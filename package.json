@@ -1,0 +1,56 @@
+{
+  "name": "figma-plugin-utilities",
+  "version": "0.2.0",
+  "description": "Shared Svelte components and utilities for Figma plugins",
+  "type": "module",
+  "svelte": "./src/index.js",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "exports": {
+    ".": {
+      "svelte": "./src/index.js",
+      "import": "./src/index.js",
+      "default": "./src/index.js"
+    },
+    "./components": {
+      "svelte": "./src/components/index.js",
+      "import": "./src/components/index.js",
+      "default": "./src/components/index.js"
+    },
+    "./lib": {
+      "import": "./src/lib/index.js",
+      "default": "./src/lib/index.js"
+    },
+    "./lib/*": {
+      "import": "./src/lib/*.js"
+    },
+    "./lib/figma-helpers": {
+      "types": "./src/lib/figma-helpers.ts",
+      "import": "./src/lib/figma-helpers.ts",
+      "default": "./src/lib/figma-helpers.ts"
+    }
+  },
+  "files": ["src"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mariusroosendaal/figma-plugin-utilities.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mariusroosendaal/figma-plugin-utilities/issues"
+  },
+  "homepage": "https://github.com/mariusroosendaal/figma-plugin-utilities#readme",
+  "keywords": [
+    "figma",
+    "plugin",
+    "svelte",
+    "components",
+    "utilities",
+    "figma-plugin"
+  ],
+  "author": "Marius Roosendaal",
+  "license": "MIT",
+  "dependencies": {
+    "figma-ui3-kit-svelte": "file:../figma-ui3-kit-svelte",
+    "svelte": "^4.2.20"
+  }
+}
