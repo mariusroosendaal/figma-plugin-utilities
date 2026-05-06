@@ -15,9 +15,12 @@
 
   /** Message to display */
   export let message = "Loading...";
+
+  let className = "";
+  export { className as class };
 </script>
 
-<div class="loading-state" role="status">
+<div class="loading-state {className}" role="status">
   <Text variant="body-medium" color="--figma-color-text-secondary">{message}</Text>
 </div>
 

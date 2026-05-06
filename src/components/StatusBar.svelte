@@ -14,6 +14,9 @@
   /** Status type: 'info', 'success', 'error', 'warning' */
   export let type = "info";
 
+  let className = "";
+  export { className as class };
+
   let visible = false;
   let timeoutId;
 
@@ -53,10 +56,11 @@
 
 {#if visible && message}
   <div
-    class="status-bar"
+    class="status-bar {className}"
     class:status-bar--error={type === "error"}
     class:status-bar--success={type === "success"}
     class:status-bar--warning={type === "warning"}
+    role={type === "error" || type === "warning" ? "alert" : "status"}
   >
     <span>{message}</span>
     <IconButton

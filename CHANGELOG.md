@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 WCAG 2.2 AA accessibility audit and remediation across all components.
 
 ### Added
+- `class` prop passthrough to **ListItem**, **LoadingState**, and **StatusBar** — consistent with other components
+- `role="alert"` for error/warning and `role="status"` for info/success on **StatusBar** — messages are now announced by screen readers on insertion
+- `"AAA-large"` case (4.5:1) to `meetsContrastLevel` in `lib/colors.js` — covers WCAG 1.4.6 large text at AAA level
+- GitHub Actions publish workflow (`.github/workflows/publish.yml`) — triggers `npm publish` on GitHub release creation
 - `aria-pressed={active}` to **ListItem** — communicates selection state to assistive technology
 - Space key activation to **ListItem** — keyboard users can now toggle items with Space as well as Enter
 - `ariaLabel="{title} options"` to the **ListItem** menu `IconButton` — gives the icon-only button an accessible name

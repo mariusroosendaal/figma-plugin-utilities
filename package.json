@@ -30,7 +30,7 @@
       "default": "./src/lib/figma-helpers.ts"
     }
   },
-  "files": ["src"],
+  "files": ["src", "README.md", "LICENSE", "CHANGELOG.md"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mariusroosendaal/figma-plugin-utilities.git"

@@ -44,6 +44,9 @@
   /** Whether to show badge slot */
   export let hasBadge = false;
 
+  let className = "";
+  export { className as class };
+
   function handleClick() {
     dispatch("click", { id });
   }
@@ -65,7 +68,7 @@
   }
 </script>
 
-<div class="list-item-wrapper">
+<div class="list-item-wrapper {className}">
   <div
     class="list-item"
     class:active

@@ -60,13 +60,15 @@ export function getContrastRatio(color1, color2) {
 /**
  * Check if contrast ratio meets WCAG level
  * @param {number} ratio - Contrast ratio
- * @param {"AA" | "AAA" | "AA-large"} level - WCAG level to check
+ * @param {"AA" | "AAA" | "AA-large" | "AAA-large"} level - WCAG level to check
  * @returns {boolean} Whether the ratio meets the level
  */
 export function meetsContrastLevel(ratio, level) {
   switch (level) {
     case "AAA":
       return ratio >= 7;
+    case "AAA-large":
+      return ratio >= 4.5;
     case "AA":
       return ratio >= 4.5;
     case "AA-large":
