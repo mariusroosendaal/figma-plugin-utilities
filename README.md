@@ -5,7 +5,7 @@ Shared Svelte components and utilities for Figma plugins.
 ## Installation
 
 ```bash
-npm install figma-plugin-ulities
+npm install figma-plugin-utilities
 ```
 
 ## Usage
@@ -24,14 +24,34 @@ import {
   LoadingState,
   FieldGroup,
   CheckboxCard,
-  // Utilities
+  // Messages
   sendToPlugin,
   createMessageHandler,
+  // Colors
   rgbToHex,
   hexToRgb,
+  getLuminance,
+  getContrastRatio,
+  meetsContrastLevel,
+  // Validation
   validateUrl,
   validateJsonString,
+  validateEmail,
+  validateNumber,
   sanitizeName,
+  sanitizeInput,
+  isEmpty,
+  // Error handling
+  safeAsync,
+  parseJsonSafe,
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+  // Resize
+  setDefaultWidth,
+  getContentHeight,
+  resizeToFit,
+  autoResize,
 } from "figma-plugin-utilities";
 ```
 
@@ -144,7 +164,7 @@ Types: `info`, `success`, `error`, `warning`. Auto-dismisses after 4s for `info`
 
 ### CheckboxCard
 
-Large checkbox with card-style background and better touch targets. 
+Large checkbox with card-style background and better touch targets.
 
 ```svelte
 <!-- Basic usage -->
@@ -195,7 +215,8 @@ window.onmessage = createMessageHandler({
 const rgb = hexToRgb("#FF0000"); // { r: 1, g: 0, b: 0 }
 const hex = rgbToHex({ r: 1, g: 0, b: 0 }); // "#FF0000"
 
-// Calculate contrast
+// Contrast utilities
+const luminance = getLuminance({ r: 1, g: 0, b: 0 });
 const ratio = getContrastRatio(color1, color2);
 const passes = meetsContrastLevel(ratio, "AA"); // true/false
 ```
@@ -209,7 +230,12 @@ const urlResult = validateUrl("https://example.com");
 const jsonResult = validateJsonString('{"key": "value"}');
 // { valid: true, parsed: {...} } or { valid: false, error: "..." }
 
+validateEmail("user@example.com"); // { valid: true }
+validateNumber("42", { min: 0, max: 100 }); // { valid: true, value: 42 }
+
 const clean = sanitizeName("My Plugin!!!"); // "My Plugin"
+sanitizeInput("<script>alert(1)</script>"); // escaped string
+isEmpty(""); // true
 ```
 
 ### Error Handling (`lib/errorHandling.js`)
@@ -229,20 +255,71 @@ if (result.ok) {
 // Parse JSON safely
 const parsed = parseJsonSafe(jsonString);
 // { ok: true, value: {...} } or { ok: false, error: "..." }
+
+// Figma notifications
+notifySuccess("Done!");
+notifyError("Something went wrong");
+notifyWarning("Check your input");
 ```
+
+### Resize (`lib/resize.js`)
+
+Utilities for dynamically resizing the plugin window to fit its content.
+
+```javascript
+// One-time resize to fit content
+resizeToFit({ width: 300, minHeight: 100, maxHeight: 600 });
+
+// Watch for content changes and auto-resize
+const cleanup = autoResize({
+  container: myContainerEl, // bind:this on a naturally-flowing wrapper
+  width: 300,
+  minHeight: 100,
+  maxHeight: 600,
+});
+
+// Call cleanup when the component is destroyed
+onDestroy(cleanup);
+
+// Set default width used across all resize calls
+setDefaultWidth(320);
+```
+
+> **Note:** The `container` element passed to `autoResize` must **not** have `height: 100%` or a fixed height — it should flow naturally with its content so `scrollHeight` can be measured accurately.
 
 ### Figma Helpers (`lib/figma-helpers.ts`)
 
 For use in `code.ts`:
 
 ```typescript
-import { sendToUI, showError, focusNodes, loadFont } from "figma-plugin-utilities/lib/figma-helpers";
+import {
+  sendToUI,
+  showError,
+  showSuccess,
+  getCollections,
+  getVariables,
+  getSelection,
+  focusNodes,
+  loadFont,
+  saveToStorage,
+  loadFromStorage,
+  handleResize,
+} from "figma-plugin-utilities/lib/figma-helpers";
 
 // Send message to UI
 sendToUI("success", { message: "Done!" });
 
-// Show notification
+// Show notifications
 showError("Something went wrong");
+showSuccess("Created!");
+
+// Variables
+const collections = await getCollections();
+const colorVars = await getVariables("COLOR");
+
+// Selection
+const selected = getSelection(); // all selected nodes
+const frames = getSelection("FRAME"); // filtered by type
 
 // Focus viewport on nodes
 focusNodes(figma.currentPage.selection);
@@ -253,4 +330,7 @@ await loadFont("Inter", "Regular");
 // Client storage
 await saveToStorage("settings", { theme: "dark" });
 const settings = await loadFromStorage("settings", { theme: "light" });
+
+// Handle resize message from UI (call in your message handler)
+if (msg.type === "resize") handleResize(msg);
 ```
