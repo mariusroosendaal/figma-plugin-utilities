@@ -61,6 +61,7 @@
     <span>{message}</span>
     <IconButton
       iconName={IconClose}
+      ariaLabel="Dismiss"
       on:click={handleClose}
       iconColor={computedIconColor}
     />

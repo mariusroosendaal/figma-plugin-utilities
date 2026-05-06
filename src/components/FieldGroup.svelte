@@ -19,6 +19,10 @@
 
   /** Size of the label (optional) */
   export let size = undefined;
+
+  $: if (typeof window !== "undefined" && label && !labelFor) {
+    console.warn("[FieldGroup] A label is rendered but no labelFor is set. Associate the label with its control using the labelFor prop.");
+  }
 </script>
 
 <div class="field-group" class:small={size === "small"}>

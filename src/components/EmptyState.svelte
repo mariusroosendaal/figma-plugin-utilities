@@ -43,7 +43,7 @@
   class:large={size === "large"}
 >
   {#if icon}
-    <div class="empty-state__icon">
+    <div class="empty-state__icon" aria-hidden="true">
       {#if typeof icon === "string"}
         <Icon iconName={icon} />
       {:else}

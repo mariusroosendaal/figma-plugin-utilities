@@ -11,7 +11,7 @@
   export let noBorder = false;
 </script>
 
-<div
+<header
   class="header {className}"
   class:has-left-content={$$slots.left}
   class:no-border={noBorder}
@@ -19,7 +19,7 @@
   <div class="header__left">
     <slot name="left" />
     {#if title}
-      <h2 class="header__title">{title}</h2>
+      <h1 class="header__title">{title}</h1>
     {/if}
   </div>
   <div class="header__center">
@@ -28,7 +28,7 @@
   <div class="header__right">
     <slot name="right" />
   </div>
-</div>
+</header>
 
 <style>
   .header {

@@ -70,9 +70,10 @@
     class="list-item"
     class:active
     on:click={handleClick}
-    on:keydown={(e) => e.key === "Enter" && handleClick()}
+    on:keydown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
     role="button"
     tabindex="0"
+    aria-pressed={active}
   >
     <div class="list-item__content">
       <div class="list-item__title">{title}</div>
@@ -92,6 +93,7 @@
   {#if menuItems.length > 0}
     <IconButton
       iconName={IconMore}
+      ariaLabel="{title} options"
       bind:element={menuButtonElement}
       on:click={handleMenuToggle}
     />

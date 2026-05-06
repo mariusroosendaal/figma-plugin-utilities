@@ -17,7 +17,7 @@
   export let message = "Loading...";
 </script>
 
-<div class="loading-state">
+<div class="loading-state" role="status">
   <Text variant="body-medium" color="--figma-color-text-secondary">{message}</Text>
 </div>
 

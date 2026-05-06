@@ -6,9 +6,7 @@
    * @example
    * <PluginLayout>
    *   <p>Main content here</p>
-   *   <svelte:fragment slot="footer">
-   *     <Button variant="primary">Create item</Button>
-   *   </svelte:fragment>
+   *   <Button variant="primary">Create item</Button>
    * </PluginLayout>
    */
 
@@ -39,5 +37,9 @@
     gap: var(--size-xsmall);
     overflow-y: auto;
     padding: var(--size-xsmall);
+  }
+
+  .plugin-footer {
+    flex-shrink: 0;
   }
 </style>

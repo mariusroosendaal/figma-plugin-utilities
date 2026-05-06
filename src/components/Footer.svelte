@@ -31,7 +31,7 @@
   export let className = "";
 </script>
 
-<div class="footer footer--{variant} {className}">
+<footer class="footer footer--{variant} {className}">
   {#if variant === "right"}
     <div class="footer__right">
       <slot />
@@ -46,7 +46,7 @@
   {:else if variant === "full"}
     <slot />
   {/if}
-</div>
+</footer>
 
 <style>
   .footer {

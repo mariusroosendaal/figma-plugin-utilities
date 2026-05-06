@@ -32,34 +32,32 @@
   /** Whether checkbox is disabled */
   export let disabled = false;
 
+  let cardEl;
+
+  function handleChange(e) {
+    if (disabled) return;
+    checked = e.target.checked;
+    dispatch("change", { checked });
+  }
+
   function handleCardClick(e) {
     if (disabled) return;
-    
-    // Don't toggle if clicking directly on the checkbox or label
-    // (let the checkbox handle it natively)
-    const target = e.target;
-    const isCheckboxOrLabel = 
-      target.tagName === "INPUT" || 
-      target.tagName === "LABEL" ||
-      target.closest("label");
-    
-    if (isCheckboxOrLabel) return;
-    
-    // Toggle and dispatch change event
-    checked = !checked;
-    dispatch("change", { checked });
+    // Clicks inside the Checkbox component (label/input) are handled natively
+    if (e.target.closest(".checkbox-container")) return;
+    cardEl?.querySelector('input[type="checkbox"]')?.click();
   }
 </script>
 
-<div 
-  class="checkbox-card" 
+<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+<!-- Keyboard users interact with the native checkbox input inside; this div is a mouse-only larger click target -->
+<div
+  class="checkbox-card"
   class:disabled
+  aria-disabled={disabled || undefined}
+  bind:this={cardEl}
   on:click={handleCardClick}
-  on:keydown={(e) => e.key === "Enter" && handleCardClick(e)}
-  role="button"
-  tabindex={disabled ? -1 : 0}
 >
-  <Checkbox {checked} {disabled} on:change>
+  <Checkbox {checked} {disabled} on:change={handleChange}>
     <slot />
   </Checkbox>
   {#if $$slots.secondary}
@@ -80,6 +78,7 @@
     border-radius: var(--border-radius-medium);
     cursor: pointer;
     min-height: 24px;
+    user-select: none;
   }
 
   .checkbox-card:hover {
