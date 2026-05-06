@@ -30,7 +30,12 @@
       "default": "./src/lib/figma-helpers.ts"
     }
   },
-  "files": ["src", "README.md", "LICENSE", "CHANGELOG.md"],
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mariusroosendaal/figma-plugin-utilities.git"
@@ -50,7 +55,7 @@
   "author": "Marius Roosendaal",
   "license": "MIT",
   "dependencies": {
-    "figma-ui3-kit-svelte": "file:../figma-ui3-kit-svelte",
+    "figma-ui3-kit-svelte": "^0.5.0",
     "svelte": "^4.2.20"
   }
 }
