@@ -103,6 +103,10 @@
     width: 100%;
   }
 
+  .footer--full :global(> *) {
+    flex: 1;
+  }
+
   .footer--full :global(button) {
     flex: 1;
     width: 100%;
