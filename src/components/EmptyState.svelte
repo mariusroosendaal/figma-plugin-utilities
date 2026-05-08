@@ -30,9 +30,12 @@
   /** Whether to center vertically */
   export let centered = true;
 
+  /** ARIA role: "status" for info messages, "alert" for errors */
+  export let role = "status";
+
   let className = '';
   export { className as class };
-  // Normalize actions
+
   $: normalizedActions = actions ? actions : action ? [action] : null;
 </script>
 
@@ -41,6 +44,7 @@
   class:centered
   class:small={size === "small"}
   class:large={size === "large"}
+  {role}
 >
   {#if icon}
     <div class="empty-state__icon" aria-hidden="true">
