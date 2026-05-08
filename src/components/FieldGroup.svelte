@@ -1,28 +1,14 @@
 <script>
   import { Label } from "figma-ui3-kit-svelte";
 
-  /**
-   * Field group wrapper
-   * Wraps a form field with an optional label
-   *
-   * @example
-   * <FieldGroup label="Collection">
-   *   <Dropdown menuItems={options} bind:value={selected} />
-   * </FieldGroup>
-   */
-
   /** Label text (optional) */
   export let label = "";
 
-  /** For attribute for the label (optional) */
+  /** id of the associated control (optional) */
   export let labelFor = "";
 
   /** Size of the label (optional) */
   export let size = undefined;
-
-  $: if (typeof window !== "undefined" && label && !labelFor) {
-    console.warn("[FieldGroup] A label is rendered but no labelFor is set. Associate the label with its control using the labelFor prop.");
-  }
 </script>
 
 <div class="field-group" class:small={size === "small"}>
