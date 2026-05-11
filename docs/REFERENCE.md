@@ -23,6 +23,7 @@ import {
   validateEmail, validateNumber, isEmpty,
   formatErrorMessage, handleAsyncError, createUserErrorMessage,
   logError, withErrorHandling, safeAsync, parseJsonSafe,
+  notifyError, notifySuccess, notifyWarning,
   setDefaultWidth, getContentHeight, resizeToFit, autoResize,
 } from "figma-plugin-utilities";
 
@@ -348,12 +349,29 @@ const userMsg = createUserErrorMessage(error, "Failed to create variables");
 // Log errors with context
 logError(error, { context: "createVariables", nodeId });
 
+// Show application notifications
+notifySuccess("Saved settings successfully");
+notifyWarning("Using fallback colors");
+notifyError("Failed to load variables");
+
 // Wrap an async function with error handling
 const safeCreate = withErrorHandling(createVariables, "Creating variables");
 await safeCreate(data);
 
 // Handle async errors in event handlers
 handleAsyncError(asyncFn, "Operation failed");
+```
+
+---
+
+## Notification utilities
+
+```javascript
+import { notifyError, notifySuccess, notifyWarning } from "figma-plugin-utilities";
+
+notifySuccess("Saved settings successfully");
+notifyWarning("Using fallback colors");
+notifyError("Failed to load variables");
 ```
 
 ---
