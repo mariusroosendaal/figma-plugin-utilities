@@ -1,6 +1,7 @@
 <script>
   import { onDestroy, createEventDispatcher } from "svelte";
-  import { IconButton, IconClose } from "figma-ui3-kit-svelte";
+  import { IconButton } from "figma-ui3-kit-svelte";
+  import { IconClose } from "figma-ui3-kit-svelte/icons";
 
   // Status bar for notifications with auto-dismiss
   // Supports types: 'info', 'success', 'error', 'warning'

@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import { IconButton, IconMore, Menu } from "figma-ui3-kit-svelte";
+  import { IconButton, Menu } from "figma-ui3-kit-svelte";
+  import { IconMore } from "figma-ui3-kit-svelte/icons";
 
   /**
    * List item with optional action menu
