@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-05-13
+
+### Changed
+- Updated **ListItem** and **StatusBar** to use icon imports from `figma-ui3-kit-svelte/icons` after the UI kit icon export restructure.
+
 ## [0.3.0] - 2026-05-06
 
 WCAG 2.2 AA accessibility audit and remediation across all components.
