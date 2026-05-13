@@ -21,7 +21,9 @@
 </script>
 
 <div class="loading-state {className}" role="status">
-  <Text variant="body-medium" color="--figma-color-text-secondary">{message}</Text>
+  <Text variant="body-medium" color="--figma-color-text-secondary"
+    >{message}</Text
+  >
 </div>
 
 <style>

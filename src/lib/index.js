@@ -1,8 +1,5 @@
 // Message utilities
-export {
-  sendToPlugin,
-  createMessageHandler,
-} from "./messages.js";
+export { sendToPlugin, createMessageHandler } from "./messages.js";
 
 // Color utilities
 export {

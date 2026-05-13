@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.1] - 2026-05-13
 
+### Added
+- ESLint configuration with TypeScript and Svelte support for code linting
+- Prettier setup with Svelte plugin for consistent code formatting
+- `lint` and `prettier` npm scripts for development workflow
+
 ### Changed
 - Updated **ListItem** and **StatusBar** to use icon imports from `figma-ui3-kit-svelte/icons` after the UI kit icon export restructure.
 

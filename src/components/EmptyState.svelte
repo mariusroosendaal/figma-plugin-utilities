@@ -33,7 +33,7 @@
   /** ARIA role: "status" for info messages, "alert" for errors */
   export let role = "status";
 
-  let className = '';
+  let className = "";
   export { className as class };
 
   $: normalizedActions = actions ? actions : action ? [action] : null;

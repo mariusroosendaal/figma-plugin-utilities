@@ -74,7 +74,12 @@
     class="list-item"
     class:active
     on:click={handleClick}
-    on:keydown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleClick(); } }}
+    on:keydown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleClick();
+      }
+    }}
     role="button"
     tabindex="0"
     aria-pressed={active}

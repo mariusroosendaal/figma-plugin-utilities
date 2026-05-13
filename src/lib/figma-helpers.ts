@@ -9,7 +9,7 @@
  */
 export function sendToUI<T extends Record<string, unknown>>(
   type: string,
-  data?: T
+  data?: T,
 ): void {
   if (data) {
     figma.ui.postMessage({ type, ...data });
@@ -32,7 +32,7 @@ export async function getCollections(): Promise<VariableCollection[]> {
  * @returns Promise resolving to array of variables
  */
 export async function getVariables(
-  type?: VariableResolvedDataType
+  type?: VariableResolvedDataType,
 ): Promise<Variable[]> {
   return figma.variables.getLocalVariablesAsync(type);
 }
@@ -61,7 +61,7 @@ export function showSuccess(message: string, timeout = 3000): void {
  * @returns Array of selected nodes
  */
 export function getSelection<T extends SceneNode>(
-  nodeType?: NodeType
+  nodeType?: NodeType,
 ): readonly T[] {
   const selection = figma.currentPage.selection;
   if (nodeType) {
@@ -85,10 +85,7 @@ export function focusNodes(nodes: readonly SceneNode[]): void {
  * @param family - Font family name
  * @param style - Font style (e.g., "Regular", "Bold")
  */
-export async function loadFont(
-  family: string,
-  style: string
-): Promise<void> {
+export async function loadFont(family: string, style: string): Promise<void> {
   await figma.loadFontAsync({ family, style });
 }
 
@@ -109,7 +106,7 @@ export async function saveToStorage<T>(key: string, value: T): Promise<void> {
  */
 export async function loadFromStorage<T>(
   key: string,
-  defaultValue?: T
+  defaultValue?: T,
 ): Promise<T | undefined> {
   try {
     const value = await figma.clientStorage.getAsync(key);

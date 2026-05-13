@@ -58,7 +58,7 @@ export function validateUrl(url, options = { required: true }) {
     }
 
     return { valid: true };
-  } catch (err) {
+  } catch {
     return {
       valid: false,
       error: "Invalid URL format",
@@ -148,6 +148,7 @@ export function sanitizeInput(input, maxLength) {
   }
 
   // Remove null bytes and control characters (except newlines and tabs)
+  // eslint-disable-next-line no-control-regex
   str = str.replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, "");
 
   // Trim whitespace

@@ -73,10 +73,10 @@ export function resizeToFit(options = {}) {
 /**
  * Set up automatic resizing when content changes
  * Uses ResizeObserver to watch for size changes
- * 
+ *
  * IMPORTANT: The container element must NOT have height: 100% or fixed height.
  * Use bind:this on a wrapper element that flows naturally with content.
- * 
+ *
  * @param {object} options - Auto-resize options
  * @param {HTMLElement} options.container - Container element to observe (required, must not have fixed height)
  * @param {number} [options.width] - Width in pixels (uses default if not specified)
