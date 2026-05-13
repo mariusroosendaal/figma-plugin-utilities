@@ -30,7 +30,12 @@
       "default": "./src/lib/figma-helpers.ts"
     }
   },
-  "files": ["src", "README.md", "LICENSE", "CHANGELOG.md"],
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mariusroosendaal/figma-plugin-utilities.git"
@@ -70,5 +75,4 @@
     "lint": "tsc --noEmit && eslint . --ext .ts,.js,.svelte && npx prettier --check \"src/**/*.{js,ts,svelte,html,css}\"",
     "prettier": "npx prettier --write \"src/**/*.{js,ts,svelte,html,css}\""
   }
-
 }
