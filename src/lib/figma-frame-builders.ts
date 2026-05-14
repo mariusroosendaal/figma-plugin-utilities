@@ -42,8 +42,7 @@ export const specTokens = {
     bodyBold:   { family: "Inter",         style: "Semi Bold", size: 14   },
     subheading: { family: "Inter",         style: "Medium",    size: 24   },
     heading:    { family: "Inter",         style: "Regular",   size: 48   },
-    code:       { family: "IBM Plex Mono", style: "Regular",   size: 12.5 },
-    codeSmall:  { family: "IBM Plex Mono", style: "Regular",   size: 12   },
+    code:       { family: "IBM Plex Mono", style: "Regular",   size: 12   },
   },
   themes: {
     light: {
