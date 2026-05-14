@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-05-14
+
+### Added
+- `figma-frame-builders.ts` — new module with Figma frame and component builder utilities (imported directly from `figma-plugin-utilities/lib/figma-frame-builders`):
+  - `createAutoLayoutFrame` — creates a `FrameNode` with auto-layout configured
+  - `createAutoLayoutComponent` — creates a `ComponentNode` with auto-layout configured
+  - `createText` — creates a styled `TextNode`
+  - `createTokenChip` — creates a rounded chip frame for displaying color tokens
+  - `createColorSwatch` — creates a color swatch frame
+  - `createTableCell` — creates a table cell frame
+  - `createTableHeader` — creates a table header frame
+  - `loadSpecFonts` — loads Inter and IBM Plex Mono font faces in parallel
+  - `specTokens` — design token constants (accent colors, font specs, light/dark themes)
+  - `PaddingSpec` and `SpecTheme` types
+
 ## [0.3.1] - 2026-05-13
 
 ### Added
