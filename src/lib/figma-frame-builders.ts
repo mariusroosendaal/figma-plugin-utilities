@@ -76,7 +76,7 @@ export async function loadSpecFonts(): Promise<void> {
   ]);
 }
 
-export function createAutoLayoutFrame(opts: {
+type AutoLayoutOpts = {
   name: string;
   direction: "HORIZONTAL" | "VERTICAL" | "NONE";
   spacing?: number;
@@ -87,78 +87,46 @@ export function createAutoLayoutFrame(opts: {
   height?: number;
   clipsContent?: boolean;
   border?: { color: RGB; width?: number };
-}): FrameNode {
-  const frame = figma.createFrame();
-  frame.name = opts.name;
-  frame.layoutMode = opts.direction;
-  frame.fills = opts.fill ? [{ type: "SOLID", color: opts.fill }] : [];
+};
 
-  if (opts.cornerRadius !== undefined) frame.cornerRadius = opts.cornerRadius;
-  if (opts.clipsContent !== undefined) frame.clipsContent = opts.clipsContent;
-  if (opts.padding !== undefined) applyPadding(frame, opts.padding);
+function applyAutoLayout(node: FrameNode | ComponentNode, opts: AutoLayoutOpts): void {
+  node.name = opts.name;
+  node.layoutMode = opts.direction;
+  node.fills = opts.fill ? [{ type: "SOLID", color: opts.fill }] : [];
+
+  if (opts.cornerRadius !== undefined) node.cornerRadius = opts.cornerRadius;
+  if (opts.clipsContent !== undefined) node.clipsContent = opts.clipsContent;
+  if (opts.padding !== undefined) applyPadding(node, opts.padding);
 
   if (opts.direction !== "NONE") {
-    frame.itemSpacing = opts.spacing ?? 0;
+    node.itemSpacing = opts.spacing ?? 0;
     const isHorizontal = opts.direction === "HORIZONTAL";
-    frame.primaryAxisSizingMode =
+    node.primaryAxisSizingMode =
       (isHorizontal ? opts.width : opts.height) !== undefined ? "FIXED" : "AUTO";
-    frame.counterAxisSizingMode =
+    node.counterAxisSizingMode =
       (isHorizontal ? opts.height : opts.width) !== undefined ? "FIXED" : "AUTO";
   }
 
   if (opts.width !== undefined || opts.height !== undefined) {
-    frame.resize(opts.width ?? frame.width, opts.height ?? frame.height);
+    node.resize(opts.width ?? node.width, opts.height ?? node.height);
   }
 
   if (opts.border) {
-    frame.strokes = [{ type: "SOLID", color: opts.border.color }];
-    frame.strokeWeight = opts.border.width ?? 1;
-    frame.strokeAlign = "CENTER";
+    node.strokes = [{ type: "SOLID", color: opts.border.color }];
+    node.strokeWeight = opts.border.width ?? 1;
+    node.strokeAlign = "CENTER";
   }
+}
 
+export function createAutoLayoutFrame(opts: AutoLayoutOpts): FrameNode {
+  const frame = figma.createFrame();
+  applyAutoLayout(frame, opts);
   return frame;
 }
 
-export function createAutoLayoutComponent(opts: {
-  name: string;
-  direction: "HORIZONTAL" | "VERTICAL" | "NONE";
-  spacing?: number;
-  padding?: PaddingSpec;
-  fill?: RGB;
-  cornerRadius?: number;
-  width?: number;
-  height?: number;
-  clipsContent?: boolean;
-  border?: { color: RGB; width?: number };
-}): ComponentNode {
+export function createAutoLayoutComponent(opts: AutoLayoutOpts): ComponentNode {
   const component = figma.createComponent();
-  component.name = opts.name;
-  component.layoutMode = opts.direction;
-  component.fills = opts.fill ? [{ type: "SOLID", color: opts.fill }] : [];
-
-  if (opts.cornerRadius !== undefined) component.cornerRadius = opts.cornerRadius;
-  if (opts.clipsContent !== undefined) component.clipsContent = opts.clipsContent;
-  if (opts.padding !== undefined) applyPadding(component, opts.padding);
-
-  if (opts.direction !== "NONE") {
-    component.itemSpacing = opts.spacing ?? 0;
-    const isHorizontal = opts.direction === "HORIZONTAL";
-    component.primaryAxisSizingMode =
-      (isHorizontal ? opts.width : opts.height) !== undefined ? "FIXED" : "AUTO";
-    component.counterAxisSizingMode =
-      (isHorizontal ? opts.height : opts.width) !== undefined ? "FIXED" : "AUTO";
-  }
-
-  if (opts.width !== undefined || opts.height !== undefined) {
-    component.resize(opts.width ?? component.width, opts.height ?? component.height);
-  }
-
-  if (opts.border) {
-    component.strokes = [{ type: "SOLID", color: opts.border.color }];
-    component.strokeWeight = opts.border.width ?? 1;
-    component.strokeAlign = "CENTER";
-  }
-
+  applyAutoLayout(component, opts);
   return component;
 }
 
@@ -351,10 +319,13 @@ export function createTableHeader(opts: {
   const title = opts.title ?? "";
 
   if (opts.variant === "header") {
-    const frame = figma.createFrame();
-    frame.name = "table-header";
-    frame.resize(960, 160);
-    frame.fills = [{ type: "SOLID", color: theme.headerFill }];
+    const frame = createAutoLayoutFrame({
+      name: "table-header",
+      direction: "NONE",
+      width: 960,
+      height: 160,
+      fill: theme.headerFill,
+    });
 
     const text = createText({
       characters: title,
