@@ -113,7 +113,7 @@ export function createAutoLayoutFrame(opts: {
   if (opts.border) {
     frame.strokes = [{ type: "SOLID", color: opts.border.color }];
     frame.strokeWeight = opts.border.width ?? 1;
-    frame.strokeAlign = "INSIDE";
+    frame.strokeAlign = "CENTER";
   }
 
   return frame;
@@ -214,31 +214,27 @@ export function createTableCell(opts: {
   const isTokenSwatch = opts.variant === "token" && opts.swatch;
 
   if (isTokenSwatch) {
-    const frame = figma.createFrame();
-    frame.name = "table-cell";
-    frame.resize(240, 72);
-    frame.fills = [{ type: "SOLID", color: theme.cellFill }];
-    frame.strokes = [{ type: "SOLID", color: theme.cellBorder }];
-    frame.strokeWeight = 1;
-    frame.strokeAlign = "INSIDE";
+    const frame = createAutoLayoutFrame({
+      name: "table-cell",
+      direction: "HORIZONTAL",
+      padding: { top: 12, right: 20, bottom: 16, left: 20 },
+      fill: theme.cellFill,
+      width: 240,
+      height: 72,
+      border,
+    });
+    frame.primaryAxisAlignItems = "SPACE_BETWEEN";
+    frame.counterAxisAlignItems = "MIN";
 
-    const chip = createTokenChip({
+    frame.appendChild(createTokenChip({
       label: opts.chipLabel ?? "",
       background: opts.chipBackground ?? theme.chipBg,
       textColor: theme.text,
-    });
-    const swatch = createColorSwatch({
+    }));
+    frame.appendChild(createColorSwatch({
       color: opts.swatchColor ?? rgb(0, 0, 0),
       inverse: theme.cellFill.r < 0.5,
-    });
-
-    frame.appendChild(chip);
-    frame.appendChild(swatch);
-
-    chip.x = 19.5;
-    chip.y = 11.5;
-    swatch.x = 240 - 19.5 - 40;
-    swatch.y = 11.5;
+    }));
     return frame;
   }
 

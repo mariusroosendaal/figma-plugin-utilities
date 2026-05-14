@@ -43,15 +43,3 @@ export {
   autoResize,
 } from "./resize.js";
 
-// Figma frame builders
-export {
-  loadSpecFonts,
-  specTokens,
-  createAutoLayoutFrame,
-  createText,
-  createTokenChip,
-  createColorSwatch,
-  createTableCell,
-  createTableHeader,
-} from "./figma-frame-builders.js";
-export type { PaddingSpec, SpecTheme } from "./figma-frame-builders.js";
