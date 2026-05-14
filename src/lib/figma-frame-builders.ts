@@ -201,7 +201,7 @@ export function createTokenChip(opts: {
   const frame = createAutoLayoutFrame({
     name: "token",
     direction: "VERTICAL",
-    padding: { top: 3, right: 8, bottom: 3, left: 8 },
+    padding: { top: 4, right: 5, bottom: 4, left: 5 },
     fill: opts.background,
     cornerRadius: 2,
     height: 24,
