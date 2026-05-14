@@ -16,7 +16,7 @@ function rgb(r: number, g: number, b: number): RGB {
   return { r, g, b };
 }
 
-function applyPadding(frame: FrameNode, spec: PaddingSpec): void {
+function applyPadding(frame: FrameNode | ComponentNode, spec: PaddingSpec): void {
   if (typeof spec === "number") {
     frame.paddingTop = spec;
     frame.paddingRight = spec;
@@ -117,6 +117,49 @@ export function createAutoLayoutFrame(opts: {
   }
 
   return frame;
+}
+
+export function createAutoLayoutComponent(opts: {
+  name: string;
+  direction: "HORIZONTAL" | "VERTICAL" | "NONE";
+  spacing?: number;
+  padding?: PaddingSpec;
+  fill?: RGB;
+  cornerRadius?: number;
+  width?: number;
+  height?: number;
+  clipsContent?: boolean;
+  border?: { color: RGB; width?: number };
+}): ComponentNode {
+  const component = figma.createComponent();
+  component.name = opts.name;
+  component.layoutMode = opts.direction;
+  component.fills = opts.fill ? [{ type: "SOLID", color: opts.fill }] : [];
+
+  if (opts.cornerRadius !== undefined) component.cornerRadius = opts.cornerRadius;
+  if (opts.clipsContent !== undefined) component.clipsContent = opts.clipsContent;
+  if (opts.padding !== undefined) applyPadding(component, opts.padding);
+
+  if (opts.direction !== "NONE") {
+    component.itemSpacing = opts.spacing ?? 0;
+    const isHorizontal = opts.direction === "HORIZONTAL";
+    component.primaryAxisSizingMode =
+      (isHorizontal ? opts.width : opts.height) !== undefined ? "FIXED" : "AUTO";
+    component.counterAxisSizingMode =
+      (isHorizontal ? opts.height : opts.width) !== undefined ? "FIXED" : "AUTO";
+  }
+
+  if (opts.width !== undefined || opts.height !== undefined) {
+    component.resize(opts.width ?? component.width, opts.height ?? component.height);
+  }
+
+  if (opts.border) {
+    component.strokes = [{ type: "SOLID", color: opts.border.color }];
+    component.strokeWeight = opts.border.width ?? 1;
+    component.strokeAlign = "CENTER";
+  }
+
+  return component;
 }
 
 export function createText(opts: {
