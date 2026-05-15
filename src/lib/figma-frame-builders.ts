@@ -177,7 +177,7 @@ export function createTokenChip<K extends NodeKind = "frame">(opts: {
   applyAutoLayout(node, {
     name: "token",
     direction: "VERTICAL",
-    padding: { top: 4, right: 5, bottom: 4, left: 5 },
+    padding: { top: 4, right: 8, bottom: 4, left: 8 },
     fill: opts.background,
     cornerRadius: 2,
     height: 24,
