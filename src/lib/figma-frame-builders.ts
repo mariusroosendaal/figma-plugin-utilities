@@ -254,6 +254,7 @@ export function createTableCell<K extends NodeKind = "frame">(opts: {
   swatchSource?: ComponentNode;
   width?: number;
   height?: number;
+  textSizing?: "fill" | "hug";
   as?: K;
 }): NodeFor<K> {
   const theme = opts.theme ?? specTokens.themes.light;
@@ -342,8 +343,12 @@ export function createTableCell<K extends NodeKind = "frame">(opts: {
     letterSpacing: isBold ? -0.084 : undefined,
   });
   label.name = "text";
-  label.layoutGrow = 1;
-  label.textAutoResize = "HEIGHT";
+  if (opts.textSizing === "hug") {
+    label.textAutoResize = "WIDTH_AND_HEIGHT";
+  } else {
+    label.layoutGrow = 1;
+    label.textAutoResize = "HEIGHT";
+  }
   node.appendChild(label);
 
   return node as NodeFor<K>;
