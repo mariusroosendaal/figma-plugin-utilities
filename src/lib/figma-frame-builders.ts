@@ -12,8 +12,15 @@ export type SpecTheme = {
   headingText: RGB;
 };
 
+export type NodeKind = "frame" | "component";
+export type NodeFor<K extends NodeKind> = K extends "component" ? ComponentNode : FrameNode;
+
 function rgb(r: number, g: number, b: number): RGB {
   return { r, g, b };
+}
+
+function createNode<K extends NodeKind>(as?: K): NodeFor<K> {
+  return (as === "component" ? figma.createComponent() : figma.createFrame()) as NodeFor<K>;
 }
 
 function applyPadding(frame: FrameNode | ComponentNode, spec: PaddingSpec): void {
@@ -42,8 +49,7 @@ export const specTokens = {
     bodyBold:   { family: "Inter",         style: "Semi Bold", size: 14   },
     subheading: { family: "Inter",         style: "Medium",    size: 24   },
     heading:    { family: "Inter",         style: "Regular",   size: 48   },
-    code:       { family: "IBM Plex Mono", style: "Regular",   size: 12.5 },
-    codeSmall:  { family: "IBM Plex Mono", style: "Regular",   size: 12   },
+    code:       { family: "IBM Plex Mono", style: "Regular",   size: 12   },
   },
   themes: {
     light: {
@@ -160,22 +166,23 @@ export function createText(opts: {
   return node;
 }
 
-export function createTokenChip(opts: {
+export function createTokenChip<K extends NodeKind = "frame">(opts: {
   label: string;
   background: RGB;
   textColor?: RGB;
   width?: number;
-}): FrameNode {
-  const frame = createAutoLayoutFrame({
+  as?: K;
+}): NodeFor<K> {
+  const node = createNode(opts.as);
+  applyAutoLayout(node, {
     name: "token",
     direction: "VERTICAL",
-    padding: { top: 4, right: 5, bottom: 4, left: 5 },
+    padding: { top: 4, right: 8, bottom: 4, left: 8 },
     fill: opts.background,
     cornerRadius: 2,
     height: 24,
     width: opts.width,
   });
-
   const text = createText({
     characters: opts.label,
     font: specTokens.fonts.code,
@@ -183,35 +190,59 @@ export function createTokenChip(opts: {
     lineHeight: 1.3,
     letterSpacing: 0.1875,
   });
+  text.name = "label";
   text.textAutoResize = "WIDTH_AND_HEIGHT";
-
-  frame.appendChild(text);
-  return frame;
+  node.appendChild(text);
+  return node as NodeFor<K>;
 }
 
-export function createColorSwatch(opts: {
+export function createColorSwatch<K extends NodeKind = "frame">(opts: {
   color: RGB;
   size?: number;
   cornerRadius?: number;
   inverse?: boolean;
-}): FrameNode {
+  as?: K;
+}): NodeFor<K> {
   const size = opts.size ?? 40;
-  const frame = figma.createFrame();
-  frame.name = "swatch";
-  frame.resize(size, size);
-  frame.fills = [{ type: "SOLID", color: opts.color }];
-  frame.cornerRadius = opts.cornerRadius ?? 2;
-  frame.strokes = [{
+  const node = createNode(opts.as);
+  applyAutoLayout(node, {
+    name: "swatch",
+    direction: "NONE",
+    fill: opts.color,
+    cornerRadius: opts.cornerRadius ?? 2,
+    width: size,
+    height: size,
+  });
+  node.strokes = [{
     type: "SOLID",
     color: opts.inverse ? rgb(1, 1, 1) : rgb(0, 0, 0),
     opacity: 0.1,
   }];
-  frame.strokeWeight = 1;
-  frame.strokeAlign = "INSIDE";
-  return frame;
+  node.strokeWeight = 1;
+  node.strokeAlign = "INSIDE";
+  return node as NodeFor<K>;
 }
 
-export function createTableCell(opts: {
+function chipOrInstance(
+  source: ComponentNode | undefined,
+  label: string,
+  background: RGB,
+  textColor: RGB,
+): FrameNode | InstanceNode {
+  if (source) return source.createInstance();
+  return createTokenChip({ label, background, textColor });
+}
+
+function swatchOrInstance(
+  source: ComponentNode | undefined,
+  color: RGB,
+  inverse: boolean,
+): FrameNode | InstanceNode {
+  if (source) return source.createInstance();
+  return createColorSwatch({ color, inverse });
+}
+
+export function createTableCell<K extends NodeKind = "frame">(opts: {
   variant: "text" | "header" | "token";
   theme?: SpecTheme;
   swatch?: boolean;
@@ -219,54 +250,62 @@ export function createTableCell(opts: {
   chipLabel?: string;
   chipBackground?: RGB;
   swatchColor?: RGB;
-}): FrameNode {
+  chipSource?: ComponentNode;
+  swatchSource?: ComponentNode;
+  width?: number;
+  height?: number;
+  textSizing?: "fill" | "hug";
+  as?: K;
+}): NodeFor<K> {
   const theme = opts.theme ?? specTokens.themes.light;
   const border = { color: theme.cellBorder };
   const isTokenSwatch = opts.variant === "token" && opts.swatch;
 
   if (isTokenSwatch) {
-    const frame = createAutoLayoutFrame({
+    const node = createNode(opts.as);
+    applyAutoLayout(node, {
       name: "table-cell",
       direction: "HORIZONTAL",
       padding: { top: 12, right: 20, bottom: 16, left: 20 },
       fill: theme.cellFill,
-      width: 240,
-      height: 72,
+      width: opts.width ?? 240,
+      height: opts.height ?? 72,
       border,
     });
-    frame.primaryAxisAlignItems = "SPACE_BETWEEN";
-    frame.counterAxisAlignItems = "MIN";
-
-    frame.appendChild(createTokenChip({
-      label: opts.chipLabel ?? "",
-      background: opts.chipBackground ?? theme.chipBg,
-      textColor: theme.text,
-    }));
-    frame.appendChild(createColorSwatch({
-      color: opts.swatchColor ?? rgb(0, 0, 0),
-      inverse: theme.cellFill.r < 0.5,
-    }));
-    return frame;
+    node.primaryAxisAlignItems = "SPACE_BETWEEN";
+    node.counterAxisAlignItems = "MIN";
+    node.appendChild(chipOrInstance(
+      opts.chipSource,
+      opts.chipLabel ?? "",
+      opts.chipBackground ?? theme.chipBg,
+      theme.text,
+    ));
+    node.appendChild(swatchOrInstance(
+      opts.swatchSource,
+      opts.swatchColor ?? rgb(0, 0, 0),
+      theme.cellFill.r < 0.5,
+    ));
+    return node as NodeFor<K>;
   }
 
   const isTextSwatch = opts.variant === "text" && opts.swatch;
-  const height = isTextSwatch ? 72 : 56;
+  const defaultHeight = isTextSwatch ? 72 : 56;
 
-  const frame = createAutoLayoutFrame({
+  const node = createNode(opts.as);
+  applyAutoLayout(node, {
     name: "table-cell",
     direction: "HORIZONTAL",
     spacing: opts.variant === "token" ? 8 : 0,
     padding: { top: 12, right: 20, bottom: 16, left: 20 },
     fill: theme.cellFill,
-    width: 240,
-    height,
+    width: opts.width ?? 240,
+    height: opts.height ?? defaultHeight,
     border,
   });
 
   if (isTextSwatch) {
-    frame.primaryAxisAlignItems = "SPACE_BETWEEN";
-    frame.counterAxisAlignItems = "MIN";
-
+    node.primaryAxisAlignItems = "SPACE_BETWEEN";
+    node.counterAxisAlignItems = "MIN";
     const label = createText({
       characters: opts.text ?? "",
       font: specTokens.fonts.body,
@@ -274,24 +313,24 @@ export function createTableCell(opts: {
       lineHeight: 1.5,
       width: 144,
     });
-    frame.appendChild(label);
-
-    const swatch = createColorSwatch({
-      color: opts.swatchColor ?? rgb(0, 0, 0),
-      inverse: theme.cellFill.r < 0.5,
-    });
-    frame.appendChild(swatch);
-    return frame;
+    label.name = "text";
+    node.appendChild(label);
+    node.appendChild(swatchOrInstance(
+      opts.swatchSource,
+      opts.swatchColor ?? rgb(0, 0, 0),
+      theme.cellFill.r < 0.5,
+    ));
+    return node as NodeFor<K>;
   }
 
   if (opts.variant === "token") {
-    const chip = createTokenChip({
-      label: opts.chipLabel ?? "",
-      background: opts.chipBackground ?? theme.chipBg,
-      textColor: theme.text,
-    });
-    frame.appendChild(chip);
-    return frame;
+    node.appendChild(chipOrInstance(
+      opts.chipSource,
+      opts.chipLabel ?? "",
+      opts.chipBackground ?? theme.chipBg,
+      theme.text,
+    ));
+    return node as NodeFor<K>;
   }
 
   // "text" and "header" variants
@@ -303,30 +342,38 @@ export function createTableCell(opts: {
     lineHeight: 1.5,
     letterSpacing: isBold ? -0.084 : undefined,
   });
-  label.layoutGrow = 1;
-  label.textAutoResize = "HEIGHT";
-  frame.appendChild(label);
+  label.name = "text";
+  if (opts.textSizing === "hug") {
+    label.textAutoResize = "WIDTH_AND_HEIGHT";
+  } else {
+    label.layoutGrow = 1;
+    label.textAutoResize = "HEIGHT";
+  }
+  node.appendChild(label);
 
-  return frame;
+  return node as NodeFor<K>;
 }
 
-export function createTableHeader(opts: {
+export function createTableHeader<K extends NodeKind = "frame">(opts: {
   variant: "header" | "subheader";
   theme?: SpecTheme;
   title?: string;
-}): FrameNode {
+  width?: number;
+  height?: number;
+  as?: K;
+}): NodeFor<K> {
   const theme = opts.theme ?? specTokens.themes.light;
   const title = opts.title ?? "";
 
   if (opts.variant === "header") {
-    const frame = createAutoLayoutFrame({
+    const node = createNode(opts.as);
+    applyAutoLayout(node, {
       name: "table-header",
       direction: "NONE",
-      width: 960,
-      height: 160,
+      width: opts.width ?? 960,
+      height: opts.height ?? 160,
       fill: theme.headerFill,
     });
-
     const text = createText({
       characters: title,
       font: specTokens.fonts.heading,
@@ -334,21 +381,23 @@ export function createTableHeader(opts: {
       lineHeight: 1.1,
       letterSpacing: -1.92,
     });
-    frame.appendChild(text);
+    text.name = "title";
+    node.appendChild(text);
     text.x = 20;
     text.y = 16;
-    return frame;
+    return node as NodeFor<K>;
   }
 
   // subheader
-  const frame = createAutoLayoutFrame({
+  const node = createNode(opts.as);
+  applyAutoLayout(node, {
     name: "table-subheader",
     direction: "VERTICAL",
     padding: { top: 55, right: 20, bottom: 16, left: 20 },
     fill: theme.subheaderFill,
-    width: 960,
+    width: opts.width ?? 960,
+    height: opts.height,
   });
-
   const text = createText({
     characters: title,
     font: specTokens.fonts.subheading,
@@ -356,6 +405,7 @@ export function createTableHeader(opts: {
     lineHeight: 1.4,
     letterSpacing: -0.24,
   });
-  frame.appendChild(text);
-  return frame;
+  text.name = "heading";
+  node.appendChild(text);
+  return node as NodeFor<K>;
 }
