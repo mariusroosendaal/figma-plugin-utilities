@@ -474,7 +474,13 @@ const BUILDERS = {
       '👥 Variant': partial ? 'Partial Disable' : 'Default',
       '🎛️ Disabled': tf(partial || parts.every(Boolean)),
     })
-    const cells = node.findAll((n) => n.type === 'TEXT' && /^-?\d/.test(n.characters))
+    // The cells are the numeric text nodes outside the lead — a lead glyph is a
+    // text layer inside an icon instance, and would otherwise pass for a cell.
+    const inIcon = (n) => {
+      for (let a = n.parent; a && a !== node; a = a.parent) if (a.type === 'INSTANCE' && /^icon\./.test(a.name)) return true
+      return false
+    }
+    const cells = node.findAll((n) => n.type === 'TEXT' && /^-?\d/.test(n.characters) && !inIcon(n))
     for (let i = 0; i < cells.length && i < values.length; i++) {
       if (values[i] === null || values[i] === undefined) continue
       for (const f of cells[i].getStyledTextSegments(['fontName']).map((x) => x.fontName)) await figma.loadFontAsync(f)
@@ -485,13 +491,16 @@ const BUILDERS = {
   },
   async Avatar(p) {
     const overflow = p.count !== undefined && p.count !== null
-    const variant = overflow
-      ? p.unread ? 'Overflow Unread' : 'Overflow Read'
-      : p.src
-        ? 'Photo'
-        : pick({ purple: 'Purple', blue: 'Blue', pink: 'Pink', red: 'Red', yellow: 'Yellow', green: 'Green', grey: 'Grey' }, p.color, 'Purple')
+    // Disabled has no photo, so a disabled one falls back to the initial.
+    const variant = p.disabled
+      ? 'Grey'
+      : overflow
+        ? p.unread ? 'Overflow Unread' : 'Overflow Read'
+        : p.src
+          ? 'Photo'
+          : pick({ purple: 'Purple', blue: 'Blue', pink: 'Pink', red: 'Red', yellow: 'Yellow', green: 'Green', grey: 'Grey' }, p.color, 'Purple')
     const node = await instance('Avatar', {
-      '👥 Variant': p.disabled ? 'Grey' : variant,
+      '👥 Variant': variant,
       '🐣 State': p.disabled ? 'Disabled' : 'Default',
       '👥 Size': pick({ small: 'Small', large: 'Large' }, p.size, 'Default'),
       '👥 Shape': p.shape === 'square' ? 'Square' : 'Circle',
