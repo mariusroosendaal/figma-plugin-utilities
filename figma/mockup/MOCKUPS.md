@@ -8,7 +8,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 - **Where to build**
   - **UI3 file** (`6dJFbL7SDC7kkS1fu3AHH6`), page **Mockups** (`1027190:25`). This is the default and needs no setup.
   - **Any other design file** with the UI3 library enabled. Components, styles and variables are imported by key. Icons need `options.icons` (see below).
-- The builder is the `build-mockup.js` source at the end of this skill. It is about 28 KB, and `use_figma` accepts up to 50 KB, so keep the spec compact: build repeated parts with small helper functions rather than writing them out.
+- The builder is the `build-mockup.js` source at the end of this skill, with comments and indentation stripped. It is about 44 KB, and `use_figma` accepts 50,000 characters in all, so keep the spec under about 6 KB: build repeated parts with small helper functions rather than writing them out, and split a large screen into several windows.
 
 ## Workflow
 
@@ -52,21 +52,25 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `SplitButton` | `iconName`, `size`, `disabled` | |
 | `Input` | `value`, `placeholder`, `size`, `disabled`, `iconName` | |
 | `Textarea` | `value`, `placeholder`, `disabled` | |
-| `NumericInput` | `value`, `placeholder`, `label` (lead letter) or `iconName`, `unit`, `options` (adds the chevron), `disabled` | |
+| `NumericInput` | `value`, `placeholder`, `label` (lead letter) or `iconName`, `unit`, `options` (adds the chevron), `variable` (a bound variable's pill), `disabled` | |
+| `NumericInputMulti` | `values`, `iconName`, `disabled` (flag or per cell) | |
+| `Tree` | `nodes`, `mode`, `expanded`, `selected`, `checked` (three levels of indent) | |
 | `ColorInput` | `value` (hex), `opacity`, `variable`, `disabled` | |
 | `Chit` | `color` (hex, `#RRGGBBAA` for alpha), `opacity`, `shape` | |
-| `Dropdown` | `value` (`{ label }`), `placeholder`, `disabled`, `iconName` | |
-| `Checkbox`, `Switch` | `checked`, `mixed`, `disabled`; label as `children` | |
-| `Radio` | `group`, `value` (or `checked`), `disabled`; label as `children` | |
-| `Tabs` | `tabs: [{ label }]` (max 5), `selectedTab` | |
+| `Dropdown` | `value` (`{ label }`), `placeholder`, `disabled`, `iconName`, `size`, `stroke` | |
+| `Checkbox`, `Switch` | `checked`, `mixed`, `disabled`, `description`; label as `children` | |
+| `Radio` | `group`, `value` (or `checked`), `disabled`, `variant` (`button`); label as `children` | |
+| `Tabs` | `tabs: [{ label, badge? }]` (max 5), `selectedTab` | |
 | `SegmentedControl` | `value`, `disabled`; `children: [{ c: 'Segment', props: { value, iconName?, tooltip? }, children: 'Label' }]` (2–6) | |
-| `Slider` | `value`, `min`, `max`, `variant` (`range`/`delta`/`stepper`), `disabled` | |
-| `Badge` | `variant`, `strong`; text as `children` | |
+| `Slider` | `value`, `min`, `max`, `variant` (`range`/`delta`/`stepper`/`hue`/`opacity`), `defaultValue` (range: the marker), `disabled` | |
+| `Badge` | `variant` (incl. `count`/`count-inactive`), `strong`, `size`, `dot`; text as `children` | |
+| `Avatar` | `name`, `color`, `src`, `size`, `shape`, `count`, `unread`, `disabled` | |
+| `VariablePill` | `label`, `selected`, `onSelected`, `muted`, `disabled` | |
 | `Banner` | `variant`, `message` | |
 | `Chip` | `label`, `variant`, `iconName`, `closable`, `focused`, `disabled` | |
 | `Tooltip` | Renders its `children` (the trigger) only; pass `show: true` to draw the bubble | |
-| `Menu` | `menuItems: [{ label, group?, section?, showHeading?, type?, checked?, selected?, iconName?, detail?, badge?, disabled?, subMenu? }]`, `itemVariant`, `showGroupLabels`, `searchable`, `searchPlaceholder`, `footerLabel` | |
-| `Modal` | `title`, `width` (`small`/`medium`/`large` or pixels), `height` (pixels), `contentPadding`, `icon2`, `footerBorder` | `children`, `footer-left`, `footer-right`, `footer-full` |
+| `Menu` | `menuItems: [{ label, group?, section?, showHeading?, type?, checked?, selected?, iconName?, detail?, badge?, disabled?, subMenu? }]`, `itemVariant`, `showGroupLabels`, `searchable`, `searchPlaceholder`, `footerLabel`, `footerVariant`; items also take `avatar` | |
+| `Modal` | `title`, `width` (`small`/`medium`/`large` or pixels), `height` (pixels), `contentPadding`, `icon2`, `footerBorder`. The Kit additions Modal has one header, so `headerVariant` draws as a title | `children`, `footer-left`, `footer-right`, `footer-full` |
 | `Header` | `title`, `noBorder` | `left`, `center`, `right` |
 | `Footer` | `variant` (`right`/`split`/`full`) | `children` (right/full), `left`, `right` (split) |
 | `PluginLayout` | | `children` |
@@ -78,7 +82,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `CheckboxCard` | `checked`, `disabled`, `secondary`; label as `children` | |
 | `Text` | `variant` (`heading-*`, `body-*`, `-strong`), `color` (`--figma-color-text-secondary` / `-tertiary`); text as `children` | |
 | `Label` | `size`; text as `children` | |
-| `RadioGroup` | `legend` | `children` (Radios) |
+| `RadioGroup` | `legend`, `direction` | `children` (Radios) |
 | `Disclosure` | | `children` (DisclosureItems) |
 | `DisclosureItem` | `title`, `open`, `section` | `children` (shown when `open`) |
 

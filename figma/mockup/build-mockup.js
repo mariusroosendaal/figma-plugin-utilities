@@ -31,6 +31,15 @@ const UI3 = {
   IconToggle: { id: '2324:46776', key: 'e0744f36051956ba28abdfa9d6129664ba5797c1', set: true },
   IconToggleDialog: { id: '2324:46817', key: 'adf85113bfab702068b38874c55b5b3ca2a649fe', set: true },
   SplitButton: { id: '2324:46856', key: '98c2aebe77ed51c1424d1dc0a7bbf91c5035795e', set: true },
+  BadgeSmallAlt: { id: '2012:35077', key: 'da463a31f8889ae48450808c882a246dd156a502', set: true },
+  BadgeLarge: { id: '2012:35016', key: '01dbc71b5a9f2c9636bbba4382a53580f4948b36', set: true },
+  BadgeDot: { id: '2012:35086', key: '1fc112401ad63d805e2dff2b04e1040218d6458d', set: false },
+  Avatar: { id: '2012:32015', key: '4b1ab7074c15da005ced9ef2c6aadd421e8abe46', set: true },
+  VariablePill: { id: '2028:79753', key: '8dd74e72f23f9fd824faad58c0edeb8d6485192a', set: true },
+  NumericInputMulti: { id: '2028:79619', key: '351a06649c2afe850c4f4a1f8fb3bb6fa282cf10', set: true },
+  MenuRowFooter: { id: '2327:96342', key: '09a61308ca8b3e0d57a047cdd66a255d031a99d4', set: true },
+  TreeRow: { id: '1027222:26144', key: 'f3e55611980a1d9735b3adc94d3fca1a8e557ce4', set: true },
+  Tree: { id: '1027222:26241', key: '80d6b8310d34fa1635ca35e76efa2c4dfbe7c984', set: false },
   Banner: { id: '1027204:342', key: '133eade4a3d7f24189bf919ea1b7472182ef2e20', set: true },
   Chip: { id: '1027205:88', key: '415f290a1158771314dd11b9fc83b97bc62e9b04', set: true },
   Modal: { id: '1027206:365', key: '248a9a4ecea1cc16056ec1bc28b56acbf5cc8627', set: true },
@@ -170,6 +179,16 @@ async function setText(node, layerName, value) {
   for (const f of t.getStyledTextSegments(['fontName']).map((s) => s.fontName)) await figma.loadFontAsync(f)
   t.characters = String(value)
 }
+// Checkbox and Switch: show the description line and set its text (a "Value"
+// layer too, inside the "Description" frame).
+async function setDescription(node, prefix, text) {
+  if (!text) return
+  setProp(node, prefix, true)
+  const t = node.findOne((n) => n.type === 'TEXT' && n.parent && n.parent.name === 'Description')
+  if (!t) return
+  for (const f of t.getStyledTextSegments(['fontName']).map((s) => s.fontName)) await figma.loadFontAsync(f)
+  t.characters = String(text)
+}
 async function swapIcon(node, prefix, iconName) {
   const c = await icon(iconName)
   if (c) setProp(node, prefix, c.id)
@@ -219,7 +238,7 @@ function textOf(spec) {
 // Each returns the created node. `block` components fill the width of a
 // vertical parent.
 
-const BLOCK = new Set(['Input', 'Textarea', 'NumericInput', 'ColorInput', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem', 'Text'])
+const BLOCK = new Set(['Input', 'Textarea', 'NumericInput', 'NumericInputMulti', 'ColorInput', 'Tree', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem', 'Text'])
 
 const BUILDERS = {
   // Prefer this over a { text } primitive wherever the code uses <Text>: it is a
@@ -248,7 +267,10 @@ const BUILDERS = {
     const node = await instance('RadioGroup')
     setProp(node, '👁️ Legend', !!p.legend)
     setProp(node, '🎛️ Legend', p.legend ?? '')
-    await fillSlot(node, 'Radios slot', spec.children ?? [], ctx)
+    // A slot's layout can't be overridden on an instance, so a row goes inside it.
+    const children = [].concat(spec.children ?? [])
+    const row = { stack: 'h', gap: 8, name: 'Radios', children: children.map((c) => ({ ...c, grow: true })) }
+    await fillSlot(node, 'Radios slot', p.direction === 'horizontal' ? [row] : children, ctx)
     return node
   },
   async Disclosure(p, spec, parent, ctx) {
@@ -280,7 +302,20 @@ const BUILDERS = {
     await swapIcon(node, '🎛️ Icon', p.iconName)
     return node
   },
+  // Counts, large badges and the dot are their own UI3 sets.
   async Badge(p, spec) {
+    const text = p.text ?? textOf(spec)
+    if (p.dot) return instance('BadgeDot')
+    if (p.variant === 'count' || p.variant === 'count-inactive') {
+      const node = await instance('BadgeSmallAlt', { '👥 Variant': p.variant === 'count' ? 'Count New' : 'Count Inactive' })
+      setProp(node, 'Text', String(text ?? ''))
+      return node
+    }
+    if (p.size === 'large') {
+      const node = await instance('BadgeLarge', { '👥 Variant': pick({ invert: 'Strong', merged: 'Merged', archived: 'Archived' }, p.variant, 'Default') })
+      await setText(node, null, text)
+      return node
+    }
     const node = await instance('Badge', {
       '👥 Variant': pick({ default: 'Default', brand: 'Brand', component: 'Component', danger: 'Danger', success: 'Success', warning: 'Warn', invert: 'Invert', selected: 'Selected', variable: 'Variable', 'variable-selected': 'Variable Selected', feedback: 'Feedback', merged: 'Merged', archived: 'Archived', menu: 'Menu', figjam: 'FigJam' }, p.variant, 'Default'),
       '🐣 Strong': tf(p.strong),
@@ -299,6 +334,7 @@ const BUILDERS = {
     })
     setProp(node, '👁️ Label', label !== undefined && label !== '')
     await setText(node, 'Value', label)
+    await setDescription(node, '👁️ Description', p.description)
     return node
   },
   async Switch(p, spec) {
@@ -306,15 +342,23 @@ const BUILDERS = {
     const node = await instance('Switch', { '🐣 Type': p.mixed ? 'Mixed' : p.checked ? 'On' : 'Off', '🎛️ Disabled': tf(p.disabled), '🐣 State': 'Default' })
     setProp(node, '👁️ Label', label !== undefined && label !== '')
     await setText(node, 'Value', label)
+    await setDescription(node, '👁️  Description', p.description)
     return node
   },
   async Radio(p, spec) {
     const label = textOf(spec)
     const on = p.checked ?? (p.group !== undefined && p.group === p.value)
+    if (p.variant === 'button') {
+      // The Button variant marks the chosen one with its Active state.
+      const node = await instance('Radio', { '👥 Variant': 'Button', '🐣 State': p.disabled ? 'Disabled' : on ? 'Active' : 'Default', '🐣 On?': 'Off', '🎛️ Label': 'True' })
+      await setText(node, null, label)
+      return node
+    }
     const node = await instance('Radio', { '👥 Variant': 'Input', '🐣 On?': on ? 'On' : 'Off', '🐣 State': p.disabled ? 'Disabled' : 'Default', '🎛️ Label': tf(label) })
     await setText(node, 'Value', label)
     return node
   },
+
   async Input(p) {
     const empty = p.value === undefined || p.value === null || p.value === ''
     const node = await instance('Input', {
@@ -334,7 +378,7 @@ const BUILDERS = {
     return node
   },
   async Dropdown(p) {
-    const node = await instance('Dropdown', { '🎛️ Disabled': tf(p.disabled), '🎛️ Icon Lead': tf(p.iconName), '🐣 State': 'Default', '👥 Size': 'Default', '🎛️ Stroke': 'True' })
+    const node = await instance('Dropdown', { '🎛️ Disabled': tf(p.disabled), '🎛️ Icon Lead': tf(p.iconName), '🐣 State': 'Default', '👥 Size': p.size === 'large' ? 'Large' : 'Default', '🎛️ Stroke': tf(p.stroke !== false) })
     const selected = p.value && (p.value.label ?? p.value)
     await setText(node, 'Value', selected ?? p.placeholder ?? 'Select an option')
     if (p.iconName) await swapIcon(node, '↪ Icon', p.iconName)
@@ -344,7 +388,7 @@ const BUILDERS = {
     const empty = p.value === undefined || p.value === null || p.value === ''
     const node = await instance('NumericInput', {
       '🐣 State': empty ? 'Empty' : 'Default',
-      '🐣 Var pill': 'False',
+      '🐣 Var pill': tf(p.variable),
       '🐣 Var icon': 'False',
       '🎛️  Disabled': tf(p.disabled),
       '🐣 Dropdown': tf(p.options && p.options.length),
@@ -355,6 +399,10 @@ const BUILDERS = {
       // The lead letter is text inside the icon.24.prop-text glyph.
       const glyph = node.findOne((n) => n.type === 'INSTANCE' && n.name === 'icon.24.prop-text')
       if (glyph) await setText(glyph, 'Icon', p.label)
+    }
+    if (p.variable) {
+      const pill = node.findOne((n) => n.type === 'INSTANCE' && n.name.includes('Chip variable'))
+      if (pill) await setText(pill, 'Value', p.variable)
     }
     return node
   },
@@ -417,6 +465,83 @@ const BUILDERS = {
     await swapIcon(node, '🎛️ Icon', p.iconName)
     return node
   },
+  async NumericInputMulti(p) {
+    const values = p.values || []
+    const parts = [].concat(p.disabled ?? false)
+    const partial = parts.length > 1 && parts.some(Boolean) && !parts.every(Boolean)
+    const node = await instance('NumericInputMulti', {
+      '🐣 State': values.every((v) => v === null || v === undefined) ? 'Empty' : 'Default',
+      '👥 Variant': partial ? 'Partial Disable' : 'Default',
+      '🎛️ Disabled': tf(partial || parts.every(Boolean)),
+    })
+    const cells = node.findAll((n) => n.type === 'TEXT' && /^-?\d/.test(n.characters))
+    for (let i = 0; i < cells.length && i < values.length; i++) {
+      if (values[i] === null || values[i] === undefined) continue
+      for (const f of cells[i].getStyledTextSegments(['fontName']).map((x) => x.fontName)) await figma.loadFontAsync(f)
+      cells[i].characters = String(values[i])
+    }
+    if (p.iconName) await swapIcon(node, '🎛️  Icon Lead', p.iconName)
+    return node
+  },
+  async Avatar(p) {
+    const overflow = p.count !== undefined && p.count !== null
+    const variant = overflow
+      ? p.unread ? 'Overflow Unread' : 'Overflow Read'
+      : p.src
+        ? 'Photo'
+        : pick({ purple: 'Purple', blue: 'Blue', pink: 'Pink', red: 'Red', yellow: 'Yellow', green: 'Green', grey: 'Grey' }, p.color, 'Purple')
+    const node = await instance('Avatar', {
+      '👥 Variant': p.disabled ? 'Grey' : variant,
+      '🐣 State': p.disabled ? 'Disabled' : 'Default',
+      '👥 Size': pick({ small: 'Small', large: 'Large' }, p.size, 'Default'),
+      '👥 Shape': p.shape === 'square' ? 'Square' : 'Circle',
+    })
+    const text = overflow ? String(p.count) : (p.name || '').trim().charAt(0).toUpperCase()
+    if (text && variant !== 'Photo') await setText(node, null, text)
+    return node
+  },
+  async VariablePill(p, spec) {
+    const state = p.disabled ? 'Disabled Secondary' : p.selected ? 'Selected' : p.onSelected ? 'On Selected' : p.muted ? 'Soft Deleted' : 'Default'
+    const node = await instance('VariablePill', { '🐣 State': state })
+    await setText(node, 'Value', p.label ?? textOf(spec) ?? '')
+    return node
+  },
+  // One Tree row per visible node; Depth nests them (three levels deep at most).
+  async Tree(p) {
+    const node = await instance('Tree')
+    const slot = node.findOne((n) => n.type === 'SLOT')
+    for (const c of [...slot.children]) c.remove()
+    const open = (id, isParent) => isParent && (p.expanded ? p.expanded.includes(id) : true)
+    const leaves = (n) => (n.children && n.children.length ? n.children.flatMap(leaves) : [n.id])
+    const ticked = new Set(p.checked || [])
+    const walk = async (list, depth) => {
+      for (const n of list) {
+        const isParent = !!(n.children && n.children.length)
+        const row = await instance('TreeRow', {
+          '🎛️ Depth': String(Math.min(depth, 3)),
+          '🐣 Twisty': isParent ? (open(n.id, isParent) ? 'Open' : 'Closed') : 'None',
+          '🐣 Selected': tf(p.mode === 'single' && p.selected === n.id),
+        })
+        slot.appendChild(row)
+        row.layoutSizingHorizontal = 'FILL'
+        setProp(row, '🎛️ Label', n.label ?? '')
+        setProp(row, '👁️ Detail', !!n.detail)
+        if (n.detail) setProp(row, '🎛️ Detail', String(n.detail))
+        setProp(row, '👁️ Icon', !!n.iconName)
+        if (n.iconName) await swapIcon(row, '↪ Icon', n.iconName)
+        setProp(row, '👁️ Checkbox', p.mode === 'check')
+        if (p.mode === 'check') {
+          const all = leaves(n)
+          const on = all.filter((id) => ticked.has(id)).length
+          const box = row.findOne((x) => x.type === 'INSTANCE' && x.name === 'Checkbox')
+          if (box) box.setProperties({ '🐣 Type': on === 0 ? 'Unchecked' : on === all.length ? 'Checked' : 'Mixed', '🎛️ Muted': tf(on === 0) })
+        }
+        if (open(n.id, isParent)) await walk(n.children, depth + 1)
+      }
+    }
+    await walk(p.nodes || [], 0)
+    return node
+  },
   async Tabs(p) {
     const tabs = p.tabs || []
     const node = await instance('Tabs', { 'Tab Count': String(Math.min(Math.max(tabs.length, 1), 5)) })
@@ -425,7 +550,16 @@ const BUILDERS = {
       if (!tabs[i]) return
       setProp(tab, 'Text', tabs[i].label ?? tabs[i])
       setProp(tab, '🐣 Selected', tf(i === (p.selectedTab ?? 0)))
+      const badge = tabs[i].badge
+      setProp(tab, '🎛️ Badge', badge !== undefined && badge !== null && badge !== '')
     })
+    // Badge counts are set once the badges show.
+    for (let i = 0; i < items.length; i++) {
+      const badge = tabs[i] && tabs[i].badge
+      if (badge === undefined || badge === null || badge === '') continue
+      const count = items[i].findOne((n) => n.type === 'INSTANCE' && n.name.includes('Badge'))
+      if (count) await setText(count, null, String(badge))
+    }
     return node
   },
   async SegmentedControl(p, spec) {
@@ -448,7 +582,13 @@ const BUILDERS = {
   },
   async Slider(p) {
     const knob = String(Math.min(5, Math.max(1, Math.round((((p.value ?? 50) - (p.min ?? 0)) / ((p.max ?? 100) - (p.min ?? 0))) * 4) + 1)))
-    return instance('Slider', { '👥 Variant': p.disabled ? 'Disabled' : pick({ range: 'Range', delta: 'Slider', stepper: 'Stepper' }, p.variant, 'Range'), '🐣 Knob Position': knob })
+    // hue → Color Range, opacity → Fill, a range with a defaultValue marker → Corner Radius
+    const variant = p.disabled
+      ? 'Disabled'
+      : p.variant === 'range' && p.defaultValue !== undefined && p.defaultValue !== null
+        ? 'Corner Radius'
+        : pick({ range: 'Range', delta: 'Slider', stepper: 'Stepper', hue: 'Color Range', opacity: 'Fill' }, p.variant, 'Range')
+    return instance('Slider', { '👥 Variant': variant, '🐣 Knob Position': knob })
   },
   async Banner(p, spec) {
     const node = await instance('Banner', { '👥 Variant': pick({ danger: 'Danger', warning: 'Warning', info: 'Info', success: 'Success' }, p.variant, 'Danger') })
@@ -523,16 +663,22 @@ const BUILDERS = {
         setProp(row, '👁️ hasShortcut', !!r.detail)
         if (r.detail) setProp(row, '↪ Shortcut', r.detail)
         if (r.iconName) await swapIcon(row, '↪ Icon', r.iconName)
-      } else if (r.type === 'checkbox' || (!checkColumn && (r.iconName || r.badge))) {
+      } else if (r.type === 'checkbox' || (!checkColumn && (r.iconName || r.badge || r.avatar))) {
         const box = r.type === 'checkbox'
         const trail = box ? (r.detail ? 'Mixed' : 'Checkbox') : r.badge ? 'Badge' : r.detail ? 'Shortcut' : 'False'
-        row = await instance('MenuRowComplex', { '🐣 State': 'Default', '🎛️ Trail': trail, '🎛️ Lead': r.iconName ? 'Icon' : 'False' })
+        row = await instance('MenuRowComplex', { '🐣 State': 'Default', '🎛️ Trail': trail, '🎛️ Lead': r.avatar ? 'Avatar' : r.iconName ? 'Icon' : 'False' })
         setProp(row, '🎛️ Text', r.label)
         if (r.detail) setProp(row, '🎛️ Shortcut', r.detail)
         if (r.iconName) {
           const glyph = row.findOne((n) => n.type === 'INSTANCE' && n.name.startsWith('icon.'))
           const c = await icon(r.iconName)
           if (glyph && c) glyph.swapComponent(c)
+        }
+        if (r.avatar) {
+          const person = row.findOne((n) => n.type === 'INSTANCE' && n.name === 'Avatar')
+          const color = pick({ purple: 'Purple', blue: 'Blue', pink: 'Pink', red: 'Red', yellow: 'Yellow', green: 'Green', grey: 'Grey' }, r.avatar.color, null)
+          if (person && color) person.setProperties({ '👥 Variant': color })
+          if (person && r.avatar.name) await setText(person, null, r.avatar.name.trim().charAt(0).toUpperCase())
         }
         if (r.badge) {
           const badge = row.findOne((n) => n.type === 'INSTANCE' && n.name === 'Badge small')
@@ -558,7 +704,12 @@ const BUILDERS = {
       }
       add(row)
     }
-    if (p.footerLabel) {
+    if (p.footerLabel && p.footerVariant === 'row') {
+      add(await instance('MenuDivider'))
+      const row = await instance('MenuRowFooter')
+      setProp(row, '🎛️ Text', p.footerLabel)
+      add(row)
+    } else if (p.footerLabel) {
       add(await instance('MenuDivider'))
       const button = await instance('Button', { '👥 Variant': 'Secondary', '👥 Size': 'Wide', '🎛️ Disabled': 'False', '🎛️ Icon Lead': 'False', '🐣 State': 'Default' })
       setProp(button, '🎛️ Label', p.footerLabel)
