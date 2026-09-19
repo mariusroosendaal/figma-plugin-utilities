@@ -36,6 +36,11 @@ const UI3 = {
   StatusBar: { id: '1027197:23902', key: 'b0196b1dd4a43d1ff9a39e6bbee225726960e448', set: true },
   ListItem: { id: '1027197:23952', key: '0958cc0be61c4fa697f0ca5a0581422bccf71899', set: true },
   CheckboxCard: { id: '1027197:24237', key: 'b8229a139f45ac8e9ff94638d652d909a450d23a', set: true },
+  Text: { id: '1027216:156', key: 'c695a971ac9052c6ebcbf432b60ce7a0d5281781', set: true },
+  Label: { id: '1027216:161', key: '964899776bca3a6d406cd9e78c9041e2319b958d', set: true },
+  RadioGroup: { id: '1027216:162', key: '9ec3520dfc75786126a616f7a5331ad428792809', set: false },
+  DisclosureItem: { id: '1027216:25160', key: '81e90351aad15cc9d9b83a8de648c39671327b1a', set: true },
+  Disclosure: { id: '1027216:25161', key: '320745f42bae91a9a03b2367e8cc8badb24762ed', set: false },
 }
 const STYLES = {
   'body-small': { id: 'S:704c8fb9b4484d295a7511c93134effcabfcc058,', key: '704c8fb9b4484d295a7511c93134effcabfcc058' },
@@ -188,9 +193,43 @@ function textOf(spec) {
 // Each returns the created node. `block` components fill the width of a
 // vertical parent.
 
-const BLOCK = new Set(['Input', 'Textarea', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider'])
+const BLOCK = new Set(['Input', 'Textarea', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem'])
 
 const BUILDERS = {
+  // Prefer this over a { text } primitive wherever the code uses <Text>: it is a
+  // connected component, so it round-trips.
+  async Text(p, spec) {
+    const color = String(p.color || '')
+    const node = await instance('Text', {
+      '👥 Variant': p.variant || 'body-medium',
+      '🎛️ Color': /tertiary/.test(color) ? 'Tertiary' : /secondary/.test(color) ? 'Secondary' : 'Default',
+    })
+    setProp(node, '🎛️ Text', textOf(spec) ?? p.text ?? '')
+    return node
+  },
+  async Label(p, spec) {
+    const node = await instance('Label', { '👥 Size': p.size === 'small' ? 'Small' : 'Medium' })
+    setProp(node, '🎛️ Label', textOf(spec) ?? p.text ?? '')
+    return node
+  },
+  async RadioGroup(p, spec, parent, ctx) {
+    const node = await instance('RadioGroup')
+    setProp(node, '👁️ Legend', !!p.legend)
+    setProp(node, '🎛️ Legend', p.legend ?? '')
+    await fillSlot(node, 'Radios slot', spec.children ?? [], ctx)
+    return node
+  },
+  async Disclosure(p, spec, parent, ctx) {
+    const node = await instance('Disclosure')
+    await fillSlot(node, 'Items slot', spec.children ?? [], ctx)
+    return node
+  },
+  async DisclosureItem(p, spec, parent, ctx) {
+    const node = await instance('DisclosureItem', { '🐣 Expanded': tf(p.open || p.expanded), '🎛️ Section': tf(p.section) })
+    setProp(node, '🎛️ Title', p.title ?? '')
+    if (p.open || p.expanded) await fillSlot(node, 'Content slot', spec.children ?? [], ctx)
+    return node
+  },
   async Button(p, spec) {
     const iconLead = p.iconName ? (p.iconLead === 'center' ? 'Center-aligned' : 'Left-aligned') : 'False'
     const node = await instance('Button', {

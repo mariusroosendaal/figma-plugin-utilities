@@ -22,7 +22,8 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
    | Default slot content | `children: [ … ]` |
    | `<div>` with flex/column layout | `{ stack: 'v' \| 'h', gap, padding, align, justify, wrap, fill, stroke, radius, height, grow, children }` |
    | CSS grid with N columns | `{ grid: N, gap, children }` |
-   | `<Text>` / plain text | `{ text, variant: 'body-medium' \| 'body-small' \| 'body-large' (+ '-strong'), color: 'text' \| 'text-secondary' \| 'text-tertiary', width?, grow?, align?, truncate? }` |
+   | `<Text>` | `{ c: 'Text', props: { variant, color }, children: '…' }`. This is a connected component, so it round-trips. |
+   | Plain text in custom markup | `{ text, variant: 'body-medium' \| 'body-small' \| 'body-large' (+ '-strong'), color: 'text' \| 'text-secondary' \| 'text-tertiary', width?, grow?, align?, truncate? }` |
    | `<Icon iconName={…}>` | `{ icon: 'icon.24.plus', color?: 'icon-tertiary' }` |
    | A color chit / swatch | `{ swatch: '#0D99FF', size?: 16, radius?: 4 }` |
    | `<hr>` | `{ divider: true }` |
@@ -69,6 +70,11 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `StatusBar` | `message`, `type` | |
 | `ListItem` | `title`, `active`, `menuItems`, `hasBadge`; meta text as `children` | |
 | `CheckboxCard` | `checked`, `disabled`, `secondary`; label as `children` | |
+| `Text` | `variant` (`heading-*`, `body-*`, `-strong`), `color` (`--figma-color-text-secondary` / `-tertiary`); text as `children` | |
+| `Label` | `size`; text as `children` | |
+| `RadioGroup` | `legend` | `children` (Radios) |
+| `Disclosure` | | `children` (DisclosureItems) |
+| `DisclosureItem` | `title`, `open`, `section` | `children` (shown when `open`) |
 
 `Input`, `Dropdown`, `FieldGroup`, `Banner` and the other block-level components fill the width of a vertical parent automatically. Anything else can take `fill: true`; in a horizontal parent, `grow: true` makes a component or stack take the remaining width (CSS `flex: 1` / `1fr`). `fill` and `stroke` on stacks take color variable names: `bg`, `bg-secondary`, `border`, `text`, `text-secondary`, `text-tertiary`, `icon-tertiary`.
 
@@ -82,7 +88,7 @@ await buildMockup(SPEC, { icons: { 'icon.24.settings': { id: '1:531125', key: '5
 
 ## What doesn't round-trip
 
-- **Plain layout.** Stacks, grids, dividers and text are plain Figma layers, so Code Connect lists only the components inside them. Legends, tables and custom markup won't appear in the generated code.
+- **Plain layout.** Stacks, grids, dividers and `{ text }` primitives are plain Figma layers, so Code Connect lists only the components inside them. Use `{ c: 'Text' }` wherever the source uses `<Text>` so it does come back. Tables and custom markup won't appear in the generated code.
 - **Runtime-only props.** `bind:`, event handlers, `type="number"`, ARIA props and ids have no Figma equivalent.
 - **Dropdown selection.** A selected value reads back as `placeholder="…"`.
 - **Tooltip.** It wraps a trigger in code, but in Figma it's hidden (the trigger renders alone).
