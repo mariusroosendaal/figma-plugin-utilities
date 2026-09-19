@@ -510,6 +510,7 @@ const BUILDERS = {
   async Tree(p) {
     const node = await instance('Tree')
     const slot = node.findOne((n) => n.type === 'SLOT')
+    if (!slot) return node
     for (const c of [...slot.children]) c.remove()
     const open = (id, isParent) => isParent && (p.expanded ? p.expanded.includes(id) : true)
     const leaves = (n) => (n.children && n.children.length ? n.children.flatMap(leaves) : [n.id])
