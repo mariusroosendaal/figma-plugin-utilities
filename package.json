@@ -30,7 +30,12 @@
       "default": "./src/lib/figma-helpers.ts"
     }
   },
-  "files": ["src", "README.md", "LICENSE", "CHANGELOG.md"],
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mariusroosendaal/figma-plugin-utilities.git"
@@ -51,6 +56,7 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@figma/code-connect": "^2.0.1",
     "@figma/plugin-typings": "^1.51.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.2",
     "@types/node": "^22.13.4",
@@ -68,7 +74,8 @@
   },
   "scripts": {
     "lint": "tsc --noEmit && eslint . --ext .ts,.js,.svelte && npx prettier --check \"src/**/*.{js,ts,svelte,html,css}\"",
-    "prettier": "npx prettier --write \"src/**/*.{js,ts,svelte,html,css}\""
+    "prettier": "npx prettier --write \"src/**/*.{js,ts,svelte,html,css}\"",
+    "figma:parse": "figma connect parse",
+    "figma:publish": "figma connect publish"
   }
-
 }
