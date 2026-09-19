@@ -4,6 +4,10 @@
 import figma from 'figma'
 const instance = figma.selectedInstance
 
+// Dev Mode only lifts imports one level, so every template also reports its full
+// import list in metadata.props.imports for parent templates to merge.
+const imports = ["import { StatusBar } from 'figma-plugin-utilities'"]
+
 const message = instance.getString('🎛️ Message')
 const type = instance.getEnum('👥 Type', {
   'Info': 'info',
@@ -14,7 +18,7 @@ const type = instance.getEnum('👥 Type', {
 
 export default {
   example: figma.code`<StatusBar message="${message}"${type !== 'info' ? figma.code` type="${type}"` : ''} />`,
-  imports: ["import { StatusBar } from 'figma-plugin-utilities'"],
+  imports,
   id: 'status-bar',
-  metadata: { nestable: true },
+  metadata: { nestable: true, props: { imports } },
 }

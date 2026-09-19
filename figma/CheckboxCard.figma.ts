@@ -4,6 +4,10 @@
 import figma from 'figma'
 const instance = figma.selectedInstance
 
+// Dev Mode only lifts imports one level, so every template also reports its full
+// import list in metadata.props.imports for parent templates to merge.
+const imports = ["import { CheckboxCard } from 'figma-plugin-utilities'"]
+
 const disabled = instance.getEnum('🎛️ Disabled', { 'False': false, 'True': true })
 const secondary = instance.getBoolean('👁️ Secondary') ? instance.getString('🎛️ Secondary') : ''
 
@@ -22,7 +26,7 @@ export default {
   ${label}${secondary ? figma.code`
   <svelte:fragment slot="secondary">${secondary}</svelte:fragment>` : ''}
 </CheckboxCard>`,
-  imports: ["import { CheckboxCard } from 'figma-plugin-utilities'"],
+  imports,
   id: 'checkbox-card',
-  metadata: { nestable: true },
+  metadata: { nestable: true, props: { imports } },
 }

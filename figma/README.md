@@ -1,6 +1,6 @@
 # Figma ↔ code
 
-Code Connect templates for the plugin utilities components, which live in the UI3 Figma file (`<UI3_FILE>` in `../figma.config.json`) on the **Plugin layout**, **Plugin states** and **Plugin fields & lists** pages. They're built from UI3 components and variables, and use native Figma slots where the Svelte component has a `<slot>`.
+Code Connect templates for the plugin utilities components, which live in the UI3 Figma file (`<UI3_FILE>` in `../figma.config.json`) on the **Plugin layout**, **Plugin states** and **Plugin fields & lists** pages. They're built from UI3 components and variables, and use native Figma slots where the Svelte component has a `<slot>`. Slot content is rendered inline from each child's own template (`getSlot()` alone makes Dev Mode emit React helper functions), and imports bubble up through `metadata.props.imports` — see the kit's `figma/README.md`.
 
 ```bash
 npm run figma:parse     # validate templates locally
