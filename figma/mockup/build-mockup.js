@@ -23,6 +23,14 @@ const UI3 = {
   MenuRowCheckmark: { id: '2327:96252', key: '6bcc3df12ba6da07596547b98ea1b9bc463141c2', set: true },
   MenuRowHeading: { id: '2327:96347', key: 'a0225291226db5768bd80f0e2ae2507d1f8d50df', set: true },
   MenuDivider: { id: '2327:96331', key: '0da775e2a59b61cfdf6b2421c562ab16882d07be', set: false },
+  MenuRowComplex: { id: '2327:96049', key: 'b122a716963d6a75190e9c9ff022ea7d19003782', set: true },
+  MenuRowToggle: { id: '2327:96288', key: '4041feb4889093ef96305a06289863c2852f9bc3', set: true },
+  NumericInput: { id: '2028:79190', key: '86d9cd69d26ad1054cd384e536a9e41fd3cd98ad', set: true },
+  ColorInput: { id: '2028:79525', key: '1109b1a24986b1756dc11673ef77fa28f7ff185a', set: true },
+  Chit: { id: '2028:79673', key: '1f3deb32138846892266cb57f84562774c680f90', set: true },
+  IconToggle: { id: '2324:46776', key: 'e0744f36051956ba28abdfa9d6129664ba5797c1', set: true },
+  IconToggleDialog: { id: '2324:46817', key: 'adf85113bfab702068b38874c55b5b3ca2a649fe', set: true },
+  SplitButton: { id: '2324:46856', key: '98c2aebe77ed51c1424d1dc0a7bbf91c5035795e', set: true },
   Banner: { id: '1027204:342', key: '133eade4a3d7f24189bf919ea1b7472182ef2e20', set: true },
   Chip: { id: '1027205:88', key: '415f290a1158771314dd11b9fc83b97bc62e9b04', set: true },
   Modal: { id: '1027206:365', key: '248a9a4ecea1cc16056ec1bc28b56acbf5cc8627', set: true },
@@ -169,6 +177,23 @@ async function swapIcon(node, prefix, iconName) {
 const tf = (b) => (b ? 'True' : 'False')
 const pick = (map, value, fallback) => map[value] ?? fallback
 
+// '#RGB' / '#RRGGBB' / '#RRGGBBAA' → { rgb, alpha }, for recoloring chits.
+function parseHex(value) {
+  let h = String(value || '').replace('#', '')
+  if (h.length === 3 || h.length === 4) h = [...h].map((c) => c + c).join('')
+  if (!/^[0-9a-f]{6}([0-9a-f]{2})?$/i.test(h)) return null
+  const byte = (i) => parseInt(h.slice(i, i + 2), 16) / 255
+  return { rgb: { r: byte(0), g: byte(2), b: byte(4) }, alpha: h.length === 8 ? byte(6) : 1, hex: h.slice(0, 6).toUpperCase() }
+}
+// Paints a _Chit 24 instance's fill layers (both halves for the Opacity type).
+function paintChit(chit, color, alpha) {
+  if (!chit || !color) return
+  for (const n of chit.findAll((n) => /^(bg\.square\.fill|bg\.squarehalf|circle\.16)/.test(n.name) && 'fills' in n)) {
+    n.fills = [{ type: 'SOLID', color: color.rgb }]
+    if (n.name.includes('alpha')) n.opacity = alpha
+  }
+}
+
 async function fillSlot(inst, slotName, children, ctx) {
   const slot = inst.findOne((n) => n.type === 'SLOT' && n.name === slotName)
   if (!slot || children === undefined) return slot
@@ -194,7 +219,7 @@ function textOf(spec) {
 // Each returns the created node. `block` components fill the width of a
 // vertical parent.
 
-const BLOCK = new Set(['Input', 'Textarea', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem', 'Text'])
+const BLOCK = new Set(['Input', 'Textarea', 'NumericInput', 'ColorInput', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem', 'Text'])
 
 const BUILDERS = {
   // Prefer this over a { text } primitive wherever the code uses <Text>: it is a
@@ -315,6 +340,83 @@ const BUILDERS = {
     if (p.iconName) await swapIcon(node, '↪ Icon', p.iconName)
     return node
   },
+  async NumericInput(p) {
+    const empty = p.value === undefined || p.value === null || p.value === ''
+    const node = await instance('NumericInput', {
+      '🐣 State': empty ? 'Empty' : 'Default',
+      '🐣 Var pill': 'False',
+      '🐣 Var icon': 'False',
+      '🎛️  Disabled': tf(p.disabled),
+      '🐣 Dropdown': tf(p.options && p.options.length),
+    })
+    await setText(node, 'Value', empty ? p.placeholder ?? '' : `${p.value}${p.unit ?? ''}`)
+    if (p.iconName) await swapIcon(node, '🎛️ Icon Lead', p.iconName)
+    else if (p.label) {
+      // The lead letter is text inside the icon.24.prop-text glyph.
+      const glyph = node.findOne((n) => n.type === 'INSTANCE' && n.name === 'icon.24.prop-text')
+      if (glyph) await setText(glyph, 'Icon', p.label)
+    }
+    return node
+  },
+  async ColorInput(p) {
+    const color = parseHex(p.value) || parseHex('#000000')
+    const opacity = p.opacity ?? 100
+    const type = p.variable ? 'Variable' : opacity < 100 ? 'Opacity' : 'Fill'
+    const node = await instance('ColorInput', { '🐣 Type': type, '🐣 State': p.disabled ? 'Disabled' : 'Default' })
+    // Text layers are named after their sample content in the UI3 file.
+    const texts = node.findAll((n) => n.type === 'TEXT')
+    for (const t of texts) {
+      let next
+      if (/^[0-9a-f]{6}$/i.test(t.characters)) next = color.hex
+      else if (/^\d{1,3}$/.test(t.characters)) next = String(Math.round(opacity))
+      else if (p.variable && t.characters !== '%') next = p.variable
+      if (next === undefined) continue
+      for (const f of t.getStyledTextSegments(['fontName']).map((s) => s.fontName)) await figma.loadFontAsync(f)
+      t.characters = next
+    }
+    paintChit(node.findOne((n) => n.type === 'INSTANCE' && n.name.includes('Chit')), color, opacity / 100)
+    return node
+  },
+  async Chit(p) {
+    const color = parseHex([].concat(p.color || [])[0])
+    const alpha = (color ? color.alpha : 1) * ((p.opacity ?? 100) / 100)
+    const gradient = typeof p.color === 'string' && p.color.includes('gradient(')
+    const node = await instance('Chit', {
+      '👥 Variant': p.shape === 'circle' ? 'Circle' : 'Square',
+      '🐣 Type': p.image ? 'Image' : gradient ? 'Gradient' : alpha < 1 ? 'Opacity' : 'Fill',
+    })
+    paintChit(node, color, alpha)
+    return node
+  },
+  // With iconNameOn the icon swaps ("Button icon toggle"); without, one icon on
+  // the selected fill ("Button icon dialog toggle").
+  async IconToggle(p) {
+    if (p.iconNameOn) {
+      const node = await instance('IconToggle', {
+        '👥 Variant': p.highlighted ? 'Highlighted' : 'Default',
+        '🎛️ On': tf(p.pressed),
+        '🎛️ Disabled': tf(p.disabled),
+        '🐣 State': 'Default',
+      })
+      const suffix = p.highlighted ? ' (Highlighted)' : ''
+      await swapIcon(node, '🎛️ Off Icon' + suffix, p.iconName)
+      await swapIcon(node, '🎛️ On Icon' + suffix, p.iconNameOn)
+      return node
+    }
+    const node = await instance('IconToggleDialog', {
+      '👥 Variant': p.variant === 'secondary' ? 'Secondary' : 'Default',
+      '🎛️ On': tf(p.pressed),
+      '🎛️ Disabled': tf(p.disabled),
+      '🐣 State': 'Default',
+    })
+    await swapIcon(node, '🎛️ Icon', p.iconName)
+    return node
+  },
+  async SplitButton(p) {
+    const node = await instance('SplitButton', { '👥 Size': p.size === 'large' ? 'Large' : 'Small', '🐣 State': p.disabled ? 'Disabled' : 'Default' })
+    await swapIcon(node, '🎛️ Icon', p.iconName)
+    return node
+  },
   async Tabs(p) {
     const tabs = p.tabs || []
     const node = await instance('Tabs', { 'Tab Count': String(Math.min(Math.max(tabs.length, 1), 5)) })
@@ -375,36 +477,92 @@ const BUILDERS = {
     setProp(node, '👁️ Hotkey', !!p.hotkey)
     return node
   },
+  // Rows follow the kit's item fields: `type` 'check' → Checkmark row ('mixed'
+  // is its Dot), 'toggle' → Toggle row, 'checkbox' or an icon/badge → Complex
+  // row; `detail` is the shortcut or count. searchable and footerLabel add the
+  // multi-select menu's field and button inside the slot.
   async Menu(p) {
     const node = await instance('Menu')
     const rows = []
+    let lastSection
     let lastGroup
     ;(p.menuItems || []).forEach((item, i) => {
-      if (i > 0 && item.group !== lastGroup) rows.push({ kind: 'divider' })
-      if (item.group !== lastGroup && item.group && (item.showHeading ?? p.showGroupLabels)) rows.push({ kind: 'heading', text: item.group })
+      const section = item.section ?? item.group
+      if (i > 0 && section !== lastSection) rows.push({ kind: 'divider' })
+      if (item.group && (i === 0 || item.group !== lastGroup) && (item.showHeading ?? p.showGroupLabels)) rows.push({ kind: 'heading', text: item.group })
       rows.push({ kind: 'item', ...item })
+      lastSection = section
       lastGroup = item.group
     })
+    const checkColumn = p.itemVariant === 'checkmark' || rows.some((r) => r.type === 'check')
     const slot = node.findOne((n) => n.type === 'SLOT')
     for (const c of [...slot.children]) c.remove()
+    const add = (row) => {
+      slot.appendChild(row)
+      row.layoutSizingHorizontal = 'FILL'
+    }
+    if (p.searchable) {
+      const search = await instance('Input', { '👥 Variant': 'Single Line', '👥 Size': 'Default', '🐣 State': 'Empty', '🎛️  Icon Lead': 'True', '🎛️  Dropdown': 'False' })
+      await setText(search, 'Value', p.searchPlaceholder ?? 'Search')
+      // The field's lead icon has no swap property; replace the instance itself.
+      const lead = search.findOne((n) => n.type === 'INSTANCE' && n.name.startsWith('icon.'))
+      if (lead) lead.swapComponent(await icon('icon.24.search.small'))
+      add(search)
+      add(await instance('MenuDivider'))
+    }
     for (const r of rows) {
+      const sub = tf(r.subMenu && r.subMenu.length)
       let row
       if (r.kind === 'divider') row = await instance('MenuDivider')
       else if (r.kind === 'heading') {
         row = await instance('MenuRowHeading', { '🎛️ Alignment': 'Default' })
         setProp(row, '🎛️ Text', r.text)
-      } else if (p.itemVariant === 'checkmark') {
-        row = await instance('MenuRowCheckmark', { '👥 Variant': 'Check', '🐣 State': 'Default', '🎛️ Submenu': tf(r.subMenu && r.subMenu.length) })
+      } else if (r.type === 'toggle') {
+        row = await instance('MenuRowToggle', { '🐣 Toggle State': r.checked === true ? 'On' : 'Off', '👁️ hasIcon': r.iconName ? 'true' : 'false' })
         setProp(row, '🎛️ Text', r.label)
-        setProp(row, '🎛️ On', !!r.selected)
-        setProp(row, '👁️ hasShortcut', false)
+        setProp(row, '👁️ hasShortcut', !!r.detail)
+        if (r.detail) setProp(row, '↪ Shortcut', r.detail)
+        if (r.iconName) await swapIcon(row, '↪ Icon', r.iconName)
+      } else if (r.type === 'checkbox' || (!checkColumn && (r.iconName || r.badge))) {
+        const box = r.type === 'checkbox'
+        const trail = box ? (r.detail ? 'Mixed' : 'Checkbox') : r.badge ? 'Badge' : r.detail ? 'Shortcut' : 'False'
+        row = await instance('MenuRowComplex', { '🐣 State': 'Default', '🎛️ Trail': trail, '🎛️ Lead': r.iconName ? 'Icon' : 'False' })
+        setProp(row, '🎛️ Text', r.label)
+        if (r.detail) setProp(row, '🎛️ Shortcut', r.detail)
+        if (r.iconName) {
+          const glyph = row.findOne((n) => n.type === 'INSTANCE' && n.name.startsWith('icon.'))
+          const c = await icon(r.iconName)
+          if (glyph && c) glyph.swapComponent(c)
+        }
+        if (r.badge) {
+          const badge = row.findOne((n) => n.type === 'INSTANCE' && n.name === 'Badge small')
+          if (badge) await setText(badge, null, r.badge)
+        }
+        if (box) {
+          const check = row.findOne((n) => n.type === 'INSTANCE' && n.name === 'Checkbox')
+          const on = r.checked === true || r.checked === 'mixed'
+          if (check) check.setProperties({ '🐣 Type': r.checked === 'mixed' ? 'Mixed' : on ? 'Checked' : 'Unchecked', '🎛️ Muted': tf(!on) })
+        }
+      } else if (checkColumn) {
+        const on = r.type === 'check' ? r.checked : p.itemVariant === 'checkmark' && r.selected
+        row = await instance('MenuRowCheckmark', { '👥 Variant': on === 'mixed' ? 'Dot' : 'Check', '🐣 State': r.disabled ? 'Disabled' : 'Default', '🎛️ Submenu': sub })
+        setProp(row, '🎛️ Text', r.label)
+        setProp(row, '🎛️ On', !!on)
+        setProp(row, '👁️ hasShortcut', !!r.detail)
+        if (r.detail) setProp(row, '↪ Shortcut', r.detail)
       } else {
-        row = await instance('MenuRowSimple', { '🐣 State': 'Default', '🎛️ Submenu': tf(r.subMenu && r.subMenu.length) })
+        row = await instance('MenuRowSimple', { '🐣 State': r.disabled ? 'Disabled' : 'Default', '🎛️ Submenu': sub })
         setProp(row, '🎛️ Text', r.label)
-        setProp(row, '👁️ hasShortcut', false)
+        setProp(row, '👁️ hasShortcut', !!r.detail)
+        if (r.detail) setProp(row, '↪ Shortcut', r.detail)
       }
-      slot.appendChild(row)
-      row.layoutSizingHorizontal = 'FILL'
+      add(row)
+    }
+    if (p.footerLabel) {
+      add(await instance('MenuDivider'))
+      const button = await instance('Button', { '👥 Variant': 'Secondary', '👥 Size': 'Wide', '🎛️ Disabled': 'False', '🎛️ Icon Lead': 'False', '🐣 State': 'Default' })
+      setProp(button, '🎛️ Label', p.footerLabel)
+      add(button)
     }
     return node
   },

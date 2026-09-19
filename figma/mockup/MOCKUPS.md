@@ -25,7 +25,8 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
    | `<Text>` | `{ c: 'Text', props: { variant, color }, children: '…' }`. This is a connected component, so it round-trips. |
    | Plain text in custom markup | `{ text, variant: 'body-medium' \| 'body-small' \| 'body-large' (+ '-strong'), color: 'text' \| 'text-secondary' \| 'text-tertiary', width?, grow?, align?, truncate? }` |
    | `<Icon iconName={…}>` | `{ icon: 'icon.24.plus', color?: 'icon-tertiary' }` |
-   | A color chit / swatch | `{ swatch: '#0D99FF', size?: 16, radius?: 4 }` |
+   | `<Chit color={…}>` | `{ c: 'Chit', props: { color: '#0D99FF' } }`. Connected, so it round-trips; use it for kit chits. |
+   | A custom color swatch (not a kit Chit) | `{ swatch: '#0D99FF', size?: 16, radius?: 4 }` |
    | `<hr>` | `{ divider: true }` |
    | Plugin window | `{ window: 'Name — view', width: 320, height?, children: [Header, PluginLayout, Footer] }` |
 
@@ -47,8 +48,13 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 |---|---|---|
 | `Button` | `variant`, `size`, `disabled`/`ariaDisabled`, `iconName`, `iconLead`; label as `children` | |
 | `IconButton` | `iconName`, `variant`, `disabled` | |
+| `IconToggle` | `iconName`, `iconNameOn` (swaps icons; without it, one icon on the selected fill), `pressed`, `highlighted`, `variant`, `disabled` | |
+| `SplitButton` | `iconName`, `size`, `disabled` | |
 | `Input` | `value`, `placeholder`, `size`, `disabled`, `iconName` | |
 | `Textarea` | `value`, `placeholder`, `disabled` | |
+| `NumericInput` | `value`, `placeholder`, `label` (lead letter) or `iconName`, `unit`, `options` (adds the chevron), `disabled` | |
+| `ColorInput` | `value` (hex), `opacity`, `variable`, `disabled` | |
+| `Chit` | `color` (hex, `#RRGGBBAA` for alpha), `opacity`, `shape` | |
 | `Dropdown` | `value` (`{ label }`), `placeholder`, `disabled`, `iconName` | |
 | `Checkbox`, `Switch` | `checked`, `mixed`, `disabled`; label as `children` | |
 | `Radio` | `group`, `value` (or `checked`), `disabled`; label as `children` | |
@@ -59,7 +65,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `Banner` | `variant`, `message` | |
 | `Chip` | `label`, `variant`, `iconName`, `closable`, `focused`, `disabled` | |
 | `Tooltip` | Renders its `children` (the trigger) only; pass `show: true` to draw the bubble | |
-| `Menu` | `menuItems: [{ label, group?, showHeading?, selected?, subMenu? }]`, `itemVariant`, `showGroupLabels` | |
+| `Menu` | `menuItems: [{ label, group?, section?, showHeading?, type?, checked?, selected?, iconName?, detail?, badge?, disabled?, subMenu? }]`, `itemVariant`, `showGroupLabels`, `searchable`, `searchPlaceholder`, `footerLabel` | |
 | `Modal` | `title`, `width` (`small`/`medium`/`large` or pixels), `height` (pixels), `contentPadding`, `icon2`, `footerBorder` | `children`, `footer-left`, `footer-right`, `footer-full` |
 | `Header` | `title`, `noBorder` | `left`, `center`, `right` |
 | `Footer` | `variant` (`right`/`split`/`full`) | `children` (right/full), `left`, `right` (split) |
