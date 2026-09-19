@@ -56,6 +56,7 @@ const VARS = {
   text: { id: 'VariableID:1325:3221', key: '4a18c53ba5f18d95abbbc156315fb6347cde902e' },
   'text-secondary': { id: 'VariableID:1330:3190', key: '4013c756c98f16bbca5bca28042f5492ccde52ea' },
   'text-tertiary': { id: 'VariableID:1330:3192', key: '0f283455cd05ac799f7516e4a1e8972df39a137c' },
+  'bg-brand': { id: 'VariableID:1326:3175', key: 'a2bf6679fa967d1b5cc804c461d5e012b840b2bb' },
   'icon-tertiary': { id: 'VariableID:1330:3205', key: '1853293bb8ba57fed790a78193e8af8e5060cb81' },
   border: { id: 'VariableID:1326:3180', key: '0231d9add0c28a818ab62bc8d70a8fff21715085' },
   4: { id: 'VariableID:1:672456', key: '0f158d8847032625eabf06aded4a5d93bd09b0d6' },
@@ -193,18 +194,24 @@ function textOf(spec) {
 // Each returns the created node. `block` components fill the width of a
 // vertical parent.
 
-const BLOCK = new Set(['Input', 'Textarea', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem'])
+const BLOCK = new Set(['Input', 'Textarea', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem', 'Text'])
 
 const BUILDERS = {
   // Prefer this over a { text } primitive wherever the code uses <Text>: it is a
   // connected component, so it round-trips.
-  async Text(p, spec) {
+  async Text(p, spec, parent) {
     const color = String(p.color || '')
     const node = await instance('Text', {
       '👥 Variant': p.variant || 'body-medium',
       '🎛️ Color': /tertiary/.test(color) ? 'Tertiary' : /secondary/.test(color) ? 'Secondary' : 'Default',
     })
     setProp(node, '🎛️ Text', textOf(spec) ?? p.text ?? '')
+    // Block text wraps to its column, like the <p>/<span display:block> it mirrors.
+    if (isVertical(parent)) {
+      const t = node.findOne((n) => n.type === 'TEXT')
+      t.layoutSizingHorizontal = 'FILL'
+      t.textAutoResize = 'HEIGHT'
+    }
     return node
   },
   async Label(p, spec) {
@@ -310,7 +317,7 @@ const BUILDERS = {
   },
   async Tabs(p) {
     const tabs = p.tabs || []
-    const node = await instance('Tabs', { 'Tab Count': String(Math.min(Math.max(tabs.length, 1), 4)) })
+    const node = await instance('Tabs', { 'Tab Count': String(Math.min(Math.max(tabs.length, 1), 5)) })
     const items = node.children.filter((c) => c.type === 'INSTANCE')
     items.forEach((tab, i) => {
       if (!tabs[i]) return
@@ -404,8 +411,17 @@ const BUILDERS = {
   async Modal(p, spec, parent, ctx) {
     const s = spec.slots || {}
     const footer = s['footer-full'] ? 'Full' : s['footer-left'] || s['footer-right'] ? 'Split' : 'None'
-    const width = pick({ small: 'Small', medium: 'Medium', large: 'Large' }, p.width, 'Medium')
+    // width: 'small' | 'medium' | 'large' | a pixel number; height: pixels.
+    const width = typeof p.width === 'number' ? 'Large' : pick({ small: 'Small', medium: 'Medium', large: 'Large' }, p.width, 'Medium')
     const node = await instance('Modal', { '👥 Width': width, '👥 Footer': footer })
+    if (typeof p.width === 'number') node.resize(p.width, node.height)
+    const content = node.findOne((n) => n.type === 'SLOT' && n.name === 'Content slot')
+    if (p.contentPadding === false) {
+      for (const f of ['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'itemSpacing']) {
+        content.setBoundVariable(f, null)
+        content[f] = 0
+      }
+    }
     setProp(node, '🎛️ Title', p.title ?? '')
     setProp(node, '👁️ Icon 2', !!p.icon2)
     if (p.footerBorder === false) setProp(node, '👁️ Footer border', false)
@@ -416,6 +432,10 @@ const BUILDERS = {
     } else if (footer === 'Full') {
       const slot = await fillSlot(node, 'Footer full slot', s['footer-full'], ctx)
       for (const c of slot.children) c.layoutSizingHorizontal = 'FILL'
+    }
+    if (p.height) {
+      node.resize(node.width, p.height)
+      content.layoutSizingVertical = 'FILL'
     }
     return node
   },
@@ -543,9 +563,17 @@ async function buildStack(spec, parent, ctx) {
     f.strokes = [await paint(spec.stroke)]
     f.strokeWeight = 1
     f.strokeAlign = 'INSIDE'
+    // e.g. strokeSides: ['bottom'] for a border-bottom
+    if (spec.strokeSides) {
+      for (const side of ['Top', 'Right', 'Bottom', 'Left']) f[`stroke${side}Weight`] = spec.strokeSides.includes(side.toLowerCase()) ? 1 : 0
+    }
   }
   parent.appendChild(f)
-  if (isVertical(parent) || spec.grow) f.layoutSizingHorizontal = 'FILL'
+  if (spec.width) {
+    f.layoutSizingHorizontal = 'FIXED'
+    f.resize(spec.width, f.height)
+  } else if (isVertical(parent) || spec.grow) f.layoutSizingHorizontal = 'FILL'
+  if (spec.fillHeight) f.layoutSizingVertical = 'FILL'
   if (spec.height) {
     f.layoutSizingVertical = 'FIXED'
     f.resize(f.width, spec.height)
@@ -629,6 +657,8 @@ async function build(spec, parent, ctx) {
   if (spec.name) node.name = spec.name
   parent.appendChild(node)
   if (isVertical(parent) && (BLOCK.has(spec.c) || spec.fill)) node.layoutSizingHorizontal = 'FILL'
+  if (spec.grow && !isVertical(parent)) node.layoutSizingHorizontal = 'FILL'
+  if (spec.fillHeight && isVertical(parent)) node.layoutSizingVertical = 'FILL'
   ctx.created.push(node.id)
   return node
 }

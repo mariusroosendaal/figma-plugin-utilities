@@ -20,7 +20,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
    | `<Button variant="secondary">Cancel</Button>` | `{ c: 'Button', props: { variant: 'secondary' }, children: 'Cancel' }` |
    | `<svelte:fragment slot="left">…` | `slots: { left: [ … ] }` |
    | Default slot content | `children: [ … ]` |
-   | `<div>` with flex/column layout | `{ stack: 'v' \| 'h', gap, padding, align, justify, wrap, fill, stroke, radius, height, grow, children }` |
+   | `<div>` with flex/column layout | `{ stack: 'v' \| 'h', gap, padding, align, justify, wrap, fill, stroke, strokeSides, radius, width, height, grow, fillHeight, children }` |
    | CSS grid with N columns | `{ grid: N, gap, children }` |
    | `<Text>` | `{ c: 'Text', props: { variant, color }, children: '…' }`. This is a connected component, so it round-trips. |
    | Plain text in custom markup | `{ text, variant: 'body-medium' \| 'body-small' \| 'body-large' (+ '-strong'), color: 'text' \| 'text-secondary' \| 'text-tertiary', width?, grow?, align?, truncate? }` |
@@ -29,7 +29,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
    | `<hr>` | `{ divider: true }` |
    | Plugin window | `{ window: 'Name — view', width: 320, height?, children: [Header, PluginLayout, Footer] }` |
 
-   Build one window per tab or state. Build modals as standalone specs (`{ c: 'Modal', … }`).
+   Build one window per tab or state. Build modals as standalone specs (`{ c: 'Modal', … }`). For a dialog that holds its own tabs and footer (`contentPadding={false}`), put a tabs row, a `fillHeight` stack and a `Footer` in its children.
 3. **Run it.** Paste the builder, then the spec, and end with:
    ```js
    const result = await buildMockup(SPEC, { page: '1027190:25' })
@@ -52,7 +52,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `Dropdown` | `value` (`{ label }`), `placeholder`, `disabled`, `iconName` | |
 | `Checkbox`, `Switch` | `checked`, `mixed`, `disabled`; label as `children` | |
 | `Radio` | `group`, `value` (or `checked`), `disabled`; label as `children` | |
-| `Tabs` | `tabs: [{ label }]` (max 4), `selectedTab` | |
+| `Tabs` | `tabs: [{ label }]` (max 5), `selectedTab` | |
 | `SegmentedControl` | `value`, `disabled`; `children: [{ c: 'Segment', props: { value, iconName?, tooltip? }, children: 'Label' }]` (2–6) | |
 | `Slider` | `value`, `min`, `max`, `variant` (`range`/`delta`/`stepper`), `disabled` | |
 | `Badge` | `variant`, `strong`; text as `children` | |
@@ -60,7 +60,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `Chip` | `label`, `variant`, `iconName`, `closable`, `focused`, `disabled` | |
 | `Tooltip` | Renders its `children` (the trigger) only; pass `show: true` to draw the bubble | |
 | `Menu` | `menuItems: [{ label, group?, showHeading?, selected?, subMenu? }]`, `itemVariant`, `showGroupLabels` | |
-| `Modal` | `title`, `width` (`small`/`medium`/`large`), `icon2`, `footerBorder` | `children`, `footer-left`, `footer-right`, `footer-full` |
+| `Modal` | `title`, `width` (`small`/`medium`/`large` or pixels), `height` (pixels), `contentPadding`, `icon2`, `footerBorder` | `children`, `footer-left`, `footer-right`, `footer-full` |
 | `Header` | `title`, `noBorder` | `left`, `center`, `right` |
 | `Footer` | `variant` (`right`/`split`/`full`) | `children` (right/full), `left`, `right` (split) |
 | `PluginLayout` | | `children` |
@@ -76,7 +76,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `Disclosure` | | `children` (DisclosureItems) |
 | `DisclosureItem` | `title`, `open`, `section` | `children` (shown when `open`) |
 
-`Input`, `Dropdown`, `FieldGroup`, `Banner` and the other block-level components fill the width of a vertical parent automatically. Anything else can take `fill: true`; in a horizontal parent, `grow: true` makes a component or stack take the remaining width (CSS `flex: 1` / `1fr`). `fill` and `stroke` on stacks take color variable names: `bg`, `bg-secondary`, `border`, `text`, `text-secondary`, `text-tertiary`, `icon-tertiary`.
+`Input`, `Dropdown`, `FieldGroup`, `Banner` and the other block-level components fill the width of a vertical parent automatically. Anything else can take `fill: true`; in a horizontal parent, `grow: true` makes a component or stack take the remaining width (CSS `flex: 1` / `1fr`). `fillHeight: true` does the same vertically (e.g. an EmptyState centred in the panel), and stacks take a fixed `width`. `fill` and `stroke` on stacks take color variable names: `bg`, `bg-secondary`, `bg-brand`, `border`, `text`, `text-secondary`, `text-tertiary`, `icon-tertiary`.
 
 ## Icons
 
