@@ -20,9 +20,11 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
    | `<Button variant="secondary">Cancel</Button>` | `{ c: 'Button', props: { variant: 'secondary' }, children: 'Cancel' }` |
    | `<svelte:fragment slot="left">…` | `slots: { left: [ … ] }` |
    | Default slot content | `children: [ … ]` |
-   | `<div>` with flex/column layout | `{ stack: 'v' \| 'h', gap, padding, align, justify, wrap, children }` |
+   | `<div>` with flex/column layout | `{ stack: 'v' \| 'h', gap, padding, align, justify, wrap, fill, stroke, radius, height, grow, children }` |
    | CSS grid with N columns | `{ grid: N, gap, children }` |
-   | `<Text>` / plain text | `{ text, variant: 'body-medium' \| 'body-small' \| 'body-large' (+ '-strong'), color: 'text' \| 'text-secondary' \| 'text-tertiary', width?, grow?, align? }` |
+   | `<Text>` / plain text | `{ text, variant: 'body-medium' \| 'body-small' \| 'body-large' (+ '-strong'), color: 'text' \| 'text-secondary' \| 'text-tertiary', width?, grow?, align?, truncate? }` |
+   | `<Icon iconName={…}>` | `{ icon: 'icon.24.plus', color?: 'icon-tertiary' }` |
+   | A color chit / swatch | `{ swatch: '#0D99FF', size?: 16, radius?: 4 }` |
    | `<hr>` | `{ divider: true }` |
    | Plugin window | `{ window: 'Name — view', width: 320, height?, children: [Header, PluginLayout, Footer] }` |
 
@@ -68,7 +70,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `ListItem` | `title`, `active`, `menuItems`, `hasBadge`; meta text as `children` | |
 | `CheckboxCard` | `checked`, `disabled`, `secondary`; label as `children` | |
 
-`Input`, `Dropdown`, `FieldGroup`, `Banner` and the other block-level components fill the width of a vertical parent automatically. Anything else can take `fill: true`.
+`Input`, `Dropdown`, `FieldGroup`, `Banner` and the other block-level components fill the width of a vertical parent automatically. Anything else can take `fill: true`; in a horizontal parent, `grow: true` makes a component or stack take the remaining width (CSS `flex: 1` / `1fr`). `fill` and `stroke` on stacks take color variable names: `bg`, `bg-secondary`, `border`, `text`, `text-secondary`, `text-tertiary`, `icon-tertiary`.
 
 ## Icons
 

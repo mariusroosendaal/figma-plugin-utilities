@@ -51,6 +51,7 @@ const VARS = {
   text: { id: 'VariableID:1325:3221', key: '4a18c53ba5f18d95abbbc156315fb6347cde902e' },
   'text-secondary': { id: 'VariableID:1330:3190', key: '4013c756c98f16bbca5bca28042f5492ccde52ea' },
   'text-tertiary': { id: 'VariableID:1330:3192', key: '0f283455cd05ac799f7516e4a1e8972df39a137c' },
+  'icon-tertiary': { id: 'VariableID:1330:3205', key: '1853293bb8ba57fed790a78193e8af8e5060cb81' },
   border: { id: 'VariableID:1326:3180', key: '0231d9add0c28a818ab62bc8d70a8fff21715085' },
   4: { id: 'VariableID:1:672456', key: '0f158d8847032625eabf06aded4a5d93bd09b0d6' },
   8: { id: 'VariableID:1:672457', key: '907024ab5c6723435cf94ff28a455b4a1d492c5f' },
@@ -471,6 +472,10 @@ async function buildText(spec, parent) {
   t.fills = [await paint(spec.color || 'text')]
   if (spec.align) t.textAlignHorizontal = spec.align.toUpperCase()
   parent.appendChild(t)
+  if (spec.truncate) {
+    t.textTruncation = 'ENDING'
+    t.maxLines = 1
+  }
   if (spec.width) {
     t.textAutoResize = 'HEIGHT'
     t.resize(spec.width, t.height)
@@ -495,8 +500,17 @@ async function buildStack(spec, parent, ctx) {
   if (spec.justify) f.primaryAxisAlignItems = { start: 'MIN', center: 'CENTER', end: 'MAX', between: 'SPACE_BETWEEN' }[spec.justify] || 'MIN'
   if (spec.wrap) f.layoutWrap = 'WRAP'
   if (spec.radius) f.cornerRadius = spec.radius
+  if (spec.stroke) {
+    f.strokes = [await paint(spec.stroke)]
+    f.strokeWeight = 1
+    f.strokeAlign = 'INSIDE'
+  }
   parent.appendChild(f)
-  if (isVertical(parent)) f.layoutSizingHorizontal = 'FILL'
+  if (isVertical(parent) || spec.grow) f.layoutSizingHorizontal = 'FILL'
+  if (spec.height) {
+    f.layoutSizingVertical = 'FIXED'
+    f.resize(f.width, spec.height)
+  }
   for (const child of [].concat(spec.children || [])) await build(child, f, ctx)
   return f
 }
@@ -532,6 +546,31 @@ async function buildDivider(spec, parent) {
   if (isVertical(parent)) r.layoutSizingHorizontal = 'FILL'
   return r
 }
+// A color square (e.g. a chit showing a hex value).
+async function buildSwatch(spec, parent) {
+  const hex = spec.swatch.replace('#', '')
+  const r = figma.createRectangle()
+  r.name = spec.name || 'Swatch'
+  r.resize(spec.size || 16, spec.size || 16)
+  r.cornerRadius = spec.radius ?? 4
+  r.fills = [{ type: 'SOLID', color: { r: parseInt(hex.slice(0, 2), 16) / 255, g: parseInt(hex.slice(2, 4), 16) / 255, b: parseInt(hex.slice(4, 6), 16) / 255 } }]
+  r.strokes = [await paint('border')]
+  r.strokeWeight = 1
+  r.strokeAlign = 'INSIDE'
+  parent.appendChild(r)
+  return r
+}
+// A bare icon (kit <Icon>), optionally recolored with a color variable.
+async function buildIcon(spec, parent) {
+  const c = await icon(spec.icon)
+  const i = c.createInstance()
+  if (spec.color) {
+    const p = await paint(spec.color)
+    for (const v of i.findAll((n) => n.type === 'VECTOR' || n.type === 'BOOLEAN_OPERATION')) v.fills = [p]
+  }
+  parent.appendChild(i)
+  return i
+}
 const isVertical = (n) => n && n.layoutMode === 'VERTICAL'
 
 async function build(spec, parent, ctx) {
@@ -541,6 +580,8 @@ async function build(spec, parent, ctx) {
   if (spec.stack) return buildStack(spec, parent, ctx)
   if (spec.grid) return buildGrid(spec, parent, ctx)
   if (spec.divider) return buildDivider(spec, parent)
+  if (spec.swatch) return buildSwatch(spec, parent)
+  if (spec.icon) return buildIcon(spec, parent)
   const fn = BUILDERS[spec.c]
   if (!fn) throw new Error(`No builder for "${spec.c}"`)
   const result = await fn(spec.props || {}, spec, parent, ctx)
