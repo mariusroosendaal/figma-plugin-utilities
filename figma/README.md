@@ -18,3 +18,7 @@ npm run figma:publish   # publish (reads FIGMA_ACCESS_TOKEN from .env)
 | Status bar | `1027197:23902` | `👥 Type` ↔ `type`. |
 | List item | `1027197:23952` | `id` is derived from the title; `👁️ Menu` → `menuItems={menuItems}`. |
 | Checkbox card | `1027197:24237` | Checked state and label come from the exposed Checkbox instance. |
+
+## Mockups
+
+`mockup/` builds Figma mockups of plugin UIs from these components — see `mockup/MOCKUPS.md`. It is synced into the `figma-plugin-kit:mockup` skill by `npm run sync-skills`.

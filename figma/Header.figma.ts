@@ -16,9 +16,11 @@ const render = (handle) => {
 
 // Render a slot's connected children inline. getSlot() alone makes Dev Mode emit
 // React helper functions, so it's only the fallback for unconnected content.
-function slot(name, indent) {
-  const children = instance.findConnectedInstances(() => true, { path: [name] })
-  if (!children.length) return instance.getSlot(name)
+// `path` lists every frame between the instance and the slot; empty slots are
+// omitted since every Header slot is optional in code.
+function slot(path, indent) {
+  const children = instance.findConnectedInstances(() => true, { path })
+  if (!children.length) return ''
   let code
   children.forEach((child) => {
     const example = render(child)
@@ -29,9 +31,9 @@ function slot(name, indent) {
 
 const title = instance.getBoolean('👁️ Title') ? instance.getString('🎛️ Title') : ''
 const noBorder = !instance.getBoolean('👁️ Border')
-const left = instance.getBoolean('👁️ Left slot') ? slot('Left slot', '    ') : undefined
-const center = instance.getBoolean('👁️ Center slot') ? slot('Center slot', '    ') : undefined
-const right = slot('Right slot', '    ')
+const left = instance.getBoolean('👁️ Left slot') ? slot(['Left', 'Left slot'], '    ') : undefined
+const center = instance.getBoolean('👁️ Center slot') ? slot(['Center slot'], '    ') : undefined
+const right = slot(['Right slot'], '    ')
 
 const fragment = (name, content) =>
   content ? figma.code`
