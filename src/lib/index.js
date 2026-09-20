@@ -42,4 +42,3 @@ export {
   resizeToFit,
   autoResize,
 } from "./resize.js";
-

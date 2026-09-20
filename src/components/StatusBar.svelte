@@ -1,4 +1,9 @@
 <script>
+  /* The auto-dismiss below trips svelte/infinite-reactive-loop: the reactive
+     statement writes `visible`, and the timeout it schedules writes it again
+     through handleClose(). Neither reads `visible`, so the statement cannot
+     re-trigger itself — the rule only sees the shared assignment target. */
+  /* eslint-disable svelte/infinite-reactive-loop */
   import { onDestroy, createEventDispatcher } from "svelte";
   import { IconButton } from "figma-ui3-kit-svelte";
   import { IconClose } from "figma-ui3-kit-svelte/icons";
@@ -43,7 +48,6 @@
   } else {
     visible = false;
   }
-
   function handleClose() {
     visible = false;
     clearTimeout(timeoutId);

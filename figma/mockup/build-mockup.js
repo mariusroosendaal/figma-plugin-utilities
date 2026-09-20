@@ -97,7 +97,7 @@ const local = async (id, key) => {
   try {
     const n = await figma.getNodeByIdAsync(id)
     return n && (!key || n.key === key) ? n : null
-  } catch (e) {
+  } catch {
     return null
   }
 }
@@ -1007,6 +1007,8 @@ async function build(spec, parent, ctx) {
 // spec: { window: 'Name', width?: 320, height?: number, children: [...] }
 //   or a single component spec (e.g. a Modal) placed on its own.
 // options: { page?: pageId, x?, y?, icons?: { 'icon.24.plus': { id, key } } }
+// The entry point: use_figma calls it after pasting this file in.
+// eslint-disable-next-line no-unused-vars
 async function buildMockup(spec, options = {}) {
   ICON_MAP = options.icons || {}
   const page = options.page ? await figma.getNodeByIdAsync(options.page) : figma.currentPage

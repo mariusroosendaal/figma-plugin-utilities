@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **EmptyState** — the actions are a keyed `{#each}`, so swapping one action for another reuses the right button rather than repainting the row
 - `figma-plugin-utilities/lib/figma-frame-builders` resolves again. It had no export entry of its own, so it fell through `"./lib/*"` to `./src/lib/figma-frame-builders.js` — a file that doesn't exist, the module being TypeScript. It now has an explicit entry, as `figma-helpers` already did
 - **docs** — `figma-frame-builders` is documented (it was absent from both the reference and the README), `sanitizeInput` no longer claims to escape HTML (it stringifies, truncates, strips control characters and trims), and `formatErrorMessage`, `handleAsyncError`, `withErrorHandling` and `logError` are documented with their real signatures. `withErrorHandling(fn, operation)` calls `fn()` with no arguments and returns its result; it was documented as returning a wrapped function
 

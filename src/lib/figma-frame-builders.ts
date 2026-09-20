@@ -1,6 +1,5 @@
 export type PaddingSpec =
-  | number
-  | { top?: number; right?: number; bottom?: number; left?: number };
+  number | { top?: number; right?: number; bottom?: number; left?: number };
 
 export type SpecTheme = {
   cellFill: RGB;
@@ -13,17 +12,24 @@ export type SpecTheme = {
 };
 
 export type NodeKind = "frame" | "component";
-export type NodeFor<K extends NodeKind> = K extends "component" ? ComponentNode : FrameNode;
+export type NodeFor<K extends NodeKind> = K extends "component"
+  ? ComponentNode
+  : FrameNode;
 
 function rgb(r: number, g: number, b: number): RGB {
   return { r, g, b };
 }
 
 function createNode<K extends NodeKind>(as?: K): NodeFor<K> {
-  return (as === "component" ? figma.createComponent() : figma.createFrame()) as NodeFor<K>;
+  return (
+    as === "component" ? figma.createComponent() : figma.createFrame()
+  ) as NodeFor<K>;
 }
 
-function applyPadding(frame: FrameNode | ComponentNode, spec: PaddingSpec): void {
+function applyPadding(
+  frame: FrameNode | ComponentNode,
+  spec: PaddingSpec,
+): void {
   if (typeof spec === "number") {
     frame.paddingTop = spec;
     frame.paddingRight = spec;
@@ -39,36 +45,36 @@ function applyPadding(frame: FrameNode | ComponentNode, spec: PaddingSpec): void
 
 export const specTokens = {
   accentColors: {
-    green:  rgb(0.251, 0.769, 0.349), // #40C459 — AAA
-    blue:   rgb(0.412, 0.671, 1.000), // #69ABFF — AA
-    purple: rgb(0.710, 0.522, 0.973), // #B585F8 — AA18
-    red:    rgb(1.000, 0.482, 0.467), // #FF7B77 — DNP
+    green: rgb(0.251, 0.769, 0.349), // #40C459 — AAA
+    blue: rgb(0.412, 0.671, 1.0), // #69ABFF — AA
+    purple: rgb(0.71, 0.522, 0.973), // #B585F8 — AA18
+    red: rgb(1.0, 0.482, 0.467), // #FF7B77 — DNP
   },
   fonts: {
-    body:       { family: "Inter",         style: "Regular",   size: 14   },
-    bodyBold:   { family: "Inter",         style: "Semi Bold", size: 14   },
-    subheading: { family: "Inter",         style: "Medium",    size: 24   },
-    heading:    { family: "Inter",         style: "Regular",   size: 48   },
-    code:       { family: "IBM Plex Mono", style: "Regular",   size: 12   },
+    body: { family: "Inter", style: "Regular", size: 14 },
+    bodyBold: { family: "Inter", style: "Semi Bold", size: 14 },
+    subheading: { family: "Inter", style: "Medium", size: 24 },
+    heading: { family: "Inter", style: "Regular", size: 48 },
+    code: { family: "IBM Plex Mono", style: "Regular", size: 12 },
   },
   themes: {
     light: {
-      cellFill:      rgb(1.000, 1.000, 1.000),
-      cellBorder:    rgb(0.949, 0.949, 0.949),
-      text:          rgb(0.102, 0.102, 0.102),
-      chipBg:        rgb(0.949, 0.949, 0.949),
-      headerFill:    rgb(1.000, 1.000, 1.000),
+      cellFill: rgb(1.0, 1.0, 1.0),
+      cellBorder: rgb(0.949, 0.949, 0.949),
+      text: rgb(0.102, 0.102, 0.102),
+      chipBg: rgb(0.949, 0.949, 0.949),
+      headerFill: rgb(1.0, 1.0, 1.0),
       subheaderFill: rgb(0.961, 0.961, 0.961),
-      headingText:   rgb(0.000, 0.000, 0.000),
+      headingText: rgb(0.0, 0.0, 0.0),
     } satisfies SpecTheme,
     dark: {
-      cellFill:      rgb(0.102, 0.102, 0.102),
-      cellBorder:    rgb(0.133, 0.133, 0.133),
-      text:          rgb(1.000, 1.000, 1.000),
-      chipBg:        rgb(0.200, 0.200, 0.200),
-      headerFill:    rgb(0.000, 0.000, 0.000),
-      subheaderFill: rgb(0.000, 0.000, 0.000),
-      headingText:   rgb(1.000, 1.000, 1.000),
+      cellFill: rgb(0.102, 0.102, 0.102),
+      cellBorder: rgb(0.133, 0.133, 0.133),
+      text: rgb(1.0, 1.0, 1.0),
+      chipBg: rgb(0.2, 0.2, 0.2),
+      headerFill: rgb(0.0, 0.0, 0.0),
+      subheaderFill: rgb(0.0, 0.0, 0.0),
+      headingText: rgb(1.0, 1.0, 1.0),
     } satisfies SpecTheme,
   },
 };
@@ -95,7 +101,10 @@ type AutoLayoutOpts = {
   border?: { color: RGB; width?: number };
 };
 
-function applyAutoLayout(node: FrameNode | ComponentNode, opts: AutoLayoutOpts): void {
+function applyAutoLayout(
+  node: FrameNode | ComponentNode,
+  opts: AutoLayoutOpts,
+): void {
   node.name = opts.name;
   node.layoutMode = opts.direction;
   node.fills = opts.fill ? [{ type: "SOLID", color: opts.fill }] : [];
@@ -108,9 +117,13 @@ function applyAutoLayout(node: FrameNode | ComponentNode, opts: AutoLayoutOpts):
     node.itemSpacing = opts.spacing ?? 0;
     const isHorizontal = opts.direction === "HORIZONTAL";
     node.primaryAxisSizingMode =
-      (isHorizontal ? opts.width : opts.height) !== undefined ? "FIXED" : "AUTO";
+      (isHorizontal ? opts.width : opts.height) !== undefined
+        ? "FIXED"
+        : "AUTO";
     node.counterAxisSizingMode =
-      (isHorizontal ? opts.height : opts.width) !== undefined ? "FIXED" : "AUTO";
+      (isHorizontal ? opts.height : opts.width) !== undefined
+        ? "FIXED"
+        : "AUTO";
   }
 
   if (opts.width !== undefined || opts.height !== undefined) {
@@ -156,7 +169,9 @@ export function createText(opts: {
   }
 
   node.characters = opts.characters;
-  node.fills = [{ type: "SOLID", color: opts.color ?? specTokens.themes.light.text }];
+  node.fills = [
+    { type: "SOLID", color: opts.color ?? specTokens.themes.light.text },
+  ];
 
   if (opts.width !== undefined) {
     node.textAutoResize = "HEIGHT";
@@ -213,11 +228,13 @@ export function createColorSwatch<K extends NodeKind = "frame">(opts: {
     width: size,
     height: size,
   });
-  node.strokes = [{
-    type: "SOLID",
-    color: opts.inverse ? rgb(1, 1, 1) : rgb(0, 0, 0),
-    opacity: 0.1,
-  }];
+  node.strokes = [
+    {
+      type: "SOLID",
+      color: opts.inverse ? rgb(1, 1, 1) : rgb(0, 0, 0),
+      opacity: 0.1,
+    },
+  ];
   node.strokeWeight = 1;
   node.strokeAlign = "INSIDE";
   return node as NodeFor<K>;
@@ -274,17 +291,21 @@ export function createTableCell<K extends NodeKind = "frame">(opts: {
     });
     node.primaryAxisAlignItems = "SPACE_BETWEEN";
     node.counterAxisAlignItems = "MIN";
-    node.appendChild(chipOrInstance(
-      opts.chipSource,
-      opts.chipLabel ?? "",
-      opts.chipBackground ?? theme.chipBg,
-      theme.text,
-    ));
-    node.appendChild(swatchOrInstance(
-      opts.swatchSource,
-      opts.swatchColor ?? rgb(0, 0, 0),
-      theme.cellFill.r < 0.5,
-    ));
+    node.appendChild(
+      chipOrInstance(
+        opts.chipSource,
+        opts.chipLabel ?? "",
+        opts.chipBackground ?? theme.chipBg,
+        theme.text,
+      ),
+    );
+    node.appendChild(
+      swatchOrInstance(
+        opts.swatchSource,
+        opts.swatchColor ?? rgb(0, 0, 0),
+        theme.cellFill.r < 0.5,
+      ),
+    );
     return node as NodeFor<K>;
   }
 
@@ -315,21 +336,25 @@ export function createTableCell<K extends NodeKind = "frame">(opts: {
     });
     label.name = "text";
     node.appendChild(label);
-    node.appendChild(swatchOrInstance(
-      opts.swatchSource,
-      opts.swatchColor ?? rgb(0, 0, 0),
-      theme.cellFill.r < 0.5,
-    ));
+    node.appendChild(
+      swatchOrInstance(
+        opts.swatchSource,
+        opts.swatchColor ?? rgb(0, 0, 0),
+        theme.cellFill.r < 0.5,
+      ),
+    );
     return node as NodeFor<K>;
   }
 
   if (opts.variant === "token") {
-    node.appendChild(chipOrInstance(
-      opts.chipSource,
-      opts.chipLabel ?? "",
-      opts.chipBackground ?? theme.chipBg,
-      theme.text,
-    ));
+    node.appendChild(
+      chipOrInstance(
+        opts.chipSource,
+        opts.chipLabel ?? "",
+        opts.chipBackground ?? theme.chipBg,
+        theme.text,
+      ),
+    );
     return node as NodeFor<K>;
   }
 
