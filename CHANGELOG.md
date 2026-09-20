@@ -12,10 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `figma-plugin-utilities/lib/figma-frame-builders` resolves again. It had no export entry of its own, so it fell through `"./lib/*"` to `./src/lib/figma-frame-builders.js` — a file that doesn't exist, the module being TypeScript. It now has an explicit entry, as `figma-helpers` already did
 - **docs** — `figma-frame-builders` is documented, `sanitizeInput` no longer claims to escape HTML (it stringifies, truncates, strips control characters and trims), and `formatErrorMessage`, `handleAsyncError`, `withErrorHandling` and `logError` are documented with their real signatures. `withErrorHandling(fn, operation)` calls `fn()` with no arguments and returns its result; it was documented as returning a wrapped function
 
-### Removed
-- The dev-mode `console.warn` **FieldGroup** logged when `label` was set without `labelFor` is gone (dropped in the a11y pass, never recorded here). A `Dropdown` is a button and cannot be a `<label for>` target, so the warning fired on correct code
 
 ## [0.4.0] - 2026-05-14
+
+### Removed
+- The dev-mode `console.warn` **FieldGroup** logged when `label` was set without `labelFor` — a `Dropdown` is a button and cannot be a `<label for>` target, so it fired on correct code. Dropped in the a11y pass, recorded late
 
 ### Added
 - `figma-frame-builders.ts` — new module with Figma frame and component builder utilities (imported directly from `figma-plugin-utilities/lib/figma-frame-builders`):
