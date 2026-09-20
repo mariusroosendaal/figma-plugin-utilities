@@ -50,6 +50,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `IconButton` | `iconName`, `variant`, `disabled` | |
 | `IconToggle` | `iconName`, `iconNameOn` (swaps icons; without it, one icon on the selected fill), `pressed`, `highlighted`, `variant`, `disabled` | |
 | `SplitButton` | `iconName`, `size`, `disabled` | |
+| `ToggleButton` | `pressed`, `iconName` (lead), `badge` (a count); label as `children` or `label` | |
 | `Input` | `value`, `placeholder`, `size`, `disabled`, `iconName` | |
 | `Textarea` | `value`, `placeholder`, `disabled` | |
 | `NumericInput` | `value`, `placeholder`, `label` (lead letter) or `iconName`, `unit`, `options` (adds the chevron), `variable` (a bound variable's pill), `disabled` | |
@@ -60,7 +61,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `Dropdown` | `value` (`{ label }`), `placeholder`, `disabled`, `iconName`, `size`, `stroke` | |
 | `Checkbox`, `Switch` | `checked`, `mixed`, `disabled`, `description`; label as `children` | |
 | `Radio` | `group`, `value` (or `checked`), `disabled`, `variant` (`button`); label as `children` | |
-| `Tabs` | `tabs: [{ label, badge? }]` (max 5), `selectedTab` | |
+| `Tabs` | `tabs: [{ label, badge?, unread? }]` (max 5; `unread` takes the count blue), `selectedTab` | |
 | `SegmentedControl` | `value`, `disabled`; `children: [{ c: 'Segment', props: { value, iconName?, tooltip? }, children: 'Label' }]` (2–6) | |
 | `Slider` | `value`, `min`, `max`, `variant` (`range`/`delta`/`stepper`/`hue`/`opacity`), `defaultValue` (range: the marker), `disabled` | |
 | `Badge` | `variant` (incl. `count`/`count-inactive`), `strong`, `size`, `dot`; text as `children` | |

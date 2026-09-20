@@ -40,6 +40,7 @@ const UI3 = {
   MenuRowFooter: { id: '2327:96342', key: '09a61308ca8b3e0d57a047cdd66a255d031a99d4', set: true },
   TreeRow: { id: '1027222:26144', key: 'f3e55611980a1d9735b3adc94d3fca1a8e557ce4', set: true },
   Tree: { id: '1027222:26241', key: '80d6b8310d34fa1635ca35e76efa2c4dfbe7c984', set: false },
+  ToggleButton: { id: '1027239:26209', key: '47d374e9c751986a166b9718203c302c757a33a4', set: true },
   Banner: { id: '1027204:342', key: '133eade4a3d7f24189bf919ea1b7472182ef2e20', set: true },
   Chip: { id: '1027205:88', key: '415f290a1158771314dd11b9fc83b97bc62e9b04', set: true },
   Modal: { id: '1027206:365', key: '248a9a4ecea1cc16056ec1bc28b56acbf5cc8627', set: true },
@@ -465,6 +466,23 @@ const BUILDERS = {
     await swapIcon(node, '🎛️ Icon', p.iconName)
     return node
   },
+  // A Kit addition: UI3 toggles only icons, so the labelled one is our own set.
+  // Its badge is a Badge small alt, filled grey at rest and on the on-selected
+  // fill while on — the On variants carry that override already.
+  async ToggleButton(p, spec) {
+    const node = await instance('ToggleButton', {
+      '🎛️ On': tf(p.pressed),
+      '🎛️ Lead': p.iconName ? 'Icon' : 'False',
+      '🎛️ Trail': p.badge === undefined || p.badge === null || p.badge === '' ? 'False' : 'Badge',
+    })
+    setProp(node, '🎛️ Label', String(p.label ?? textOf(spec) ?? 'Label'))
+    if (p.iconName) await swapIcon(node, '↪ Icon', p.iconName)
+    if (p.badge !== undefined && p.badge !== null && p.badge !== '') {
+      const badge = node.findOne((n) => n.type === 'INSTANCE' && n.name.includes('Badge'))
+      if (badge) setProp(badge, 'Text', String(p.badge))
+    }
+    return node
+  },
   async NumericInputMulti(p) {
     const values = p.values || []
     const parts = [].concat(p.disabled ?? false)
@@ -563,12 +581,16 @@ const BUILDERS = {
       const badge = tabs[i].badge
       setProp(tab, '🎛️ Badge', badge !== undefined && badge !== null && badge !== '')
     })
-    // Badge counts are set once the badges show.
+    // Badge counts are set once the badges show. _Tab reaches for Count New on
+    // the selected tab; the kit reserves it for `unread` and gives the selected
+    // tab the filled grey Default instead.
     for (let i = 0; i < items.length; i++) {
       const badge = tabs[i] && tabs[i].badge
       if (badge === undefined || badge === null || badge === '') continue
       const count = items[i].findOne((n) => n.type === 'INSTANCE' && n.name.includes('Badge'))
-      if (count) await setText(count, null, String(badge))
+      if (!count) continue
+      setProp(count, '👥 Variant', tabs[i].unread ? 'Count New' : i === (p.selectedTab ?? 0) ? 'Default' : 'Count Inactive')
+      await setText(count, null, String(badge))
     }
     return node
   },
