@@ -28,6 +28,11 @@
       "types": "./src/lib/figma-helpers.ts",
       "import": "./src/lib/figma-helpers.ts",
       "default": "./src/lib/figma-helpers.ts"
+    },
+    "./lib/figma-frame-builders": {
+      "types": "./src/lib/figma-frame-builders.ts",
+      "import": "./src/lib/figma-frame-builders.ts",
+      "default": "./src/lib/figma-frame-builders.ts"
     }
   },
   "files": [

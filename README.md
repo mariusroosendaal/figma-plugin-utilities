@@ -73,11 +73,13 @@ import { sendToPlugin, createMessageHandler } from "figma-plugin-utilities/lib";
 | `Header` | Header bar with `left`, `center`, `right` slots and optional title |
 | `Footer` | Footer with `right`, `split`, and `full` layout variants |
 | `StatusBar` | Toast notifications with auto-dismiss (info/success/error/warning) |
-| `EmptyState` | Empty/error states with optional icon and action buttons |
-| `ListItem` | Selectable list items with metadata slot and action menu |
-| `LoadingState` | Centered loading indicator with custom message |
-| `FieldGroup` | Label + input wrapper for form fields |
-| `CheckboxCard` | Large checkbox with card styling and better touch targets |
+| `EmptyState` | Empty/error states with optional icon and action buttons; `size`, `centered`, and `role="alert"` for failures |
+| `ListItem` | Selectable list items with metadata and `badge` slots, an action menu (`menuOpen`, `menuToggle`, `menuClose`) |
+| `LoadingState` | Centred message as `role="status"` (text only, no spinner) |
+| `FieldGroup` | Label + input wrapper; `labelFor` binds the label to a text control |
+| `CheckboxCard` | Large checkbox with card styling and better touch targets; `change` event |
+
+Every component also takes a `class` (or `className`) prop.
 
 ### Header
 
@@ -231,11 +233,14 @@ const jsonResult = validateJsonString('{"key": "value"}');
 // { valid: true, parsed: {...} } or { valid: false, error: "..." }
 
 validateEmail("user@example.com"); // { valid: true }
-validateNumber("42", { min: 0, max: 100 }); // { valid: true, value: 42 }
+validateNumber("42", { min: 0, max: 100, integer: true }); // { valid: true, value: 42 }
+validateUrl("", { required: false }); // { valid: true } — empty is allowed
+validateJsonString(text, { maxSizeKB: 512, requireObject: true });
 
-const clean = sanitizeName("My Plugin!!!"); // "My Plugin"
-sanitizeInput("<script>alert(1)</script>"); // escaped string
-isEmpty(""); // true
+const clean = sanitizeName("My Plugin!!!", 200); // "My Plugin" — "Untitled" if nothing survives
+sanitizeInput(input, 50); // stringify, truncate to maxLength, strip control characters, trim
+// Note: sanitizeInput does NOT escape HTML. Escape at the point of rendering instead.
+isEmpty(""); // true — also for [] and {}
 ```
 
 ### Error Handling (`lib/errorHandling.js`)
@@ -286,6 +291,26 @@ setDefaultWidth(320);
 ```
 
 > **Note:** The `container` element passed to `autoResize` must **not** have `height: 100%` or a fixed height — it should flow naturally with its content so `scrollHeight` can be measured accurately.
+
+### Spec Frame Builders (`lib/figma-frame-builders.ts`)
+
+Typed builders for canvas frames in a spec or documentation generator — auto-layout frames and components, text, token chips, colour swatches, table cells and headers, with light and dark palettes.
+
+```typescript
+import {
+  specTokens, loadSpecFonts,
+  createAutoLayoutFrame, createAutoLayoutComponent, createText,
+  createTokenChip, createColorSwatch, createTableCell, createTableHeader,
+} from "figma-plugin-utilities/lib/figma-frame-builders";
+
+await loadSpecFonts(); // once, before drawing
+const theme = specTokens.themes.dark;
+
+const row = createAutoLayoutFrame({ name: "row", direction: "HORIZONTAL", spacing: 8, fill: theme.cellFill });
+row.appendChild(createTokenChip({ label: "#FFFFFF", background: theme.chipBg, textColor: theme.text }));
+```
+
+`specTokens` carries `accentColors`, `fonts` and `themes` (`light`, `dark`). Builders that can return either node take `as: "component"` for a `ComponentNode` instead of a `FrameNode`. Exported types: `PaddingSpec`, `SpecTheme`, `NodeKind`, `NodeFor`.
 
 ### Figma Helpers (`lib/figma-helpers.ts`)
 
