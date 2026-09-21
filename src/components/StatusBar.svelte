@@ -86,6 +86,7 @@
     align-items: center;
     justify-content: space-between;
     background: var(--figma-color-bg-secondary);
+    color: var(--figma-color-text);
     font-size: var(--body-medium-font-size);
     font-weight: var(--body-medium-font-weight);
     letter-spacing: var(--body-medium-letter-spacing);
