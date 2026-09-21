@@ -5,7 +5,7 @@
 ## [0.4.0] - 2026-09-21
 
 ### Added
-- `figma-frame-builders.ts` — new module with Figma frame and component builder utilities, imported from `figma-plugin-utilities/lib/figma-frame-builders` (its own export entry). They mirror the Vitrine spec library — colours, typography, spacing and layer names (`label` chip and text, a `tokens` row in token cells, `title` in both header variants):
+- `figma-frame-builders.ts` — new module with Figma frame and component builder utilities, imported from `figma-plugin-utilities/lib/figma-frame-builders` (its own export entry). They mirror the Vitrine spec library — colors, typography, spacing and layer names (`label` chip and text, a `tokens` row in token cells, `title` in both header variants):
   - `createAutoLayoutFrame` — creates a `FrameNode` with auto-layout configured
   - `createAutoLayoutComponent` — creates a `ComponentNode` with auto-layout configured
   - `createText` — creates a styled `TextNode`
