@@ -294,7 +294,7 @@ setDefaultWidth(320);
 
 ### Spec Frame Builders (`lib/figma-frame-builders.ts`)
 
-Typed builders for canvas frames in a spec or documentation generator — auto-layout frames and components, text, token chips, colour swatches, table cells and headers, with light and dark palettes.
+Typed builders for canvas frames in a spec or documentation generator — auto-layout frames and components, text, token chips, color swatches, table cells and headers, with light and dark palettes.
 
 ```typescript
 import {
