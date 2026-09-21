@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed
+- **figma-frame-builders** match the current Vitrine spec components — colours, typography and spacing, plus the library's layer names (`label` chip and text, a `tokens` row in token cells, `title` in both header variants). `SpecTheme` gains an optional `headerBorder`, and `specTokens.accentColors` take the library's status colours
+
 ### Fixed
 - **StatusBar** — the default `info` type sets `color: var(--figma-color-text)`. The `error`, `success` and `warning` types each set a foreground; the default one relied on inheritance, and nothing up the tree sets `color`, so the message rendered in the UA's black on the dark theme's grey bar
 - **EmptyState** — the actions are a keyed `{#each}`, so swapping one action for another reuses the right button rather than repainting the row

@@ -9,6 +9,8 @@ export type SpecTheme = {
   headerFill: RGB;
   subheaderFill: RGB;
   headingText: RGB;
+  /** Bottom rule under the header; the inverse header has none. */
+  headerBorder?: RGB;
 };
 
 export type NodeKind = "frame" | "component";
@@ -45,36 +47,37 @@ function applyPadding(
 
 export const specTokens = {
   accentColors: {
-    green: rgb(0.251, 0.769, 0.349), // #40C459 — AAA
-    blue: rgb(0.412, 0.671, 1.0), // #69ABFF — AA
-    purple: rgb(0.71, 0.522, 0.973), // #B585F8 — AA18
-    red: rgb(1.0, 0.482, 0.467), // #FF7B77 — DNP
+    green: rgb(0.337, 0.757, 0.396), // #56C165 — AAA
+    blue: rgb(0.447, 0.682, 0.988), // #72AEFC — AA
+    purple: rgb(0.753, 0.608, 0.965), // #C09BF6 — AA18
+    red: rgb(0.98, 0.553, 0.569), // #FA8D91 — DNP
   },
   fonts: {
     body: { family: "Inter", style: "Regular", size: 14 },
     bodyBold: { family: "Inter", style: "Semi Bold", size: 14 },
     subheading: { family: "Inter", style: "Medium", size: 24 },
-    heading: { family: "Inter", style: "Regular", size: 48 },
+    heading: { family: "Inter", style: "Medium", size: 48 },
     code: { family: "IBM Plex Mono", style: "Regular", size: 12 },
   },
   themes: {
     light: {
-      cellFill: rgb(1.0, 1.0, 1.0),
-      cellBorder: rgb(0.949, 0.949, 0.949),
-      text: rgb(0.102, 0.102, 0.102),
-      chipBg: rgb(0.949, 0.949, 0.949),
-      headerFill: rgb(1.0, 1.0, 1.0),
-      subheaderFill: rgb(0.961, 0.961, 0.961),
-      headingText: rgb(0.0, 0.0, 0.0),
+      cellFill: rgb(1.0, 1.0, 1.0), // #FFFFFF
+      cellBorder: rgb(0.949, 0.949, 0.949), // #F2F2F2
+      text: rgb(0.09, 0.09, 0.09), // #171717
+      chipBg: rgb(0.949, 0.949, 0.949), // #F2F2F2
+      headerFill: rgb(1.0, 1.0, 1.0), // #FFFFFF
+      subheaderFill: rgb(0.949, 0.949, 0.949), // #F2F2F2
+      headingText: rgb(0.09, 0.09, 0.09), // #171717
+      headerBorder: rgb(0.886, 0.886, 0.886), // #E2E2E2
     } satisfies SpecTheme,
     dark: {
-      cellFill: rgb(0.102, 0.102, 0.102),
-      cellBorder: rgb(0.133, 0.133, 0.133),
-      text: rgb(1.0, 1.0, 1.0),
-      chipBg: rgb(0.2, 0.2, 0.2),
-      headerFill: rgb(0.0, 0.0, 0.0),
-      subheaderFill: rgb(0.0, 0.0, 0.0),
-      headingText: rgb(1.0, 1.0, 1.0),
+      cellFill: rgb(0.09, 0.09, 0.09), // #171717
+      cellBorder: rgb(0.114, 0.114, 0.114), // #1D1D1D
+      text: rgb(1.0, 1.0, 1.0), // #FFFFFF
+      chipBg: rgb(0.157, 0.157, 0.157), // #282828
+      headerFill: rgb(0.09, 0.09, 0.09), // #171717
+      subheaderFill: rgb(0.157, 0.157, 0.157), // #282828
+      headingText: rgb(1.0, 1.0, 1.0), // #FFFFFF
     } satisfies SpecTheme,
   },
 };
@@ -190,20 +193,21 @@ export function createTokenChip<K extends NodeKind = "frame">(opts: {
 }): NodeFor<K> {
   const node = createNode(opts.as);
   applyAutoLayout(node, {
-    name: "token",
+    name: "label",
     direction: "VERTICAL",
-    padding: { top: 4, right: 8, bottom: 4, left: 8 },
+    padding: { right: 4, left: 4 },
     fill: opts.background,
     cornerRadius: 2,
     height: 24,
     width: opts.width,
   });
+  node.primaryAxisAlignItems = "CENTER";
   const text = createText({
     characters: opts.label,
     font: specTokens.fonts.code,
     color: opts.textColor ?? specTokens.themes.light.text,
-    lineHeight: 1.3,
-    letterSpacing: 0.1875,
+    lineHeight: 1.4,
+    letterSpacing: 0.18,
   });
   text.name = "label";
   text.textAutoResize = "WIDTH_AND_HEIGHT";
@@ -250,6 +254,17 @@ function chipOrInstance(
   return createTokenChip({ label, background, textColor });
 }
 
+// The library cell holds its chips in a "tokens" slot, a hugging row.
+function tokensRow(chip: FrameNode | InstanceNode): FrameNode {
+  const row = createAutoLayoutFrame({
+    name: "tokens",
+    direction: "HORIZONTAL",
+    spacing: 4,
+  });
+  row.appendChild(chip);
+  return row;
+}
+
 function swatchOrInstance(
   source: ComponentNode | undefined,
   color: RGB,
@@ -283,7 +298,7 @@ export function createTableCell<K extends NodeKind = "frame">(opts: {
     applyAutoLayout(node, {
       name: "table-cell",
       direction: "HORIZONTAL",
-      padding: { top: 12, right: 20, bottom: 16, left: 20 },
+      padding: { top: 12, right: 20, bottom: 12, left: 20 },
       fill: theme.cellFill,
       width: opts.width ?? 240,
       height: opts.height ?? 72,
@@ -292,11 +307,13 @@ export function createTableCell<K extends NodeKind = "frame">(opts: {
     node.primaryAxisAlignItems = "SPACE_BETWEEN";
     node.counterAxisAlignItems = "MIN";
     node.appendChild(
-      chipOrInstance(
-        opts.chipSource,
-        opts.chipLabel ?? "",
-        opts.chipBackground ?? theme.chipBg,
-        theme.text,
+      tokensRow(
+        chipOrInstance(
+          opts.chipSource,
+          opts.chipLabel ?? "",
+          opts.chipBackground ?? theme.chipBg,
+          theme.text,
+        ),
       ),
     );
     node.appendChild(
@@ -316,7 +333,7 @@ export function createTableCell<K extends NodeKind = "frame">(opts: {
   applyAutoLayout(node, {
     name: "table-cell",
     direction: "HORIZONTAL",
-    spacing: opts.variant === "token" ? 8 : 0,
+    spacing: opts.variant === "token" ? 8 : isTextSwatch ? 16 : 0,
     padding: { top: 12, right: 20, bottom: 16, left: 20 },
     fill: theme.cellFill,
     width: opts.width ?? 240,
@@ -331,7 +348,7 @@ export function createTableCell<K extends NodeKind = "frame">(opts: {
       characters: opts.text ?? "",
       font: specTokens.fonts.body,
       color: theme.text,
-      lineHeight: 1.5,
+      lineHeight: 1.4,
       width: 144,
     });
     label.name = "text";
@@ -348,11 +365,13 @@ export function createTableCell<K extends NodeKind = "frame">(opts: {
 
   if (opts.variant === "token") {
     node.appendChild(
-      chipOrInstance(
-        opts.chipSource,
-        opts.chipLabel ?? "",
-        opts.chipBackground ?? theme.chipBg,
-        theme.text,
+      tokensRow(
+        chipOrInstance(
+          opts.chipSource,
+          opts.chipLabel ?? "",
+          opts.chipBackground ?? theme.chipBg,
+          theme.text,
+        ),
       ),
     );
     return node as NodeFor<K>;
@@ -364,8 +383,7 @@ export function createTableCell<K extends NodeKind = "frame">(opts: {
     characters: opts.text ?? "",
     font: isBold ? specTokens.fonts.bodyBold : specTokens.fonts.body,
     color: theme.text,
-    lineHeight: 1.5,
-    letterSpacing: isBold ? -0.084 : undefined,
+    lineHeight: 1.4,
   });
   label.name = "text";
   if (opts.textSizing === "hug") {
@@ -394,43 +412,56 @@ export function createTableHeader<K extends NodeKind = "frame">(opts: {
     const node = createNode(opts.as);
     applyAutoLayout(node, {
       name: "table-header",
-      direction: "NONE",
+      direction: "VERTICAL",
+      padding: { top: 16, right: 20, bottom: 16, left: 20 },
       width: opts.width ?? 960,
       height: opts.height ?? 160,
       fill: theme.headerFill,
     });
+    if (theme.headerBorder) {
+      node.strokes = [{ type: "SOLID", color: theme.headerBorder }];
+      node.strokeTopWeight = 0;
+      node.strokeRightWeight = 0;
+      node.strokeBottomWeight = 1;
+      node.strokeLeftWeight = 0;
+      node.strokeAlign = "INSIDE";
+    }
     const text = createText({
       characters: title,
       font: specTokens.fonts.heading,
       color: theme.headingText,
-      lineHeight: 1.1,
+      lineHeight: 1,
       letterSpacing: -1.92,
     });
     text.name = "title";
     node.appendChild(text);
-    text.x = 20;
-    text.y = 16;
+    text.layoutSizingHorizontal = "FILL";
+    text.textAutoResize = "HEIGHT";
     return node as NodeFor<K>;
   }
 
-  // subheader
+  // subheader: the title sits on the bottom edge
   const node = createNode(opts.as);
   applyAutoLayout(node, {
     name: "table-subheader",
     direction: "VERTICAL",
-    padding: { top: 55, right: 20, bottom: 16, left: 20 },
+    spacing: 8,
+    padding: { top: 16, right: 20, bottom: 16, left: 20 },
     fill: theme.subheaderFill,
     width: opts.width ?? 960,
-    height: opts.height,
+    height: opts.height ?? 96,
   });
+  node.primaryAxisAlignItems = "MAX";
   const text = createText({
     characters: title,
     font: specTokens.fonts.subheading,
     color: theme.headingText,
-    lineHeight: 1.4,
-    letterSpacing: -0.24,
+    lineHeight: 1.3,
+    letterSpacing: -0.48,
   });
-  text.name = "heading";
+  text.name = "title";
   node.appendChild(text);
+  text.layoutSizingHorizontal = "FILL";
+  text.textAutoResize = "HEIGHT";
   return node as NodeFor<K>;
 }
