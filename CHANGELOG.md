@@ -2,23 +2,10 @@
 
 ## [Unreleased]
 
-### Changed
-- **figma-frame-builders** match the current Vitrine spec components — colours, typography and spacing, plus the library's layer names (`label` chip and text, a `tokens` row in token cells, `title` in both header variants). `SpecTheme` gains an optional `headerBorder`, and `specTokens.accentColors` take the library's status colours
-
-### Fixed
-- **StatusBar** — the default `info` type sets `color: var(--figma-color-text)`. The `error`, `success` and `warning` types each set a foreground; the default one relied on inheritance, and nothing up the tree sets `color`, so the message rendered in the UA's black on the dark theme's grey bar
-- **EmptyState** — the actions are a keyed `{#each}`, so swapping one action for another reuses the right button rather than repainting the row
-- `figma-plugin-utilities/lib/figma-frame-builders` resolves again. It had no export entry of its own, so it fell through `"./lib/*"` to `./src/lib/figma-frame-builders.js` — a file that doesn't exist, the module being TypeScript. It now has an explicit entry, as `figma-helpers` already did
-- **docs** — `figma-frame-builders` is documented, `sanitizeInput` no longer claims to escape HTML (it stringifies, truncates, strips control characters and trims), and `formatErrorMessage`, `handleAsyncError`, `withErrorHandling` and `logError` are documented with their real signatures. `withErrorHandling(fn, operation)` calls `fn()` with no arguments and returns its result; it was documented as returning a wrapped function
-
-
-## [0.4.0] - 2026-05-14
-
-### Removed
-- The dev-mode `console.warn` **FieldGroup** logged when `label` was set without `labelFor` — a `Dropdown` is a button and cannot be a `<label for>` target, so it fired on correct code. Dropped in the a11y pass, recorded late
+## [0.4.0] - 2026-09-21
 
 ### Added
-- `figma-frame-builders.ts` — new module with Figma frame and component builder utilities (imported directly from `figma-plugin-utilities/lib/figma-frame-builders`):
+- `figma-frame-builders.ts` — new module with Figma frame and component builder utilities, imported from `figma-plugin-utilities/lib/figma-frame-builders` (its own export entry). They mirror the Vitrine spec library — colours, typography, spacing and layer names (`label` chip and text, a `tokens` row in token cells, `title` in both header variants):
   - `createAutoLayoutFrame` — creates a `FrameNode` with auto-layout configured
   - `createAutoLayoutComponent` — creates a `ComponentNode` with auto-layout configured
   - `createText` — creates a styled `TextNode`
@@ -27,8 +14,16 @@
   - `createTableCell` — creates a table cell frame
   - `createTableHeader` — creates a table header frame
   - `loadSpecFonts` — loads Inter and IBM Plex Mono font faces in parallel
-  - `specTokens` — design token constants (accent colors, font specs, light/dark themes)
+  - `specTokens` — design token constants (accent colors, font specs, light/dark themes with an optional `headerBorder`)
   - `PaddingSpec`, `SpecTheme`, `NodeKind` and `NodeFor` types
+
+### Removed
+- The dev-mode `console.warn` **FieldGroup** logged when `label` was set without `labelFor` — a `Dropdown` is a button and cannot be a `<label for>` target, so it fired on correct code. Dropped in the a11y pass, recorded late
+
+### Fixed
+- **StatusBar** — the default `info` type sets `color: var(--figma-color-text)`. The `error`, `success` and `warning` types each set a foreground; the default one relied on inheritance, and nothing up the tree sets `color`, so the message rendered in the UA's black on the dark theme's grey bar
+- **EmptyState** — the actions are a keyed `{#each}`, so swapping one action for another reuses the right button rather than repainting the row
+- **docs** — `figma-frame-builders` is documented, `sanitizeInput` no longer claims to escape HTML (it stringifies, truncates, strips control characters and trims), and `formatErrorMessage`, `handleAsyncError`, `withErrorHandling` and `logError` are documented with their real signatures. `withErrorHandling(fn, operation)` calls `fn()` with no arguments and returns its result; it was documented as returning a wrapped function
 
 ## [0.3.1] - 2026-05-13
 
