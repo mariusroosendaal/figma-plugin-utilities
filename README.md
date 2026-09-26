@@ -316,6 +316,14 @@ row.appendChild(createTokenChip({ label: "#FFFFFF", background: theme.chipBg, te
 
 `specTokens` carries `accentColors`, `fonts` and `themes` (`light`, `dark`). Builders that can return either node take `as: "component"` for a `ComponentNode` instead of a `FrameNode`. Exported types: `PaddingSpec`, `SpecTheme`, `NodeKind`, `NodeFor`.
 
+### Scale Math (`lib/scale.ts`)
+
+Pure math for scales shaped across breakpoints — the ramp's quadratic Bézier (`bezier`, `clampPosition`, `levelT`), blending by viewport width (`blendAt`), values between breakpoints (`valueAtWidth`), fallback widths (`FALLBACK_WIDTHS`, `isBreakpointName`, `widthsFor`) and fluid CSS (`fluidClamp`, `trimNumber`), plus `lerp` and `roundHalfDown`. No Figma API: both threads may import it, provided the plugin builds each thread separately.
+
+```typescript
+import { widthsFor, blendAt, fluidClamp } from "figma-plugin-utilities/lib/scale";
+```
+
 ### Figma Helpers (`lib/figma-helpers.ts`)
 
 For use in `code.ts`:
