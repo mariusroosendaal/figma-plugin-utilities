@@ -38,7 +38,7 @@
    *   cells: Cell[],
    *   tone?: "new" | null,
    *   removed?: boolean,
-   *   badges?: { text: string, variant?: string }[],
+   *   badges?: { text: string, variant?: string, title?: string }[],
    *   [extra: string]: any,
    * }} Row
    */
@@ -145,7 +145,9 @@
         <span class="token" role={roles ? "cell" : undefined}>
           <span class="name" class:is-new={row.tone === "new"}>{row.name}</span>
           {#each shown(row, maxBadges) as badge, i (i)}
-            <Badge variant={badge.variant ?? "default"} text={badge.text} />
+            <span title={badge.title ?? null}>
+              <Badge variant={badge.variant ?? "default"} text={badge.text} />
+            </span>
           {/each}
           {#if hidden(row, maxBadges).length}
             <span

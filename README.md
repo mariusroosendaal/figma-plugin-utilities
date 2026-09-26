@@ -86,7 +86,7 @@ import { sendToPlugin, createMessageHandler } from "figma-plugin-utilities/lib";
 | `FieldGroup` | Label + input wrapper; `labelFor` binds the label to a text control |
 | `CheckboxCard` | Large checkbox with card styling and better touch targets; `change` event |
 | `Section` | Titled group of fields as in Figma's panels: a `Header` with the title and an `actions` slot, content padded by the section itself |
-| `DataTable` | Named rows with a cell per column (a set at each breakpoint, a style before and after): columns with their own width and alignment, a read-only mode with table roles, row selection with an `editor` slot, notes as badges with a `+N` count past two, an `action` slot, values as badges or variable chips, removed rows and a marked column |
+| `DataTable` | Named rows with a cell per column (a set at each breakpoint, a style before and after): columns with their own width and alignment, a read-only mode with table roles, row selection with an `editor` slot, notes as badges, with titles, and a `+N` count past two, an `action` slot, values as badges or variable chips, removed rows and a marked column |
 | `FieldGrid` | Fields side by side in equal columns (`columns`, default 2) that shrink below their content |
 | `SteppedField` | A field with − and + icon buttons after it, as one grid cell; `step` event with -1 or 1 |
 | `LadderBadges` | A scale's sizes as badges, outlined where used and archived where not, each with the caller's title |
