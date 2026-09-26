@@ -1,10 +1,10 @@
 // Responsive scale math shared by plugins that shape a scale across
-// breakpoints, such as Type Tools and Spacing Sets: the ramp's quadratic
+// breakpoints, such as Vitrine Tools' Type and Spacing tabs: the ramp's quadratic
 // Bézier, blending by viewport width, values between breakpoints, fallback
 // widths and fluid CSS. Pure — no Figma API — so both threads may import it.
 //
-// Units are the caller's: Type Tools works in px along its ladder, Spacing
-// Sets in ladder rungs. Nothing here maps a value onto a ladder.
+// Units are the caller's: the Type tab works in px along its ladder, the
+// Spacing tab in ladder rungs. Nothing here maps a value onto a ladder.
 
 /** The quadratic Bézier through p0 and p2, pulled toward p1, at t in 0…1. */
 export const bezier = (t: number, p0: number, p1: number, p2: number) =>

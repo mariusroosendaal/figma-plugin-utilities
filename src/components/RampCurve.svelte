@@ -1,7 +1,7 @@
 <!--
   A ramp's quadratic Bézier at the breakpoint shown, with the other
-  breakpoints' curves faint behind it, from Type Tools' and Spacing Sets'
-  ramp editors. Everything up the y axis is in the caller's units — px along
+  breakpoints' curves faint behind it, from the ramp editors of Vitrine
+  Tools' Type and Spacing tabs. Everything up the y axis is in the caller's units — px along
   a type ladder, rungs of a spacing one — so the caller passes the curves,
   the grid lines, the dots and how a point snaps to a rung. At the smallest
   and largest breakpoint the three control points are handles: bottom and
