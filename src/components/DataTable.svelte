@@ -13,7 +13,7 @@
 -->
 <script>
   import { createEventDispatcher } from "svelte";
-  import { Badge, VariablePill } from "figma-ui3-kit-svelte";
+  import { Badge, Tooltip, VariablePill } from "figma-ui3-kit-svelte";
 
   /**
    * @typedef {{
@@ -144,19 +144,25 @@
       >
         <span class="token" role={roles ? "cell" : undefined}>
           <span class="name" class:is-new={row.tone === "new"}>{row.name}</span>
+          <!-- Tooltips, not titles: a plugin's frame may not show a title. -->
           {#each shown(row, maxBadges) as badge, i (i)}
-            <span title={badge.title ?? null}>
+            {#if badge.title}
+              <Tooltip label={badge.title} direction="Top">
+                <Badge variant={badge.variant ?? "default"} text={badge.text} />
+              </Tooltip>
+            {:else}
               <Badge variant={badge.variant ?? "default"} text={badge.text} />
-            </span>
+            {/if}
           {/each}
           {#if hidden(row, maxBadges).length}
-            <span
-              title={hidden(row, maxBadges)
+            <Tooltip
+              label={hidden(row, maxBadges)
                 .map((b) => b.text)
                 .join(", ")}
+              direction="Top"
             >
               <Badge text="+{hidden(row, maxBadges).length}" />
-            </span>
+            </Tooltip>
           {/if}
         </span>
         {#each row.cells as cell, c (c)}
