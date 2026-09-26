@@ -79,7 +79,7 @@ import { sendToPlugin, createMessageHandler } from "figma-plugin-utilities/lib";
 | `LoadingState` | Centred message as `role="status"` (text only, no spinner) |
 | `FieldGroup` | Label + input wrapper; `labelFor` binds the label to a text control |
 | `CheckboxCard` | Large checkbox with card styling and better touch targets; `change` event |
-| `ValueTable` | Named rows with a value per column (a set at each breakpoint): row selection with an `editor` slot, `badges` and `action` slots, values as badges or variable chips, removed rows, a marked column and a legend |
+| `ValueTable` | Named rows with a value per column (a set at each breakpoint): row selection with an `editor` slot, notes as badges with a `+N` count past two, an `action` slot, values as badges or variable chips, removed rows, a marked column and a legend |
 
 Every component also takes a `class` (or `className`) prop.
 

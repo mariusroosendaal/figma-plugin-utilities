@@ -4,8 +4,9 @@
   by its `label`, with its values in it. Selecting a row opens the `editor`
   slot under it; removed rows are colored and can't be selected. A value
   that aliases a variable is its chip; others are badges. Both are colored
-  as new, changed or removed; muted values are plain text. A row's badges
-  go in the `badges` slot, its trailing button in `action`.
+  as new, changed or removed; muted values are plain text. A row's notes
+  are badges after its name, the first `maxBadges` of them and a count of
+  the rest, listed in its title; its trailing button goes in `action`.
 -->
 <script>
   import { createEventDispatcher } from "svelte";
@@ -26,6 +27,7 @@
    *   cells: Cell[],
    *   tone?: "new" | null,
    *   removed?: boolean,
+   *   badges?: { text: string, variant?: string }[],
    *   [extra: string]: any,
    * }} Row
    */
@@ -50,6 +52,8 @@
    * their contents still in line with the rest of it.
    */
   export let inset = null;
+  /** How many of a row's badges show before the rest become a count. */
+  export let maxBadges = 2;
 
   let className = "";
   export { className as class };
@@ -58,6 +62,10 @@
 
   // The badge a value gets for its tone.
   const TONES = { new: "success", changed: "warning" };
+
+  // Reactive, so the rows follow a new limit.
+  $: shown = (row) => (row.badges ?? []).slice(0, maxBadges);
+  $: hidden = (row) => (row.badges ?? []).slice(maxBadges);
 
   $: cols = columns.map((c) => (typeof c === "string" ? { label: c } : c));
 </script>
@@ -95,7 +103,18 @@
         <div class="tr removed" aria-label={row.label}>
           <span class="token">
             <span class="name">{row.name}</span>
-            <slot name="badges" {row} />
+            {#each shown(row) as badge, i (i)}
+              <Badge variant={badge.variant ?? "default"} text={badge.text} />
+            {/each}
+            {#if hidden(row).length}
+              <span
+                title={hidden(row)
+                  .map((b) => b.text)
+                  .join(", ")}
+              >
+                <Badge text="+{hidden(row).length}" />
+              </span>
+            {/if}
           </span>
           {#each row.cells as cell, c (c)}
             <span class="num" title={cell.title ?? null}>
@@ -119,7 +138,18 @@
             <span class="name" class:is-new={row.tone === "new"}
               >{row.name}</span
             >
-            <slot name="badges" {row} />
+            {#each shown(row) as badge, i (i)}
+              <Badge variant={badge.variant ?? "default"} text={badge.text} />
+            {/each}
+            {#if hidden(row).length}
+              <span
+                title={hidden(row)
+                  .map((b) => b.text)
+                  .join(", ")}
+              >
+                <Badge text="+{hidden(row).length}" />
+              </span>
+            {/if}
           </span>
           {#each row.cells as cell, c (c)}
             <span
