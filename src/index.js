@@ -7,8 +7,9 @@ export {
   ListItem,
   LoadingState,
   PluginLayout,
+  Section,
   StatusBar,
-  ValueTable,
+  DataTable,
   Header,
 } from "./components/index.js";
 

@@ -3,7 +3,8 @@
 ## [Unreleased]
 
 ### Added
-- **ValueTable** — named rows with a value per column, such as a set's size at each breakpoint, from Type Tools' and Spacing Sets' sets tables. Rows are buttons that open the `editor` slot under them; each takes notes as badges after its name, the first two shown and the rest counted as `+N` with them in its title, and a trailing button in the `action` slot. Values are badges, or variable chips where they alias a variable, colored as new or changed; removed rows are colored and can't be selected, one column can be marked, headers can be buttons that pick it, and a legend says what the colors mean
+- **Section** — a titled group of fields as in Figma's panels, from Spacing Sets: a fieldset headed by `Header`, the title strong on its left and icon buttons at its right in the `actions` slot. It pads its own content, so its container doesn't
+- **DataTable** — named rows with a cell per column, such as a set's size at each breakpoint or a style's size before and after an update, from Type Tools' and Spacing Sets' sets tables and review modals. Columns take their own width and alignment. Selectable rows are buttons that open the `editor` slot under them, with a trailing button in the `action` slot; with `selectable={false}` the table is read-only, with table roles. Each row takes notes as badges after its name, the first two shown and the rest counted as `+N` with them in its title. Cells are badges, variable chips where they alias a variable, or plain text, colored as new or changed; removed rows are colored and can't be selected, one column can be marked, and headers can be buttons that pick it
 
 ## [0.4.0] - 2026-09-21
 
