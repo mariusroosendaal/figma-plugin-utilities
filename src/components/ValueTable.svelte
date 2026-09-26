@@ -2,12 +2,14 @@
   ValueTable: named rows with a value per column — a set's size or spacing
   at each breakpoint. A list of row buttons, not a table: each row is named
   by its `label`, with its values in it. Selecting a row opens the `editor`
-  slot under it; removed rows are colored and can't be selected. A row's
-  badges go in the `badges` slot, its trailing button in `action`.
+  slot under it; removed rows are colored and can't be selected. A value
+  that aliases a variable is its chip; others are badges. Both are colored
+  as new, changed or removed; muted values are plain text. A row's badges
+  go in the `badges` slot, its trailing button in `action`.
 -->
 <script>
   import { createEventDispatcher } from "svelte";
-  import { Badge, Text } from "figma-ui3-kit-svelte";
+  import { Badge, Text, VariablePill } from "figma-ui3-kit-svelte";
 
   /**
    * @typedef {{ label: string, title?: string }} Column
@@ -15,7 +17,8 @@
    *   text: string | number,
    *   tone?: "new" | "changed" | "muted" | null,
    *   title?: string | null,
-   * }} Cell
+   *   alias?: string | null,
+   * }} Cell  `alias` names the variable the value aliases, shown as a chip.
    * @typedef {{
    *   key: string,
    *   name: string,
@@ -41,16 +44,25 @@
   export let selectableColumns = false;
   /** @type {{ label: string, variant: string }[]} What the colors mean. */
   export let legend = [];
+  /**
+   * @type {string | null} The container's side padding, such as
+   * "var(--size-xsmall)": the rows run through it to the container's edges,
+   * their contents still in line with the rest of it.
+   */
+  export let inset = null;
 
   let className = "";
   export { className as class };
 
   const dispatch = createEventDispatcher();
 
+  // The badge a value gets for its tone.
+  const TONES = { new: "success", changed: "warning" };
+
   $: cols = columns.map((c) => (typeof c === "string" ? { label: c } : c));
 </script>
 
-<div class="table {className}" style="--cols: {cols.length}">
+<div class="table {className}" style:--cols={cols.length} style:--inset={inset}>
   <div class="row-wrap" aria-hidden={selectableColumns ? undefined : "true"}>
     <div class="tr th">
       <span aria-hidden="true">{nameLabel}</span>
@@ -86,7 +98,13 @@
             <slot name="badges" {row} />
           </span>
           {#each row.cells as cell, c (c)}
-            <span class="num" title={cell.title ?? null}>{cell.text}</span>
+            <span class="num" title={cell.title ?? null}>
+              {#if cell.tone === "muted"}
+                {cell.text}
+              {:else}
+                <Badge variant="danger" text={String(cell.text)} />
+              {/if}
+            </span>
           {/each}
         </div>
       {:else}
@@ -107,18 +125,33 @@
             <span
               class="num"
               class:active={c === active}
-              class:is-new={cell.tone === "new"}
-              class:cell-changed={cell.tone === "changed"}
               class:muted={cell.tone === "muted"}
-              title={cell.title ?? null}>{cell.text}</span
+              title={[cell.alias, cell.title].filter(Boolean).join(", ") ||
+                null}
             >
+              {#if cell.tone === "muted"}
+                {cell.text}
+              {:else if cell.alias}
+                <!-- No label, so no title of its own over the cell's. -->
+                <VariablePill
+                  label={null}
+                  class={cell.tone ? `tone-${cell.tone}` : ""}
+                  >{cell.text}</VariablePill
+                >
+              {:else}
+                <Badge
+                  variant={TONES[cell.tone] ?? "default"}
+                  text={String(cell.text)}
+                />
+              {/if}
+            </span>
           {/each}
         </button>
       {/if}
       <span class="action"><slot name="action" {row} /></span>
     </div>
     {#if selected}
-      <slot name="editor" {row} />
+      <div class="editor"><slot name="editor" {row} /></div>
     {/if}
   {/each}
 </div>
@@ -137,11 +170,18 @@
 {/if}
 
 <style>
+  /* Run through the container's padding. Rows keep their own 8px inside,
+     so the name lines up with the container's content; the action ends at
+     its edge. */
   .table {
     display: flex;
     flex-direction: column;
-    font-size: 11px;
-    font-family: var(--font-family-code, monospace);
+    margin-inline: calc(-1 * var(--inset, 0px));
+    font-family: var(--font-stack);
+    font-size: var(--body-medium-font-size);
+    font-weight: var(--body-medium-font-weight);
+    line-height: var(--body-medium-line-height);
+    letter-spacing: var(--body-medium-letter-spacing);
   }
   .tr {
     display: grid;
@@ -153,6 +193,7 @@
     background: none;
     color: var(--figma-color-text);
     font: inherit;
+    letter-spacing: inherit;
     text-align: left;
   }
   /* A row and its action side by side; the button can't sit in the row,
@@ -162,26 +203,25 @@
     grid-template-columns: minmax(0, 1fr) var(--size-small);
     column-gap: var(--size-xxxsmall);
     align-items: center;
+    padding-inline: max(0px, calc(var(--inset, 0px) - var(--size-xxsmall)))
+      var(--inset, 0px);
+    border-bottom: 1px solid var(--figma-color-border);
+  }
+  .editor {
+    padding-inline: max(0px, calc(var(--inset, 0px) - var(--size-xxsmall)));
     border-bottom: 1px solid var(--figma-color-border);
   }
   .action {
     display: flex;
   }
-  /* Hover and selection as in a tree row, rounded and inset; the action
-     sits outside it. */
+  /* Hover and the open row share one gray, the action included. */
   .row {
     width: 100%;
-    border-radius: var(--border-radius-medium);
     cursor: pointer;
   }
-  .row:hover {
-    background: var(--figma-color-bg-hover);
-  }
-  .item.selected .row {
-    background: var(--figma-color-bg-selected);
-  }
-  .item.selected .row:hover {
-    background: var(--figma-color-bg-selected-hover);
+  .item:hover,
+  .item.selected {
+    background: var(--figma-color-bg-secondary);
   }
   .row:focus-visible,
   .col:focus-visible {
@@ -213,6 +253,7 @@
     background: none;
     color: inherit;
     font: inherit;
+    letter-spacing: inherit;
     cursor: pointer;
   }
   .col:hover:not(.active) {
@@ -224,19 +265,18 @@
   .th .active {
     color: var(--figma-color-text);
   }
-  /* On a selected row the column is a shade deeper than the row. */
-  .item.selected .active {
-    background: var(--figma-color-bg-selected-hover);
-  }
   .is-new {
     color: var(--figma-color-text-success);
   }
-  .cell-changed {
-    color: var(--figma-color-text-warning);
-    font-weight: 600;
-  }
   .removed {
     color: var(--figma-color-text-danger);
+  }
+  /* A chip has no colored variants; its text takes the badge's color. */
+  .num :global(.variable-pill.tone-new) {
+    color: var(--figma-color-text-success);
+  }
+  .num :global(.variable-pill.tone-changed) {
+    color: var(--figma-color-text-warning);
   }
   .muted {
     color: var(--figma-color-text-secondary);

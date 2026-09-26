@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Added
-- **ValueTable** — named rows with a value per column, such as a set's size at each breakpoint, from Type Tools' and Spacing Sets' sets tables. Rows are buttons that open the `editor` slot under them; each takes badges and a trailing button in the `badges` and `action` slots. Removed rows are colored and can't be selected, cells are colored as new or changed, one column can be marked, headers can be buttons that pick it, and a legend says what the colors mean
+- **ValueTable** — named rows with a value per column, such as a set's size at each breakpoint, from Type Tools' and Spacing Sets' sets tables. Rows are buttons that open the `editor` slot under them; each takes badges and a trailing button in the `badges` and `action` slots. Values are badges, or variable chips where they alias a variable, colored as new or changed; removed rows are colored and can't be selected, one column can be marked, headers can be buttons that pick it, and a legend says what the colors mean
 
 ## [0.4.0] - 2026-09-21
 
