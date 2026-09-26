@@ -30,6 +30,7 @@ import {
   SteppedField,
   LadderBadges,
   CodeExportModal,
+  RampCurve,
   // Messages
   sendToPlugin,
   createMessageHandler,
@@ -89,6 +90,7 @@ import { sendToPlugin, createMessageHandler } from "figma-plugin-utilities/lib";
 | `FieldGrid` | Fields side by side in equal columns (`columns`, default 2) that shrink below their content |
 | `SteppedField` | A field with − and + icon buttons after it, as one grid cell; `step` event with -1 or 1 |
 | `LadderBadges` | A scale's sizes as badges, outlined where used and archived where not, each with the caller's title |
+| `RampCurve` | A ramp's Bézier at the breakpoint shown, in the caller's units: handles for the ends and the bend at the smallest and largest breakpoint, blends between; `change` and `select` events |
 | `CodeExportModal` | Read-only code in a modal with a copy button that reads "Copied" for 2s; a `controls` slot above the code |
 
 Every component also takes a `class` (or `className`) prop.
@@ -245,6 +247,31 @@ Large checkbox with card-style background and better touch targets.
 ```
 
 Each badge's accessible name is `"{value}px, used"` or `"{value}px, unused"`.
+
+### RampCurve
+
+```svelte
+<RampCurve
+  {ramp}
+  curves={breakpoints.map((_, b) => rampAt(ramp, b))}
+  span={[lo, hi]}
+  grid={ladder.map((size, rung) => ({ key: rung, y: size, label: size }))}
+  dots={levels.map((size, k) => ({ key: k, x: k / (levels.length - 1), y: size }))}
+  {breakpoints}
+  {selected}
+  rungCount={ladder.length}
+  rungAt={(px) => nearestRung(ladder, px)}
+  format={(px) => `${Math.round(px)}px`}
+  ariaLabel="Heading ramp"
+  bottomLabel="Smallest level"
+  topLabel="Largest level"
+  along="levels"
+  on:change={(e) => (ramp = { ...ramp, ...e.detail })}
+  on:select={(e) => (selected = e.detail)}
+/>
+```
+
+`ramp` holds the ends as rungs and the bends at each end (`bottomSm`, `topSm`, `bendSm`, `bottomLg`, `topLg`, `bendLg`) and `bendPosition`; `change` patches those keys. Everything else on the y axis is in the caller's units.
 
 ### CodeExportModal
 

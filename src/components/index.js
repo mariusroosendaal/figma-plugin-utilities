@@ -14,3 +14,4 @@ export { default as CodeExportModal } from "./CodeExportModal.svelte";
 export { default as FieldGrid } from "./FieldGrid.svelte";
 export { default as LadderBadges } from "./LadderBadges.svelte";
 export { default as SteppedField } from "./SteppedField.svelte";
+export { default as RampCurve } from "./RampCurve.svelte";

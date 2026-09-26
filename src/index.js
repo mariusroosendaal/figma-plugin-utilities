@@ -15,6 +15,7 @@ export {
   FieldGrid,
   LadderBadges,
   SteppedField,
+  RampCurve,
 } from "./components/index.js";
 
 // Re-export all utilities
