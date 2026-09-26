@@ -26,6 +26,10 @@ import {
   CheckboxCard,
   Section,
   DataTable,
+  FieldGrid,
+  SteppedField,
+  LadderBadges,
+  CodeExportModal,
   // Messages
   sendToPlugin,
   createMessageHandler,
@@ -82,6 +86,10 @@ import { sendToPlugin, createMessageHandler } from "figma-plugin-utilities/lib";
 | `CheckboxCard` | Large checkbox with card styling and better touch targets; `change` event |
 | `Section` | Titled group of fields as in Figma's panels: a `Header` with the title and an `actions` slot, content padded by the section itself |
 | `DataTable` | Named rows with a cell per column (a set at each breakpoint, a style before and after): columns with their own width and alignment, a read-only mode with table roles, row selection with an `editor` slot, notes as badges with a `+N` count past two, an `action` slot, values as badges or variable chips, removed rows and a marked column |
+| `FieldGrid` | Fields side by side in equal columns (`columns`, default 2) that shrink below their content |
+| `SteppedField` | A field with − and + icon buttons after it, as one grid cell; `step` event with -1 or 1 |
+| `LadderBadges` | A scale's sizes as badges, outlined where used and archived where not, each with the caller's title |
+| `CodeExportModal` | Read-only code in a modal with a copy button that reads "Copied" for 2s; a `controls` slot above the code |
 
 Every component also takes a `class` (or `className`) prop.
 
@@ -198,6 +206,64 @@ Large checkbox with card-style background and better touch targets.
   Large
 </CheckboxCard>
 ```
+
+### FieldGrid
+
+```svelte
+<FieldGrid columns={3}>
+  <FieldGroup label="Base">…</FieldGroup>
+  <FieldGroup label="Ratio">…</FieldGroup>
+  <FieldGroup label="Steps">…</FieldGroup>
+</FieldGrid>
+```
+
+### SteppedField
+
+```svelte
+<SteppedField
+  downLabel="Step {set.name} down"
+  upLabel="Step {set.name} up"
+  on:step={(e) => setOffset(set.offset + e.detail)}
+>
+  <FieldGroup label="Steps off the curve" labelFor="offset" size="small">
+    <NumericInput id="offset" value={set.offset} precision={0} />
+  </FieldGroup>
+</SteppedField>
+```
+
+### LadderBadges
+
+```svelte
+<LadderBadges
+  ariaLabel="Ladder sizes"
+  badges={ladder.map((value, i) => ({
+    value,
+    used: used.has(i),
+    title: used.has(i) ? "Used by a style" : "Unused",
+  }))}
+/>
+```
+
+Each badge's accessible name is `"{value}px, used"` or `"{value}px, unused"`.
+
+### CodeExportModal
+
+```svelte
+<CodeExportModal
+  isOpen={exportOpen}
+  title="Export CSS"
+  value={css}
+  ariaLabel="Exported CSS"
+  copyLabel="Copy CSS"
+  onClose={() => (exportOpen = false)}
+>
+  <svelte:fragment slot="controls">
+    <SegmentedControl …/>
+  </svelte:fragment>
+</CodeExportModal>
+```
+
+Copies with `execCommand`, since the plugin iframe isn't granted clipboard-write. `position` (default `"bottom"`), `width` (`"medium"`) and `height` (`"auto"`) pass through to `Modal`.
 
 ## Utilities
 
