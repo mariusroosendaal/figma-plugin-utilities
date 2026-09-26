@@ -7,4 +7,5 @@ export { default as ListItem } from "./ListItem.svelte";
 export { default as LoadingState } from "./LoadingState.svelte";
 export { default as PluginLayout } from "./PluginLayout.svelte";
 export { default as StatusBar } from "./StatusBar.svelte";
+export { default as ValueTable } from "./ValueTable.svelte";
 export { default as Header } from "./Header.svelte";

@@ -8,6 +8,7 @@ export {
   LoadingState,
   PluginLayout,
   StatusBar,
+  ValueTable,
   Header,
 } from "./components/index.js";
 
