@@ -21,8 +21,8 @@
    *   title?: string,
    *   width?: string,
    *   align?: "start" | "end",
-   * }} Column  `width` is a grid track, 2.75rem by default; `align` "end"
-   *   by default, for numbers.
+   * }} Column  `width` is a grid track, 2.75rem by default; `align` "start"
+   *   by default, "end" to right-align numbers.
    * @typedef {{
    *   text: string | number,
    *   tone?: "new" | "changed" | "muted" | null,
@@ -107,7 +107,7 @@
           <button
             type="button"
             class="num col"
-            class:start={col.align === "start"}
+            class:end={col.align === "end"}
             class:active={c === active}
             aria-label="Show {col.label}"
             aria-pressed={c === active}
@@ -117,7 +117,7 @@
         {:else}
           <span
             class="num"
-            class:start={col.align === "start"}
+            class:end={col.align === "end"}
             class:active={c === active}
             role={roles ? "columnheader" : undefined}
             title={col.title ?? null}>{col.label}</span
@@ -169,7 +169,7 @@
           {@const plain = cell.plain || cell.tone === "muted"}
           <span
             class="num"
-            class:start={cols[c]?.align === "start"}
+            class:end={cols[c]?.align === "end"}
             class:active={c === active}
             class:plain
             class:muted={cell.tone === "muted"}
@@ -289,7 +289,7 @@
   .num {
     padding: 3px var(--size-xxxsmall);
     border-radius: var(--border-radius-medium);
-    text-align: right;
+    text-align: left;
   }
   /* Tabular figures line up plain numbers in a column; a badge or chip is
      sized to its own text, where they'd only widen a narrow 1. */
@@ -332,9 +332,9 @@
   .text-changed {
     color: var(--figma-color-text-warning);
   }
-  /* Text columns read from the left. */
-  .num.start {
-    text-align: left;
+  /* Columns set to end, for numbers, read from the right. */
+  .num.end {
+    text-align: right;
   }
   /* Read-only rows have no action; the name runs to the edge. */
   .static .row-wrap {
