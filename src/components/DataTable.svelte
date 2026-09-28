@@ -4,7 +4,7 @@
   and after an update. The name leads each row, with its notes as badges
   after it: the first `maxBadges`, and a count of the rest listed in its
   title. A cell is a badge, a variable chip where it aliases a variable, or
-  plain text; badges and text are colored as new or changed.
+  plain text; badges and text are colored as new, changed or danger.
 
   Selectable (the default), rows are buttons, named by their `label`, that
   open the `editor` slot under them, with a trailing button in `action`.
@@ -25,7 +25,7 @@
    *   by default, "end" to right-align numbers.
    * @typedef {{
    *   text: string | number,
-   *   tone?: "new" | "changed" | "muted" | null,
+   *   tone?: "new" | "changed" | "danger" | "muted" | null,
    *   title?: string | null,
    *   alias?: string | null,
    *   plain?: boolean,
@@ -74,7 +74,7 @@
   const dispatch = createEventDispatcher();
 
   // The badge a value gets for its tone.
-  const TONES = { new: "success", changed: "warning" };
+  const TONES = { new: "success", changed: "warning", danger: "danger" };
 
   // The limit is passed in, so the markup re-runs when it changes.
   const shown = (row, max) => (row.badges ?? []).slice(0, max);
@@ -175,6 +175,7 @@
             class:muted={cell.tone === "muted"}
             class:text-new={plain && cell.tone === "new"}
             class:text-changed={plain && cell.tone === "changed"}
+            class:text-danger={plain && cell.tone === "danger"}
             role={roles ? "cell" : undefined}
             title={[cell.alias, cell.title].filter(Boolean).join(", ") || null}
           >
@@ -331,6 +332,9 @@
   }
   .text-changed {
     color: var(--figma-color-text-warning);
+  }
+  .text-danger {
+    color: var(--figma-color-text-danger);
   }
   /* Columns set to end, for numbers, read from the right. */
   .num.end {
