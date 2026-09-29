@@ -16,6 +16,7 @@ export {
   LadderBadges,
   SteppedField,
   RampCurve,
+  MappingChip,
 } from "./components/index.js";
 
 // Re-export all utilities

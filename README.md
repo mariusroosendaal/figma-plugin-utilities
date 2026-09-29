@@ -31,6 +31,7 @@ import {
   LadderBadges,
   CodeExportModal,
   RampCurve,
+  MappingChip,
   // Messages
   sendToPlugin,
   createMessageHandler,
@@ -91,6 +92,7 @@ import { sendToPlugin, createMessageHandler } from "figma-plugin-utilities/lib";
 | `SteppedField` | A field with − and + icon buttons after it, as one grid cell; `step` event with -1 or 1 |
 | `LadderBadges` | A scale's sizes as badges, outlined where used and archived where not, each with the caller's tooltip |
 | `RampCurve` | A ramp's Bézier at the breakpoint shown, in the caller's units: handles for the ends and the bend at the smallest and largest breakpoint, blends between; `change` and `select` events |
+| `MappingChip` | One side of a source → target row: a filled 24px chip with a lead icon or chit, a truncating label, a `preview` after a dot and a trailing `count`; `click` event |
 | `CodeExportModal` | Read-only code in a modal with a copy button that reads "Copied" for 2s; a `controls` slot above the code |
 
 Every component also takes a `class` (or `className`) prop.
@@ -247,6 +249,20 @@ Large checkbox with card-style background and better touch targets.
 ```
 
 Each badge's accessible name is `"{value}px, used"` or `"{value}px, unused"`.
+
+### MappingChip
+
+```svelte
+<MappingChip
+  label={row.sourceName}
+  count={row.uses}
+  tone="secondary"
+  title="Select these icons"
+  on:click={() => reveal(row)}
+/>
+```
+
+`iconName` or `chit` (which wins) adds a lead that hangs into the padding; `preview` follows the label as "label · preview"; `tone` is `default`, `secondary` or `component`; `selected` draws the selection border. The `lead` slot takes a marker ahead of the lead, and `element` binds the button.
 
 ### RampCurve
 

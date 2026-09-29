@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Added
+- **MappingChip** — one side of a source → target row as a filled 24px chip with no border, from Data Mapper's MappingButton (which now wraps it), the Vitrine audit plugin's source and Icon Swapper's. A button that fires `click`, with a lead icon or chit that hangs into the padding, a truncating `label`, a secondary `preview` after a dot and a trailing `count`. `tone` colors it `default`, `secondary` or `component`; `selected` draws the selection border; a `lead` slot takes a marker ahead of the lead; `element` binds the button
 - **FieldGrid** — fields side by side in `columns` equal columns (2 by default), tracks that shrink below their content, from Type Tools and Spacing Sets
 - **SteppedField** — a field in the default slot with − and + icon buttons after it, as one grid cell, from both plugins' set editors. The buttons are named by `downLabel` and `upLabel` and fire `step` with -1 or 1
 - **LadderBadges** — a scale's sizes as badges, from Spacing Sets and Type Tools' ladder: outlined (`default`) where used, `archived` where not. Each badge in `badges` is `{ value, used, title }`, shown in a tooltip, so each plugin words its own; the group is named by `ariaLabel`
