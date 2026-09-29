@@ -46,6 +46,8 @@ const UI3 = {
   Modal: { id: '1027206:365', key: '248a9a4ecea1cc16056ec1bc28b56acbf5cc8627', set: true },
   Menu: { id: '1027206:366', key: '460fe8753d38a6fa072564cfc475b7546803f486', set: false },
   Header: { id: '1027197:23734', key: '92dea3280c6742ad57bbd682c483cac3e5062980', set: false },
+  // Figma's own title bar above a plugin UI — not kit code, added to every window.
+  WindowHeader: { id: '1027551:31', key: '135771e54148bad7bdcb0825057ac6785ba48f27', set: false },
   Footer: { id: '1027197:23800', key: '78de9140a69b8fb9bb9f797c34636f2b787fbf7e', set: true },
   PluginLayout: { id: '1027197:23801', key: '41f0db58e59fc01415c151d1cf7c2f1e25f9faea', set: false },
   FieldGroup: { id: '1027197:23913', key: '0b2eb3a95c0e4a960f7a8ee0e8b46a2136fd5dee', set: true },
@@ -1027,11 +1029,23 @@ async function buildMockup(spec, options = {}) {
     root.clipsContent = true
     root.counterAxisSizingMode = 'FIXED'
     root.resize(spec.width || 320, 100)
+    page.appendChild(root)
+    // Figma's title bar, as it draws one above every plugin UI: the plugin's
+    // icon, its name — the window's name up to " — ", or `title` — and close.
+    // `height` is the plugin's own, as passed to figma.showUI, so the window
+    // grows by the bar. `chrome: false` leaves it out.
+    let chrome = 0
+    if (spec.chrome !== false) {
+      const bar = await instance('WindowHeader')
+      setProp(bar, '🎛️ Title', spec.title ?? spec.window.split(' — ')[0])
+      root.appendChild(bar)
+      bar.layoutSizingHorizontal = 'FILL'
+      chrome = bar.height
+    }
     if (spec.height) {
       root.primaryAxisSizingMode = 'FIXED'
-      root.resize(spec.width || 320, spec.height)
+      root.resize(spec.width || 320, spec.height + chrome)
     }
-    page.appendChild(root)
     for (const child of [].concat(spec.children || [])) await build(child, root, ctx)
     const layout = root.children.find((c) => c.name === 'Plugin layout' || c.name === 'PluginLayout')
     if (layout && spec.height) layout.layoutSizingVertical = 'FILL'

@@ -28,7 +28,9 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
    | `<Chit color={…}>` | `{ c: 'Chit', props: { color: '#0D99FF' } }`. Connected, so it round-trips; use it for kit chits. |
    | A custom color swatch (not a kit Chit) | `{ swatch: '#0D99FF', size?: 16, radius?: 4 }` |
    | `<hr>` | `{ divider: true }` |
-   | Plugin window | `{ window: 'Name — view', width: 320, height?, children: [Header, PluginLayout, Footer] }` |
+   | Plugin window | `{ window: 'Name — view', width: 320, height?, title?, chrome?, children: [Header, PluginLayout, Footer] }` |
+
+   A window opens with Figma's title bar, the kit's **Plugin window header**: the plugin's icon, its name and a close button, as Figma draws them above every plugin UI. The name is the window's up to ` — `, or `title`; `chrome: false` leaves the bar out. `width` and `height` are the plugin's own, as passed to `figma.showUI`, so the window is 40px taller than `height` with the bar. The bar isn't kit code, so it has no Code Connect and doesn't round-trip.
 
    Build one window per tab or state. Build modals as standalone specs (`{ c: 'Modal', … }`). For a dialog that holds its own tabs and footer (`contentPadding={false}`), put a tabs row, a `fillHeight` stack and a `Footer` in its children.
 3. **Run it.** Paste the builder, then the spec, and end with:
