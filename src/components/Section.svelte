@@ -28,6 +28,10 @@
     border: none;
     padding: 0;
     margin: 0;
+    /* A fieldset is at least as wide as its content by default, so a
+       dropdown's long label would widen it past its container instead of
+       truncating. */
+    min-inline-size: 0;
   }
 
   /* The Header's own title is regular; a section's is strong, as in Figma's
