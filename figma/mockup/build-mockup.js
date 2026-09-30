@@ -894,18 +894,21 @@ const BUILDERS = {
     await fillSlot(node, 'Content slot', spec.children ?? [], ctx)
     return node
   },
-  // Each field takes one column's width, from the width the grid will fill, so
-  // the rest wrap onto new rows and a short last row doesn't stretch.
+  // Each field takes one column's width, from the width the grid fills, so
+  // the rest wrap onto new rows and a short last row doesn't stretch. The
+  // width is only known once every container is placed (a Section builds its
+  // content before it fills its parent), so the columns are set at the end.
   async FieldGrid(p, spec, parent, ctx) {
     const cols = Math.min(Math.max(p.columns ?? 2, 2), 5)
     const node = await instance('FieldGrid', { '👥 Columns': String(cols) })
     const slot = await fillSlot(node, 'Fields slot', spec.children ?? [], ctx)
-    const width = isVertical(parent) ? parent.width - parent.paddingLeft - parent.paddingRight : node.width
-    const column = Math.floor((width - 8 * (cols - 1)) / cols)
-    for (const c of slot.children) {
-      c.layoutSizingHorizontal = 'FILL'
-      c.minWidth = c.maxWidth = column
-    }
+    ctx.after.push(() => {
+      const column = Math.floor((node.width - 8 * (cols - 1)) / cols)
+      for (const c of slot.children) {
+        c.layoutSizingHorizontal = 'FILL'
+        c.minWidth = c.maxWidth = column
+      }
+    })
     return node
   },
   async SteppedField(p, spec, parent, ctx) {
@@ -1160,7 +1163,8 @@ async function buildMockup(spec, options = {}) {
   const page = options.page ? await figma.getNodeByIdAsync(options.page) : figma.currentPage
   if (page !== figma.currentPage) await figma.setCurrentPageAsync(page)
   const right = page.children.reduce((m, n) => Math.max(m, n.x + n.width), 0)
-  const ctx = { created: [] }
+  // `after`: work that needs final widths, run once the tree is placed.
+  const ctx = { created: [], after: [] }
 
   // Re-running a spec replaces the previous build of the same window.
   if (spec.window) for (const n of page.children.filter((n) => n.name === spec.window)) n.remove()
@@ -1200,6 +1204,8 @@ async function buildMockup(spec, options = {}) {
     page.appendChild(root)
     holder.remove()
   }
+  // Outer grids first: a grid's fields are pushed before the grid itself.
+  for (const fn of ctx.after.reverse()) fn()
   root.x = options.x ?? right + 100
   root.y = options.y ?? 0
   return { root: root.id, created: ctx.created.length }
