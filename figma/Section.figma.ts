@@ -34,7 +34,7 @@ let title = ''
 let actions = ''
 const header = instance.findInstance('Plugin header')
 if (header && header.type === 'INSTANCE') {
-  title = header.getString('🎛️ Title')
+  title = header.getBoolean('👁️ Title') ? header.getString('🎛️ Title') : ''
   actions = slot(header, 'Right slot', '    ', true)
 }
 const content = slot(instance, 'Content slot', '  ', false, (node) => node.name !== 'Plugin header')

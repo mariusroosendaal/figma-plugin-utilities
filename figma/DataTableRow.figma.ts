@@ -26,11 +26,15 @@ const cells = connected
 const cellCode = cells.map((c) => (type === 'removed' ? c.fields.filter((f) => !f.startsWith('tone')) : c.fields))
   .map((fields) => `{ ${fields.join(', ')} }`)
 
+// A "+N" badge is the count DataTable draws past maxBadges, not a note.
 const badges = connected
-  .filter((node) => node.codeConnectId() === 'badge' && node.name !== 'Button icon')
+  .filter((node) => node.codeConnectId() === 'badge')
   .map((badge) => {
     const [layer] = badge.findLayers((node) => node.type === 'TEXT')
-    const text = layer && layer.type === 'TEXT' ? layer.textContent : ''
+    return { badge, text: layer && layer.type === 'TEXT' ? layer.textContent : '' }
+  })
+  .filter(({ text }) => !/^\+\d+$/.test(text))
+  .map(({ badge, text }) => {
     const variant = badge.getEnum('👥 Variant', { 'Success': 'success', 'Warn': 'warning', 'Danger': 'danger', 'Brand': 'brand', 'Component': 'component' })
     return variant ? `{ text: ${JSON.stringify(text)}, variant: '${variant}' }` : `{ text: ${JSON.stringify(text)} }`
   })

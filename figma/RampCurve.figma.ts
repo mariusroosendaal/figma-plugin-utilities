@@ -9,8 +9,9 @@ const instance = figma.selectedInstance
 const imports = ["import { RampCurve } from 'figma-plugin-utilities'"]
 
 // The chart is drawn from the caller's ramp maths, which Figma can't hold, so
-// the data props stay variables. Editable is the smallest (or largest)
-// breakpoint; the others are blends, shown only.
+// the data props stay variables, `selected` too: Editable is the smallest or
+// the largest breakpoint, which the design can't say; the others are blends,
+// shown only.
 const editable = instance.getEnum('🐣 Editable', { 'True': true, 'False': false })
 const dropdown = instance.findInstance('Breakpoint')
 let shown = ''
@@ -28,7 +29,7 @@ export default {
   {grid}
   {dots}
   {breakpoints}
-  selected={${editable ? '0' : 'selected'}}
+  {selected}
   ariaLabel="Heading ramp"
   on:change={(e) => updateRamp(e.detail)}
   on:select={(e) => (selected = e.detail)}
