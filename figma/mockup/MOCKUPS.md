@@ -8,7 +8,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 - **Where to build**
   - **UI3 file** (`6dJFbL7SDC7kkS1fu3AHH6`), page **Mockups** (`1027190:25`). This is the default and needs no setup.
   - **Any other design file** with the UI3 library enabled. Components, styles and variables are imported by key. Icons need `options.icons` (see below).
-- The builder is the `build-mockup.js` source at the end of this skill, with comments and indentation stripped. It is about 44 KB, and `use_figma` accepts 50,000 characters in all, so keep the spec under about 6 KB: build repeated parts with small helper functions rather than writing them out, and split a large screen into several windows.
+- The builder is the `build-mockup.js` source at the end of this skill, minified. It is about 44 KB, and `use_figma` accepts 50,000 characters in all, so keep the spec under about 6 KB: build repeated parts with small helper functions rather than writing them out, and split a large screen into several windows.
 
 ## Workflow
 
@@ -83,6 +83,14 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `StatusBar` | `message`, `type` | |
 | `ListItem` | `title`, `active`, `menuItems`, `hasBadge`; meta text as `children` | |
 | `CheckboxCard` | `checked`, `disabled`, `secondary`; label as `children` | |
+| `Section` | `title` | `children` (the fields), `actions` (icon buttons) |
+| `FieldGrid` | `columns` (2–5) | `children` (the fields) |
+| `SteppedField` | | `children` (the field) |
+| `LadderBadges` | `badges: [{ value, used }]` | |
+| `MappingChip` | `label`, `preview`, `count`, `iconName` or `chit`, `tone`, `selected`, `disabled` | |
+| `DataTable` | `columns` (labels, or `{ label, width }` in rem), `rows: [{ key, name, cells, removed?, badges? }]` (cells as DataTable takes them, or bare values), `nameLabel`, `selectable`, `selectedKey`, `active`, `maxBadges` | `action` (every row), `editor` (under the `selectedKey` row) |
+| `RampCurve` | `breakpoints`, `selected`. The chart is the component's sample drawing; the ramp data isn't drawn | |
+| `CodeExportModal` | `title`, `value`, `copyLabel` | `controls` (above the code) |
 | `Text` | `variant` (`heading-*`, `body-*`, `-strong`), `color` (`--figma-color-text-secondary` / `-tertiary`); text as `children` | |
 | `Label` | `size`; text as `children` | |
 | `RadioGroup` | `legend`, `direction` | `children` (Radios) |
@@ -101,7 +109,7 @@ await buildMockup(SPEC, { icons: { 'icon.24.settings': { id: '1:531125', key: '5
 
 ## What doesn't round-trip
 
-- **Plain layout.** Stacks, grids, dividers and `{ text }` primitives are plain Figma layers, so Code Connect lists only the components inside them. Use `{ c: 'Text' }` wherever the source uses `<Text>` so it does come back. Tables and custom markup won't appear in the generated code.
+- **Plain layout.** Stacks, grids, dividers and `{ text }` primitives are plain Figma layers, so Code Connect lists only the components inside them. Use `{ c: 'Text' }` wherever the source uses `<Text>` so it does come back. Custom markup won't appear in the generated code; use `DataTable` for tables.
 - **Runtime-only props.** `bind:`, event handlers, `type="number"`, ARIA props and ids have no Figma equivalent.
 - **Dropdown selection.** A selected value reads back as `placeholder="…"`.
 - **Tooltip.** It wraps a trigger in code, but in Figma it's hidden (the trigger renders alone).

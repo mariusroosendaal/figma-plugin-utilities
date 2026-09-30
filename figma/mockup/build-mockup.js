@@ -56,6 +56,16 @@ const UI3 = {
   StatusBar: { id: '1027197:23902', key: 'b0196b1dd4a43d1ff9a39e6bbee225726960e448', set: true },
   ListItem: { id: '1027197:23952', key: '0958cc0be61c4fa697f0ca5a0581422bccf71899', set: true },
   CheckboxCard: { id: '1027197:24237', key: 'b8229a139f45ac8e9ff94638d652d909a450d23a', set: true },
+  Section: { id: '1027600:38', key: '100785ab13837f8ffa57ed518ab69f77f6bab6ab', set: false },
+  CodeExportModal: { id: '1027600:85', key: '28fdf9be6729bd7c1f65bde45141abe8a76cf184', set: false },
+  FieldGrid: { id: '1027602:534', key: '51663b518974c0c701de68a5b6e9edce70d9df8b', set: true },
+  SteppedField: { id: '1027596:474', key: '7a9bbe79f93a8b7659c5243e7ca02491ffb22dea', set: false },
+  LadderBadges: { id: '1027596:502', key: 'e3d3b7ac533804899f86bb6b41f198172dddd05d', set: false },
+  MappingChip: { id: '1027594:377', key: '0fe7789c674326d04b8657821eb51d0bf3233f7b', set: true },
+  DataTable: { id: '1027596:301', key: 'f1d2ead952fa218c84a7d59ab68e557d43f8de94', set: false },
+  DataTableRow: { id: '1027596:300', key: 'ca96ebfb66f9871836f6a8f80d00c712fe599cf0', set: true },
+  DataTableCell: { id: '1027596:211', key: 'ce512cf1e7f1954a52bd28b88a3e523dbf5c0aec', set: true },
+  RampCurve: { id: '1027599:473', key: 'd86ee6d14cf7ab42c7b8f8c7c5b42b524016dc71', set: true },
   Text: { id: '1027216:156', key: 'c695a971ac9052c6ebcbf432b60ce7a0d5281781', set: true },
   Label: { id: '1027216:161', key: '964899776bca3a6d406cd9e78c9041e2319b958d', set: true },
   RadioGroup: { id: '1027216:162', key: '9ec3520dfc75786126a616f7a5331ad428792809', set: false },
@@ -78,6 +88,9 @@ const VARS = {
   'text-tertiary': { id: 'VariableID:1330:3192', key: '0f283455cd05ac799f7516e4a1e8972df39a137c' },
   'bg-brand': { id: 'VariableID:1326:3175', key: 'a2bf6679fa967d1b5cc804c461d5e012b840b2bb' },
   'icon-tertiary': { id: 'VariableID:1330:3205', key: '1853293bb8ba57fed790a78193e8af8e5060cb81' },
+  'icon-secondary': { id: 'VariableID:1330:3204', key: 'b217e368b48c6a4f0f3be738ae764e9f08908df4' },
+  'icon-component': { id: 'VariableID:1514:3145', key: 'bc20c1a13b1be87b1f2dafff53cdef5a6ded958d' },
+  'icon-disabled': { id: 'VariableID:1516:3173', key: 'ddfd8ce75dd6646b48291471f9ba18c10de8e2e8' },
   border: { id: 'VariableID:1326:3180', key: '0231d9add0c28a818ab62bc8d70a8fff21715085' },
   4: { id: 'VariableID:1:672456', key: '0f158d8847032625eabf06aded4a5d93bd09b0d6' },
   8: { id: 'VariableID:1:672457', key: '907024ab5c6723435cf94ff28a455b4a1d492c5f' },
@@ -197,6 +210,12 @@ async function swapIcon(node, prefix, iconName) {
   if (c) setProp(node, prefix, c.id)
 }
 const tf = (b) => (b ? 'True' : 'False')
+// Hides a lead icon's container frame, which holds the lead's padding, so the
+// content starts where it would with no lead at all.
+function hide(node, name) {
+  const box = node.findOne((n) => n.type === 'FRAME' && n.name === name)
+  if (box) box.visible = false
+}
 const pick = (map, value, fallback) => map[value] ?? fallback
 
 // '#RGB' / '#RRGGBB' / '#RRGGBBAA' → { rgb, alpha }, for recoloring chits.
@@ -241,7 +260,7 @@ function textOf(spec) {
 // Each returns the created node. `block` components fill the width of a
 // vertical parent.
 
-const BLOCK = new Set(['Input', 'Textarea', 'NumericInput', 'NumericInputMulti', 'ColorInput', 'Tree', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem', 'Text'])
+const BLOCK = new Set(['Input', 'Textarea', 'NumericInput', 'NumericInputMulti', 'ColorInput', 'Tree', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem', 'Text', 'Section', 'FieldGrid', 'SteppedField', 'LadderBadges', 'DataTable', 'RampCurve'])
 
 const BUILDERS = {
   // Prefer this over a { text } primitive wherever the code uses <Text>: it is a
@@ -324,6 +343,10 @@ const BUILDERS = {
       '🐣 Strong': tf(p.strong),
     })
     await setText(node, null, p.text ?? textOf(spec))
+    // UI3's small Archived badge always has a lead icon; the kit's has one only
+    // with iconName. Hide its container, which keeps the padding; hiding the
+    // icon alone leaves an empty gap.
+    if (!p.iconName) hide(node, 'Icon')
     return node
   },
   async Checkbox(p, spec) {
@@ -402,7 +425,7 @@ const BUILDERS = {
       // The lead letter is text inside the icon.24.prop-text glyph.
       const glyph = node.findOne((n) => n.type === 'INSTANCE' && n.name === 'icon.24.prop-text')
       if (glyph) await setText(glyph, 'Icon', p.label)
-    }
+    } else hide(node, 'Icon')
     if (p.variable) {
       const pill = node.findOne((n) => n.type === 'INSTANCE' && n.name.includes('Chip variable'))
       if (pill) await setText(pill, 'Value', p.variable)
@@ -861,6 +884,126 @@ const BUILDERS = {
     }
     return node
   },
+  // A borderless Plugin header with the title, then the fields; the header's
+  // right slot holds the `actions`.
+  async Section(p, spec, parent, ctx) {
+    const node = await instance('Section')
+    const header = node.findOne((n) => n.type === 'INSTANCE' && n.name === 'Plugin header')
+    setProp(header, '🎛️ Title', p.title ?? '')
+    await fillSlot(header, 'Right slot', (spec.slots || {}).actions ?? [], ctx)
+    await fillSlot(node, 'Content slot', spec.children ?? [], ctx)
+    return node
+  },
+  // Each field takes one column's width, from the width the grid will fill, so
+  // the rest wrap onto new rows and a short last row doesn't stretch.
+  async FieldGrid(p, spec, parent, ctx) {
+    const cols = Math.min(Math.max(p.columns ?? 2, 2), 5)
+    const node = await instance('FieldGrid', { '👥 Columns': String(cols) })
+    const slot = await fillSlot(node, 'Fields slot', spec.children ?? [], ctx)
+    const width = isVertical(parent) ? parent.width - parent.paddingLeft - parent.paddingRight : node.width
+    const column = Math.floor((width - 8 * (cols - 1)) / cols)
+    for (const c of slot.children) {
+      c.layoutSizingHorizontal = 'FILL'
+      c.minWidth = c.maxWidth = column
+    }
+    return node
+  },
+  async SteppedField(p, spec, parent, ctx) {
+    const node = await instance('SteppedField')
+    await fillSlot(node, 'Field slot', spec.children ?? [], ctx)
+    return node
+  },
+  async LadderBadges(p, spec, parent, ctx) {
+    const node = await instance('LadderBadges')
+    await fillSlot(node, 'Badges slot', (p.badges || []).map((b) => ({ c: 'Badge', props: { variant: b.used ? 'default' : 'archived', text: String(b.value) } })), ctx)
+    return node
+  },
+  async MappingChip(p) {
+    const has = (v) => v !== undefined && v !== null && v !== ''
+    const state = p.disabled ? 'Disabled' : p.selected ? 'Selected' : 'Default'
+    const tone = pick({ secondary: 'Secondary', component: 'Component' }, p.tone, 'Default')
+    const node = await instance('MappingChip', { '🎛️ Lead': p.chit ? 'Chit' : p.iconName ? 'Icon' : 'False', '👥 Tone': tone, '🐣 State': state })
+    setProp(node, '🎛️ Label', p.label ?? '')
+    setProp(node, '👁️ Preview', has(p.preview))
+    if (has(p.preview)) setProp(node, '🎛️ Preview', '· ' + p.preview)
+    setProp(node, '👁️ Count', has(p.count))
+    if (has(p.count)) setProp(node, '🎛️ Count', String(p.count))
+    if (p.chit) paintChit(node.findOne((n) => n.name === 'Chit'), parseHex([].concat(p.chit)[0]), 1)
+    else if (p.iconName) {
+      // A swapped icon drops the variant's icon color, so paint it again.
+      await swapIcon(node, '↪ Icon', p.iconName)
+      const color = state === 'Disabled' ? 'icon-disabled' : { Secondary: 'icon-secondary', Component: 'icon-component' }[tone]
+      if (color) await tint(node.findOne((n) => n.type === 'INSTANCE'), color)
+    }
+    return node
+  },
+  // Rows from `columns` and `rows` as DataTable takes them. slots.action fills
+  // every row's action; slots.editor opens under the selected row.
+  async DataTable(p, spec, parent, ctx) {
+    const s = spec.slots || {}
+    const node = await instance('DataTable')
+    const slot = await fillSlot(node, 'Rows slot', [], ctx)
+    const cols = (p.columns || []).map((c) => (typeof c === 'string' ? { label: c } : c))
+    const selectable = p.selectable !== false
+    const max = p.maxBadges ?? 2
+    const addRow = async (type, name, cells, r = {}) => {
+      const selected = selectable && !r.removed && r.key !== undefined && r.key === p.selectedKey
+      const row = await instance('DataTableRow', { '👥 Type': type, '🐣 Selected': tf(selected) })
+      slot.appendChild(row)
+      row.layoutSizingHorizontal = 'FILL'
+      await setText(row, 'Name', name)
+      setProp(row, '👁️ Action', selectable)
+      const cellSlot = await fillSlot(row, 'Cells slot', [], ctx)
+      for (let i = 0; i < cells.length; i++) {
+        const c = cells[i] !== null && typeof cells[i] === 'object' ? cells[i] : { text: cells[i] }
+        const kind = type === 'Header' ? 'Header' : c.plain || c.tone === 'muted' ? 'Text' : c.alias && !r.removed ? 'Variable' : 'Badge'
+        const cell = await instance('DataTableCell', { '👥 Type': kind, '🐣 Active': tf(i === p.active) })
+        cellSlot.appendChild(cell)
+        // Tracks are rem, 2.75rem by default.
+        cell.resize(parseFloat((cols[i] && cols[i].width) || '2.75') * 16, cell.height)
+        if (kind === 'Header' || kind === 'Text') setProp(cell, '🎛️ Value', String(c.text))
+        else {
+          const inner = cell.findOne((n) => n.type === 'INSTANCE')
+          if (kind === 'Badge') setProp(inner, '👥 Variant', r.removed ? 'Danger' : pick({ new: 'Success', changed: 'Warn', danger: 'Danger' }, c.tone, 'Default'))
+          await setText(inner, null, c.text)
+        }
+      }
+      const badges = r.badges || []
+      const shown = badges.slice(0, max).map((b) => ({ c: 'Badge', props: { variant: b.variant, text: b.text } }))
+      if (badges.length > max) shown.push({ c: 'Badge', props: { text: `+${badges.length - max}` } })
+      await fillSlot(row, 'Badges slot', shown, ctx)
+      if (type !== 'Header') await fillSlot(row, 'Action slot', s.action ?? [], ctx)
+      if (selected && s.editor) await build({ stack: 'v', padding: [8, 0, 8, 0], stroke: 'border', strokeSides: ['bottom'], name: 'Editor', children: s.editor }, slot, ctx)
+    }
+    await addRow('Header', p.nameLabel ?? 'Name', cols.map((c) => c.label))
+    for (const r of p.rows || []) await addRow(r.removed ? 'Removed' : 'Row', r.name, r.cells || [], r)
+    return node
+  },
+  // The chart is the component's sample drawing; the ramp maths live in code.
+  // Only the smallest and largest breakpoint are editable.
+  async RampCurve(p) {
+    const names = p.breakpoints || []
+    const selected = p.selected ?? 0
+    const last = names.length - 1
+    const node = await instance('RampCurve', { '🐣 Editable': tf(selected === 0 || selected === last) })
+    await setText(node.findOne((n) => n.name === 'Breakpoint'), 'Value', names[selected])
+    node.findAll((n) => n.type === 'INSTANCE' && n.parent.name === 'Endpoint actions').forEach((b, i) => setProp(b, '🎛️ Label', `Edit ${names[i ? last : 0]}`))
+    return node
+  },
+  // The kit Modal with the code in a Textarea and one copy button; slots.controls
+  // go above the code.
+  async CodeExportModal(p, spec, parent, ctx) {
+    const node = await instance('CodeExportModal')
+    const modal = node.findOne((n) => n.type === 'INSTANCE' && n.name === 'Modal')
+    setProp(modal, '🎛️ Title', p.title ?? '')
+    await setText(modal, 'Value', p.value)
+    setProp(modal.findOne((n) => n.type === 'INSTANCE' && n.name === 'Button'), '🎛️ Label', p.copyLabel)
+    const content = modal.findOne((n) => n.type === 'SLOT' && n.name === 'Content slot')
+    const code = content.children[0]
+    for (const c of [].concat((spec.slots || {}).controls ?? [])) await build(c, content, ctx)
+    content.appendChild(code)
+    return node
+  },
 }
 
 // ---------------------------------------------------------------------------
@@ -974,12 +1117,13 @@ async function buildSwatch(spec, parent) {
 async function buildIcon(spec, parent) {
   const c = await icon(spec.icon)
   const i = c.createInstance()
-  if (spec.color) {
-    const p = await paint(spec.color)
-    for (const v of i.findAll((n) => n.type === 'VECTOR' || n.type === 'BOOLEAN_OPERATION')) v.fills = [p]
-  }
+  if (spec.color) await tint(i, spec.color)
   parent.appendChild(i)
   return i
+}
+async function tint(icon, color) {
+  const p = await paint(color)
+  for (const v of icon.findAll((n) => n.type === 'VECTOR' || n.type === 'BOOLEAN_OPERATION')) v.fills = [p]
 }
 const isVertical = (n) => n && n.layoutMode === 'VERTICAL'
 
