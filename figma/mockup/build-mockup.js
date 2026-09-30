@@ -80,6 +80,12 @@ const STYLES = {
   'body-large': { id: 'S:a449a3e94dd8ecb4968a45c9b04eaeca206487d4,', key: 'a449a3e94dd8ecb4968a45c9b04eaeca206487d4' },
   'body-large-strong': { id: 'S:04f70f6a2ef04f88ce1a33e587aab52369770780,', key: '04f70f6a2ef04f88ce1a33e587aab52369770780' },
 }
+// Plugin windows float at elevation 400. UI3 keeps one style per theme: the
+// dark one is heavier and adds a light inner edge.
+const EFFECTS = {
+  light: { id: 'S:5106844de706e9abc38329718f9b920a1941b6e2,', key: '5106844de706e9abc38329718f9b920a1941b6e2' },
+  dark: { id: 'S:a8a6c100c1df51b80382b949eef0018e2379192e,', key: 'a8a6c100c1df51b80382b949eef0018e2379192e' },
+}
 const VARS = {
   bg: { id: 'VariableID:1325:3223', key: 'fc500746e49f560ee7b8a31ee9e3d8bdd97baabc' },
   'bg-secondary': { id: 'VariableID:1325:3224', key: 'aa7d8614086d761bb7b7332fcb65482edb2e2371' },
@@ -137,6 +143,17 @@ const textStyle = (name) =>
     await figma.loadFontAsync(s.fontName)
     return s
   })
+const effectStyle = (theme) =>
+  once('e:' + theme, async () => {
+    const e = EFFECTS[theme]
+    return (await figma.getStyleByIdAsync(e.id).catch(() => null)) || figma.importStyleByKeyAsync(e.key)
+  })
+// The theme a node sits in, read off the background it resolves: its page's or
+// frame's mode for UI3's colors, whichever file that is.
+async function themeOf(node) {
+  const { value } = (await variable('bg')).resolveForConsumer(node)
+  return 0.2126 * value.r + 0.7152 * value.g + 0.0722 * value.b < 0.5 ? 'dark' : 'light'
+}
 
 let ICON_MAP = {}
 async function icon(name) {
@@ -1178,6 +1195,8 @@ async function buildMockup(spec, options = {}) {
     root.counterAxisSizingMode = 'FIXED'
     root.resize(spec.width || 320, 100)
     page.appendChild(root)
+    // `elevation: false` leaves the shadow out, e.g. for a window drawn inside a frame.
+    if (spec.elevation !== false) await root.setEffectStyleIdAsync((await effectStyle(await themeOf(root))).id)
     // Figma's title bar, as it draws one above every plugin UI: the plugin's
     // icon, its name — the window's name up to " — ", or `title` — and close.
     // `height` is the plugin's own, as passed to figma.showUI, so the window
