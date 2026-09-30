@@ -151,11 +151,18 @@
     if (!editable) return;
     dragging = handle;
     frozen = [yMin, yMax];
+    // Text selection would start as the drag leaves the chart.
+    event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
     event.currentTarget.focus();
   }
+  // The drag is followed on the window, not by pointer capture alone, which
+  // doesn't always take in a plugin's iframe: the handle keeps moving once
+  // the pointer leaves the chart.
   function handleMove(event) {
     if (!dragging) return;
+    // Let go outside the plugin's window, where the release went unheard.
+    if (event.buttons === 0) return handleUp();
     const y = yAt(event);
     if (dragging === "bend") {
       const range = current[2] - current[0];
@@ -166,6 +173,7 @@
     }
   }
   function handleUp() {
+    if (!dragging) return;
     dragging = null;
     frozen = null;
   }
@@ -185,6 +193,12 @@
     else setEnd(handle, ramp[`${handle}${end}`] + up);
   }
 </script>
+
+<svelte:window
+  on:pointermove={handleMove}
+  on:pointerup={handleUp}
+  on:pointercancel={handleUp}
+/>
 
 <div class="ramp-curve">
   <Dropdown
@@ -212,9 +226,6 @@
     viewBox="0 0 {W} {H}"
     role="group"
     aria-label="{ariaLabel} at {breakpoints[selected]}"
-    on:pointermove={handleMove}
-    on:pointerup={handleUp}
-    on:pointercancel={handleUp}
   >
     {#each lines as line (line.key)}
       <line
