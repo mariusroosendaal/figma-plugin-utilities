@@ -1247,7 +1247,13 @@ async function buildMockup(spec, options = {}) {
     }
     for (const child of [].concat(spec.children || [])) await build(child, root, ctx)
     const layout = root.children.find((c) => c.name === 'Plugin layout' || c.name === 'PluginLayout')
+    // The component is 240px tall: fill a fixed window, hug the content otherwise.
     if (layout && spec.height) layout.layoutSizingVertical = 'FILL'
+    else if (layout) {
+      layout.layoutSizingVertical = 'HUG'
+      const slot = layout.findOne((n) => n.type === 'SLOT')
+      if (slot) slot.layoutSizingVertical = 'HUG'
+    }
   } else {
     const holder = figma.createAutoLayout('VERTICAL', { name: 'Mockup holder' })
     page.appendChild(holder)
