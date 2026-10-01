@@ -72,6 +72,7 @@ const UI3 = {
   RadioGroup: { id: '1027216:162', key: '9ec3520dfc75786126a616f7a5331ad428792809', set: false },
   DisclosureItem: { id: '1027216:25160', key: '81e90351aad15cc9d9b83a8de648c39671327b1a', set: true },
   Disclosure: { id: '1027216:25161', key: '320745f42bae91a9a03b2367e8cc8badb24762ed', set: false },
+  SidebarRow: { id: '2012:63744', key: '292c5ff546da18e6ecc2ec81b5d3b5b1a5cbf936', set: true },
 }
 const STYLES = {
   'body-small': { id: 'S:704c8fb9b4484d295a7511c93134effcabfcc058,', key: '704c8fb9b4484d295a7511c93134effcabfcc058' },
@@ -98,12 +99,13 @@ const VARS = {
   'icon-secondary': { id: 'VariableID:1330:3204', key: 'b217e368b48c6a4f0f3be738ae764e9f08908df4' },
   'icon-component': { id: 'VariableID:1514:3145', key: 'bc20c1a13b1be87b1f2dafff53cdef5a6ded958d' },
   'icon-disabled': { id: 'VariableID:1516:3173', key: 'ddfd8ce75dd6646b48291471f9ba18c10de8e2e8' },
+  'icon-brand': { id: 'VariableID:1330:3209', key: 'a970cb3b077bba8625a1fa560f6c690377977e48' },
+  'icon-danger': { id: 'VariableID:1330:3212', key: 'f4fa2b468e0674c638ae9b3f7ae77c29a71819bd' },
+  'icon-warning': { id: 'VariableID:1330:3213', key: 'e72fbfe23be77408d34c48703231b3c97593d646' },
   border: { id: 'VariableID:1326:3180', key: '0231d9add0c28a818ab62bc8d70a8fff21715085' },
   4: { id: 'VariableID:1:672456', key: '0f158d8847032625eabf06aded4a5d93bd09b0d6' },
   8: { id: 'VariableID:1:672457', key: '907024ab5c6723435cf94ff28a455b4a1d492c5f' },
   16: { id: 'VariableID:1:672458', key: 'bec56e8d6dd80d7504dd39f05d79742960693715' },
-  'radius-medium': { id: 'VariableID:1:672460', key: '774a56af073bcb91c653f64f20c1e6242f1d00b8' },
-  'radius-large': { id: 'VariableID:1:672461', key: '7daac276bb8bcc70f0cf440f5a1992ddcee96915' },
 }
 const ICONS_PAGE = '1:530873'
 
@@ -228,6 +230,14 @@ async function swapIcon(node, prefix, iconName) {
   if (c) setProp(node, prefix, c.id)
 }
 const tf = (b) => (b ? 'True' : 'False')
+// Short for what most builders repeat, to keep the minified builder small.
+const stretch = (node) => (node.layoutSizingHorizontal = 'FILL')
+const stateOf = (p) => (p.disabled ? 'Disabled' : 'Default')
+const named = (node, name) => node.findOne((n) => n.type === 'INSTANCE' && n.name === name)
+function shortcut(row, detail) {
+  setProp(row, '👁️ hasShortcut', !!detail)
+  if (detail) setProp(row, '↪ Shortcut', detail)
+}
 // Hides a lead icon's container frame, which holds the lead's padding, so the
 // content starts where it would with no lead at all.
 function hide(node, name) {
@@ -235,6 +245,7 @@ function hide(node, name) {
   if (box) box.visible = false
 }
 const pick = (map, value, fallback) => map[value] ?? fallback
+const AVATAR_COLORS = { purple: 'Purple', blue: 'Blue', pink: 'Pink', red: 'Red', yellow: 'Yellow', green: 'Green', grey: 'Grey' }
 // The kit Badge's variants as UI3's Badge small names them.
 const BADGE_VARIANTS = { default: 'Default', brand: 'Brand', component: 'Component', danger: 'Danger', success: 'Success', warning: 'Warn', invert: 'Invert', selected: 'Selected', variable: 'Variable', 'variable-selected': 'Variable Selected', feedback: 'Feedback', merged: 'Merged', archived: 'Archived', menu: 'Menu', figjam: 'FigJam' }
 
@@ -280,7 +291,7 @@ function textOf(spec) {
 // Each returns the created node. `block` components fill the width of a
 // vertical parent.
 
-const BLOCK = new Set(['Input', 'Textarea', 'NumericInput', 'NumericInputMulti', 'ColorInput', 'Tree', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem', 'Text', 'Section', 'FieldGrid', 'SteppedField', 'LadderBadges', 'DataTable', 'RampCurve'])
+const BLOCK = new Set(['Input', 'Textarea', 'NumericInput', 'NumericInputMulti', 'ColorInput', 'Tree', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'SidebarRow', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem', 'Text', 'Section', 'FieldGrid', 'SteppedField', 'LadderBadges', 'DataTable', 'RampCurve'])
 
 const BUILDERS = {
   // Prefer this over a { text } primitive wherever the code uses <Text>: it is a
@@ -295,7 +306,7 @@ const BUILDERS = {
     // Block text wraps to its column, like the <p>/<span display:block> it mirrors.
     if (isVertical(parent)) {
       const t = node.findOne((n) => n.type === 'TEXT')
-      t.layoutSizingHorizontal = 'FILL'
+      stretch(t)
       t.textAutoResize = 'HEIGHT'
     }
     return node
@@ -400,7 +411,7 @@ const BUILDERS = {
       await setText(node, null, label)
       return node
     }
-    const node = await instance('Radio', { '👥 Variant': 'Input', '🐣 On?': on ? 'On' : 'Off', '🐣 State': p.disabled ? 'Disabled' : 'Default', '🎛️ Label': tf(label) })
+    const node = await instance('Radio', { '👥 Variant': 'Input', '🐣 On?': on ? 'On' : 'Off', '🐣 State': stateOf(p), '🎛️ Label': tf(label) })
     await setText(node, 'Value', label)
     return node
   },
@@ -419,7 +430,7 @@ const BUILDERS = {
   },
   async Textarea(p) {
     const empty = p.value === undefined || p.value === null || p.value === ''
-    const node = await instance('Input', { '👥 Variant': 'Multi Line', '🐣 State': p.disabled ? 'Disabled' : 'Default' })
+    const node = await instance('Input', { '👥 Variant': 'Multi Line', '🐣 State': stateOf(p) })
     await setText(node, 'Value', empty ? p.placeholder ?? '' : p.value)
     return node
   },
@@ -439,10 +450,10 @@ const BUILDERS = {
       node = await instance('DropdownBadge', { '🎛️ Lead': chit ? 'Chit' : iconName ? 'Icon' : 'False', '🎛️ Trail': badges.length ? 'Badge' : 'False' })
       if (chit) {
         const color = parseHex([].concat(chit)[0])
-        paintChit(node.findOne((n) => n.type === 'INSTANCE' && n.name === 'Chit 24'), color, color && color.alpha)
+        paintChit(named(node, 'Chit 24'), color, color && color.alpha)
       }
       if (badges.length) {
-        const badge = node.findOne((n) => n.type === 'INSTANCE' && n.name === 'Badge small')
+        const badge = named(node, 'Badge small')
         badge.setProperties({ '👥 Variant': pick(BADGE_VARIANTS, badges[0].variant ?? p.badgeVariant, 'Default'), '🐣 Strong': tf(badges[0].strong) })
         await setText(badge, null, badges[0].text)
       }
@@ -466,7 +477,7 @@ const BUILDERS = {
     if (p.iconName) await swapIcon(node, '🎛️ Icon Lead', p.iconName)
     else if (p.label) {
       // The lead letter is text inside the icon.24.prop-text glyph.
-      const glyph = node.findOne((n) => n.type === 'INSTANCE' && n.name === 'icon.24.prop-text')
+      const glyph = named(node, 'icon.24.prop-text')
       if (glyph) await setText(glyph, 'Icon', p.label)
     } else hide(node, 'Icon')
     if (p.variable) {
@@ -479,7 +490,7 @@ const BUILDERS = {
     const color = parseHex(p.value) || parseHex('#000000')
     const opacity = p.opacity ?? 100
     const type = p.variable ? 'Variable' : opacity < 100 ? 'Opacity' : 'Fill'
-    const node = await instance('ColorInput', { '🐣 Type': type, '🐣 State': p.disabled ? 'Disabled' : 'Default' })
+    const node = await instance('ColorInput', { '🐣 Type': type, '🐣 State': stateOf(p) })
     // Text layers are named after their sample content in the UI3 file.
     const texts = node.findAll((n) => n.type === 'TEXT')
     for (const t of texts) {
@@ -530,7 +541,7 @@ const BUILDERS = {
     return node
   },
   async SplitButton(p) {
-    const node = await instance('SplitButton', { '👥 Size': p.size === 'large' ? 'Large' : 'Small', '🐣 State': p.disabled ? 'Disabled' : 'Default' })
+    const node = await instance('SplitButton', { '👥 Size': p.size === 'large' ? 'Large' : 'Small', '🐣 State': stateOf(p) })
     await swapIcon(node, '🎛️ Icon', p.iconName)
     return node
   },
@@ -584,10 +595,10 @@ const BUILDERS = {
         ? p.unread ? 'Overflow Unread' : 'Overflow Read'
         : p.src
           ? 'Photo'
-          : pick({ purple: 'Purple', blue: 'Blue', pink: 'Pink', red: 'Red', yellow: 'Yellow', green: 'Green', grey: 'Grey' }, p.color, 'Purple')
+          : pick(AVATAR_COLORS, p.color, 'Purple')
     const node = await instance('Avatar', {
       '👥 Variant': variant,
-      '🐣 State': p.disabled ? 'Disabled' : 'Default',
+      '🐣 State': stateOf(p),
       '👥 Size': pick({ small: 'Small', large: 'Large' }, p.size, 'Default'),
       '👥 Shape': p.shape === 'square' ? 'Square' : 'Circle',
     })
@@ -619,7 +630,7 @@ const BUILDERS = {
           '🐣 Selected': tf(p.mode === 'single' && p.selected === n.id),
         })
         slot.appendChild(row)
-        row.layoutSizingHorizontal = 'FILL'
+        stretch(row)
         setProp(row, '🎛️ Label', n.label ?? '')
         setProp(row, '👁️ Detail', !!n.detail)
         if (n.detail) setProp(row, '🎛️ Detail', String(n.detail))
@@ -666,7 +677,7 @@ const BUILDERS = {
     const segments = [].concat(spec.children || []).filter((s) => s && s.c === 'Segment')
     const iconMode = segments.some((s) => s.props && s.props.iconName)
     const count = String(Math.min(Math.max(segments.length, 2), 6)).padStart(2, '0')
-    const node = await instance('SegmentedControl', { '👥 Variant': iconMode ? 'Icon' : 'Label', '👥 Tab Count': count, '🐣 State': p.disabled ? 'Disabled' : 'Default' })
+    const node = await instance('SegmentedControl', { '👥 Variant': iconMode ? 'Icon' : 'Label', '👥 Tab Count': count, '🐣 State': stateOf(p) })
     const items = node.children.filter((c) => c.type === 'INSTANCE')
     for (let i = 0; i < items.length; i++) {
       const s = segments[i]
@@ -739,7 +750,7 @@ const BUILDERS = {
     for (const c of [...slot.children]) c.remove()
     const add = (row) => {
       slot.appendChild(row)
-      row.layoutSizingHorizontal = 'FILL'
+      stretch(row)
     }
     if (p.searchable) {
       const search = await instance('Input', { '👥 Variant': 'Single Line', '👥 Size': 'Default', '🐣 State': 'Empty', '🎛️  Icon Lead': 'True', '🎛️  Dropdown': 'False' })
@@ -760,8 +771,7 @@ const BUILDERS = {
       } else if (r.type === 'toggle') {
         row = await instance('MenuRowToggle', { '🐣 Toggle State': r.checked === true ? 'On' : 'Off', '👁️ hasIcon': r.iconName ? 'true' : 'false' })
         setProp(row, '🎛️ Text', r.label)
-        setProp(row, '👁️ hasShortcut', !!r.detail)
-        if (r.detail) setProp(row, '↪ Shortcut', r.detail)
+        shortcut(row, r.detail)
         if (r.iconName) await swapIcon(row, '↪ Icon', r.iconName)
       } else if (r.type === 'checkbox' || (!checkColumn && (r.iconName || r.badge || r.avatar))) {
         const box = r.type === 'checkbox'
@@ -775,32 +785,30 @@ const BUILDERS = {
           if (glyph && c) glyph.swapComponent(c)
         }
         if (r.avatar) {
-          const person = row.findOne((n) => n.type === 'INSTANCE' && n.name === 'Avatar')
-          const color = pick({ purple: 'Purple', blue: 'Blue', pink: 'Pink', red: 'Red', yellow: 'Yellow', green: 'Green', grey: 'Grey' }, r.avatar.color, null)
+          const person = named(row, 'Avatar')
+          const color = pick(AVATAR_COLORS, r.avatar.color, null)
           if (person && color) person.setProperties({ '👥 Variant': color })
           if (person && r.avatar.name) await setText(person, null, r.avatar.name.trim().charAt(0).toUpperCase())
         }
         if (r.badge) {
-          const badge = row.findOne((n) => n.type === 'INSTANCE' && n.name === 'Badge small')
+          const badge = named(row, 'Badge small')
           if (badge) await setText(badge, null, r.badge)
         }
         if (box) {
-          const check = row.findOne((n) => n.type === 'INSTANCE' && n.name === 'Checkbox')
+          const check = named(row, 'Checkbox')
           const on = r.checked === true || r.checked === 'mixed'
           if (check) check.setProperties({ '🐣 Type': r.checked === 'mixed' ? 'Mixed' : on ? 'Checked' : 'Unchecked', '🎛️ Muted': tf(!on) })
         }
       } else if (checkColumn) {
         const on = r.type === 'check' ? r.checked : p.itemVariant === 'checkmark' && r.selected
-        row = await instance('MenuRowCheckmark', { '👥 Variant': on === 'mixed' ? 'Dot' : 'Check', '🐣 State': r.disabled ? 'Disabled' : 'Default', '🎛️ Submenu': sub })
+        row = await instance('MenuRowCheckmark', { '👥 Variant': on === 'mixed' ? 'Dot' : 'Check', '🐣 State': stateOf(r), '🎛️ Submenu': sub })
         setProp(row, '🎛️ Text', r.label)
         setProp(row, '🎛️ On', !!on)
-        setProp(row, '👁️ hasShortcut', !!r.detail)
-        if (r.detail) setProp(row, '↪ Shortcut', r.detail)
+        shortcut(row, r.detail)
       } else {
-        row = await instance('MenuRowSimple', { '🐣 State': r.disabled ? 'Disabled' : 'Default', '🎛️ Submenu': sub })
+        row = await instance('MenuRowSimple', { '🐣 State': stateOf(r), '🎛️ Submenu': sub })
         setProp(row, '🎛️ Text', r.label)
-        setProp(row, '👁️ hasShortcut', !!r.detail)
-        if (r.detail) setProp(row, '↪ Shortcut', r.detail)
+        shortcut(row, r.detail)
       }
       add(row)
     }
@@ -833,7 +841,7 @@ const BUILDERS = {
     }
     setProp(node, '🎛️ Title', p.title ?? '')
     setProp(node, '👁️ Icon 2', !!p.icon2)
-    if (p.icon2 && p.icon2Name) await swapIcon(node.findOne((n) => n.type === 'INSTANCE' && n.name === 'Icon 2'), '🎛️ Icon', p.icon2Name)
+    if (p.icon2 && p.icon2Name) await swapIcon(named(node, 'Icon 2'), '🎛️ Icon', p.icon2Name)
     if (p.footerBorder === false) setProp(node, '👁️ Footer border', false)
     await fillSlot(node, 'Content slot', spec.children ?? [], ctx)
     if (footer === 'Split') {
@@ -841,7 +849,7 @@ const BUILDERS = {
       await fillSlot(node, 'Footer right slot', s['footer-right'] ?? [], ctx)
     } else if (footer === 'Full') {
       const slot = await fillSlot(node, 'Footer full slot', s['footer-full'], ctx)
-      for (const c of slot.children) c.layoutSizingHorizontal = 'FILL'
+      for (const c of slot.children) stretch(c)
     }
     if (p.height) {
       node.resize(node.width, p.height)
@@ -871,7 +879,7 @@ const BUILDERS = {
       await fillSlot(node, 'Right slot', s.right ?? [], ctx)
     } else {
       const slot = await fillSlot(node, 'Actions slot', spec.children ?? [], ctx)
-      if (variant === 'Full') for (const c of slot.children) c.layoutSizingHorizontal = 'FILL'
+      if (variant === 'Full') for (const c of slot.children) stretch(c)
     }
     // Text at an edge sits 16px in, as Footer.svelte insets a kit Text there.
     const isText = (c) => typeof c === 'string' || (!!c && (c.c === 'Text' || (c.text !== undefined && !c.c)))
@@ -922,11 +930,61 @@ const BUILDERS = {
     setProp(node, '👁️ Badge', !!p.hasBadge)
     return node
   },
+  // UI3's Sidebar row comment. Its lead and icons are fixed layers, not
+  // slots: the lead's Avatars and icons swap into its avatars (two with a
+  // link, one without), the actions' icons into its two icons, and what's
+  // left over hides. The row's Hover state shows the actions.
+  async SidebarRow(p, spec) {
+    const s = spec.slots || {}
+    const node = await instance('SidebarRow', {
+      '🐣 State': p.selected ? 'Selected' : p.hover ? 'Hover' : 'Default',
+      '🎛️  Unread': tf(p.unread),
+      '🎛️  Replies': tf(p.link),
+    })
+    const texts = { NumPage: p.meta, Name: p.title, Timestamp: p.detail, Message: p.message ?? textOf(spec), 'Reply Count': p.link }
+    // The icons are hidden until hover, and use_figma skips hidden layers in
+    // instances by default, so look at them all while building the row.
+    const skipping = figma.skipInvisibleInstanceChildren
+    figma.skipInvisibleInstanceChildren = false
+    for (const [prop, value] of Object.entries(texts)) if (value) setProp(node, prop, String(value))
+    const find = (name) => node.findOne((n) => n.name === name)
+    stretch(node.children[0])
+    for (const t of node.findAll((n) => n.type === 'TEXT' && n.componentPropertyReferences?.characters)) {
+      if (!texts[t.componentPropertyReferences.characters.split('#')[0]]) t.visible = false
+      if (t.width > 150) stretch(t)
+    }
+    const lead = [].concat(s.lead ?? [])
+    const actions = [].concat(s.actions ?? [])
+    const list = find('Avatar List')
+    list.visible = lead.length > 0
+    for (const i of [0, 1]) {
+      const item = lead[i]
+      const slot = list.children[i]
+      if (!slot) {
+        // Without a link the row has one avatar.
+      } else if (item?.c === 'Avatar') {
+        // UI3 greys out a read comment's avatars: `disabled`.
+        const a = item.props || {}
+        slot.setProperties({ '👥 Variant': a.disabled ? 'Grey' : pick(AVATAR_COLORS, a.color, 'Purple'), '🐣 State': stateOf(a) })
+        await setText(slot, null, (a.name || '').charAt(0).toUpperCase())
+      } else if (item?.icon) {
+        slot.swapComponent(await icon(item.icon))
+        slot.fills = []
+        if (item.color) await tint(slot, item.color)
+      } else slot.visible = false
+      const name = actions[i]?.icon ?? actions[i]?.props?.iconName
+      const button = find('Icons').children[i]
+      if (name) button.swapComponent(await icon(name))
+      else button.visible = false
+    }
+    figma.skipInvisibleInstanceChildren = skipping
+    return node
+  },
   async CheckboxCard(p, spec) {
     const node = await instance('CheckboxCard', { '🎛️ Disabled': tf(p.disabled) })
     setProp(node, '👁️ Secondary', !!p.secondary)
     if (p.secondary) setProp(node, '🎛️ Secondary', p.secondary)
-    const cb = node.findOne((n) => n.type === 'INSTANCE' && n.name === 'Checkbox')
+    const cb = named(node, 'Checkbox')
     if (cb) {
       cb.setProperties(p.checked ? { '🐣 Type': 'Checked', '🎛️ Muted': 'False' } : { '🐣 Type': 'Unchecked', '🎛️ Muted': 'True' })
       await setText(cb, 'Value', textOf(spec) ?? '')
@@ -937,7 +995,7 @@ const BUILDERS = {
   // right slot holds the `actions`.
   async Section(p, spec, parent, ctx) {
     const node = await instance('Section')
-    const header = node.findOne((n) => n.type === 'INSTANCE' && n.name === 'Plugin header')
+    const header = named(node, 'Plugin header')
     setProp(header, '🎛️ Title', p.title ?? '')
     await fillSlot(header, 'Right slot', (spec.slots || {}).actions ?? [], ctx)
     await fillSlot(node, 'Content slot', spec.children ?? [], ctx)
@@ -954,7 +1012,7 @@ const BUILDERS = {
     ctx.after.push(() => {
       const column = Math.floor((node.width - 8 * (cols - 1)) / cols)
       for (const c of slot.children) {
-        c.layoutSizingHorizontal = 'FILL'
+        stretch(c)
         c.minWidth = c.maxWidth = column
       }
     })
@@ -1002,7 +1060,7 @@ const BUILDERS = {
       const selected = selectable && !r.removed && r.key !== undefined && r.key === p.selectedKey
       const row = await instance('DataTableRow', { '👥 Type': type, '🐣 Selected': tf(selected) })
       slot.appendChild(row)
-      row.layoutSizingHorizontal = 'FILL'
+      stretch(row)
       await setText(row, 'Name', name)
       setProp(row, '👁️ Action', selectable)
       const cellSlot = await fillSlot(row, 'Cells slot', [], ctx)
@@ -1046,10 +1104,10 @@ const BUILDERS = {
   // go above the code.
   async CodeExportModal(p, spec, parent, ctx) {
     const node = await instance('CodeExportModal')
-    const modal = node.findOne((n) => n.type === 'INSTANCE' && n.name === 'Modal')
+    const modal = named(node, 'Modal')
     setProp(modal, '🎛️ Title', p.title ?? '')
     await setText(modal, 'Value', p.value)
-    setProp(modal.findOne((n) => n.type === 'INSTANCE' && n.name === 'Button'), '🎛️ Label', p.copyLabel)
+    setProp(named(modal, 'Button'), '🎛️ Label', p.copyLabel)
     const content = modal.findOne((n) => n.type === 'SLOT' && n.name === 'Content slot')
     const code = content.children[0]
     for (const c of [].concat((spec.slots || {}).controls ?? [])) await build(c, content, ctx)
@@ -1077,7 +1135,7 @@ async function buildText(spec, parent) {
     t.textAutoResize = 'HEIGHT'
     t.resize(spec.width, t.height)
   } else if (isVertical(parent) || spec.grow) {
-    t.layoutSizingHorizontal = 'FILL'
+    stretch(t)
     t.textAutoResize = 'HEIGHT'
   }
   return t
@@ -1110,7 +1168,7 @@ async function buildStack(spec, parent, ctx) {
   if (spec.width) {
     f.layoutSizingHorizontal = 'FIXED'
     f.resize(spec.width, f.height)
-  } else if (isVertical(parent) || spec.grow) f.layoutSizingHorizontal = 'FILL'
+  } else if (isVertical(parent) || spec.grow) stretch(f)
   if (spec.fillHeight) f.layoutSizingVertical = 'FILL'
   if (spec.height) {
     f.layoutSizingVertical = 'FIXED'
@@ -1129,14 +1187,14 @@ async function buildGrid(spec, parent, ctx) {
     const row = await buildStack({ stack: 'h', gap, name: 'Row' }, f, ctx)
     for (const item of items.slice(i, i + cols)) {
       const n = await build(item, row, ctx)
-      if (n) n.layoutSizingHorizontal = 'FILL'
+      if (n) stretch(n)
     }
     for (let k = items.slice(i, i + cols).length; k < cols; k++) {
       const spacer = figma.createFrame()
       spacer.name = 'Empty cell'
       spacer.fills = []
       row.appendChild(spacer)
-      spacer.layoutSizingHorizontal = 'FILL'
+      stretch(spacer)
       spacer.resize(spacer.width, 1)
     }
   }
@@ -1148,7 +1206,7 @@ async function buildDivider(spec, parent) {
   r.fills = [await paint('border')]
   parent.appendChild(r)
   r.resize(parent.width || 100, 1)
-  if (isVertical(parent)) r.layoutSizingHorizontal = 'FILL'
+  if (isVertical(parent)) stretch(r)
   return r
 }
 // A color square (e.g. a chit showing a hex value).
@@ -1175,7 +1233,9 @@ async function buildIcon(spec, parent) {
 }
 async function tint(icon, color) {
   const p = await paint(color)
-  for (const v of icon.findAll((n) => n.type === 'VECTOR' || n.type === 'BOOLEAN_OPERATION')) v.fills = [p]
+  // Only the shapes that are drawn: filling a cutout (warning.small's !)
+  // would fill the icon in.
+  for (const v of icon.findAll((n) => (n.type === 'VECTOR' || n.type === 'BOOLEAN_OPERATION') && n.fills.length)) v.fills = [p]
 }
 const isVertical = (n) => n && n.layoutMode === 'VERTICAL'
 
@@ -1195,8 +1255,8 @@ async function build(spec, parent, ctx) {
   const node = result
   if (spec.name) node.name = spec.name
   parent.appendChild(node)
-  if (isVertical(parent) && (BLOCK.has(spec.c) || spec.fill)) node.layoutSizingHorizontal = 'FILL'
-  if (spec.grow && !isVertical(parent)) node.layoutSizingHorizontal = 'FILL'
+  if (isVertical(parent) && (BLOCK.has(spec.c) || spec.fill)) stretch(node)
+  if (spec.grow && !isVertical(parent)) stretch(node)
   if (spec.fillHeight && isVertical(parent)) node.layoutSizingVertical = 'FILL'
   ctx.created.push(node.id)
   return node
@@ -1238,7 +1298,7 @@ async function buildMockup(spec, options = {}) {
       const bar = await instance('WindowHeader')
       setProp(bar, '🎛️ Title', spec.title ?? spec.window.split(' — ')[0])
       root.appendChild(bar)
-      bar.layoutSizingHorizontal = 'FILL'
+      stretch(bar)
       chrome = bar.height
     }
     if (spec.height) {

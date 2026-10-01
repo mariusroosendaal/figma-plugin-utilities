@@ -24,7 +24,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
    | CSS grid with N columns | `{ grid: N, gap, children }` |
    | `<Text>` | `{ c: 'Text', props: { variant, color }, children: '…' }`. This is a connected component, so it round-trips. |
    | Plain text in custom markup | `{ text, variant: 'body-medium' \| 'body-small' \| 'body-large' (+ '-strong'), color: 'text' \| 'text-secondary' \| 'text-tertiary', width?, grow?, align?, truncate? }` |
-   | `<Icon iconName={…}>` | `{ icon: 'icon.24.plus', color?: 'icon-tertiary' }` |
+   | `<Icon iconName={…}>` | `{ icon: 'icon.24.plus', color?: 'icon-tertiary' }`; `color` also takes `icon-secondary`, `icon-brand`, `icon-warning`, `icon-danger` |
    | `<Chit color={…}>` | `{ c: 'Chit', props: { color: '#0D99FF' } }`. Connected, so it round-trips; use it for kit chits. |
    | A custom color swatch (not a kit Chit) | `{ swatch: '#0D99FF', size?: 16, radius?: 4 }` |
    | `<hr>` | `{ divider: true }` |
@@ -82,6 +82,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `LoadingState` | `message` | |
 | `StatusBar` | `message`, `type` | |
 | `ListItem` | `title`, `active`, `menuItems`, `hasBadge`; meta text as `children` | |
+| `SidebarRow` | `meta`, `title`, `detail`, `message` (or `children`), `link`, `unread`, `selected`, `hover` (the Hover state, which shows the actions); `lines` isn't drawn | `lead` (Avatars by `name` and `color`, `disabled` for UI3's grey read ones, or `{ icon, color }`: two with a `link`, one without), `actions` (IconButtons or `{ icon }`, up to two) |
 | `CheckboxCard` | `checked`, `disabled`, `secondary`; label as `children` | |
 | `Section` | `title` | `children` (the fields), `actions` (icon buttons) |
 | `FieldGrid` | `columns` (2–5) | `children` (the fields) |
