@@ -15,6 +15,7 @@ const UI3 = {
   Radio: { id: '2015:20365', key: '76164e6ee770820fd92e54c599e52a93fd4048d8', set: true },
   Input: { id: '2028:79255', key: '62a920f029d5f8bde4984db2e5be53a55454690a', set: true },
   Dropdown: { id: '2028:36589', key: 'fa10d177e81113d0444767849ed87092e3d3fb70', set: true },
+  DropdownBadge: { id: '1027231:25918', key: '18018ce67e36f22a525888874ece3445393faa16', set: true },
   Tabs: { id: '2015:27780', key: 'bfd94b8634aa735c9be6158d1208ca9a768d6773', set: true },
   SegmentedControl: { id: '2015:20960', key: 'bca770b30596f62d0674bc3b4b7ae2f6775f5b1e', set: true },
   Slider: { id: '2015:23280', key: 'd810bedfd3a19e1d131f6b97d050f941dad848b6', set: true },
@@ -234,6 +235,8 @@ function hide(node, name) {
   if (box) box.visible = false
 }
 const pick = (map, value, fallback) => map[value] ?? fallback
+// The kit Badge's variants as UI3's Badge small names them.
+const BADGE_VARIANTS = { default: 'Default', brand: 'Brand', component: 'Component', danger: 'Danger', success: 'Success', warning: 'Warn', invert: 'Invert', selected: 'Selected', variable: 'Variable', 'variable-selected': 'Variable Selected', feedback: 'Feedback', merged: 'Merged', archived: 'Archived', menu: 'Menu', figjam: 'FigJam' }
 
 // '#RGB' / '#RRGGBB' / '#RRGGBBAA' → { rgb, alpha }, for recoloring chits.
 function parseHex(value) {
@@ -356,7 +359,7 @@ const BUILDERS = {
       return node
     }
     const node = await instance('Badge', {
-      '👥 Variant': pick({ default: 'Default', brand: 'Brand', component: 'Component', danger: 'Danger', success: 'Success', warning: 'Warn', invert: 'Invert', selected: 'Selected', variable: 'Variable', 'variable-selected': 'Variable Selected', feedback: 'Feedback', merged: 'Merged', archived: 'Archived', menu: 'Menu', figjam: 'FigJam' }, p.variant, 'Default'),
+      '👥 Variant': pick(BADGE_VARIANTS, p.variant, 'Default'),
       '🐣 Strong': tf(p.strong),
     })
     await setText(node, null, p.text ?? textOf(spec))
@@ -420,11 +423,34 @@ const BUILDERS = {
     await setText(node, 'Value', empty ? p.placeholder ?? '' : p.value)
     return node
   },
+  // A badge or a lead chit takes the Kit additions Dropdown badge: UI3's
+  // Dropdown has neither. It has one Badge small, so only the first of several
+  // badges draws, and no disabled, size or stroke variants. As in the kit, the
+  // chosen item's own chit or icon wins over the props, and `label` over its
+  // label ('' shows the placeholder).
   async Dropdown(p) {
-    const node = await instance('Dropdown', { '🎛️ Disabled': tf(p.disabled), '🎛️ Icon Lead': tf(p.iconName), '🐣 State': 'Default', '👥 Size': p.size === 'large' ? 'Large' : 'Default', '🎛️ Stroke': tf(p.stroke !== false) })
-    const selected = p.value && (p.value.label ?? p.value)
-    await setText(node, 'Value', selected ?? p.placeholder ?? 'Select an option')
-    if (p.iconName) await swapIcon(node, '↪ Icon', p.iconName)
+    const value = p.value && typeof p.value === 'object' ? p.value : null
+    const chit = (value && value.chit) || p.chit || null
+    const iconName = chit ? null : (value && value.iconName) || p.iconName
+    const text = p.label ?? (value ? value.label : p.value)
+    const badges = [].concat(p.badge ?? []).filter(Boolean).map((b) => (typeof b === 'string' ? { text: b } : b))
+    let node
+    if (badges.length || chit) {
+      node = await instance('DropdownBadge', { '🎛️ Lead': chit ? 'Chit' : iconName ? 'Icon' : 'False', '🎛️ Trail': badges.length ? 'Badge' : 'False' })
+      if (chit) {
+        const color = parseHex([].concat(chit)[0])
+        paintChit(node.findOne((n) => n.type === 'INSTANCE' && n.name === 'Chit 24'), color, color && color.alpha)
+      }
+      if (badges.length) {
+        const badge = node.findOne((n) => n.type === 'INSTANCE' && n.name === 'Badge small')
+        badge.setProperties({ '👥 Variant': pick(BADGE_VARIANTS, badges[0].variant ?? p.badgeVariant, 'Default'), '🐣 Strong': tf(badges[0].strong) })
+        await setText(badge, null, badges[0].text)
+      }
+    } else {
+      node = await instance('Dropdown', { '🎛️ Disabled': tf(p.disabled), '🎛️ Icon Lead': tf(iconName), '🐣 State': 'Default', '👥 Size': p.size === 'large' ? 'Large' : 'Default', '🎛️ Stroke': tf(p.stroke !== false) })
+    }
+    await setText(node, 'Value', text || p.placeholder || 'Select an option')
+    if (iconName) await swapIcon(node, '↪ Icon', iconName)
     return node
   },
   async NumericInput(p) {
@@ -807,6 +833,7 @@ const BUILDERS = {
     }
     setProp(node, '🎛️ Title', p.title ?? '')
     setProp(node, '👁️ Icon 2', !!p.icon2)
+    if (p.icon2 && p.icon2Name) await swapIcon(node.findOne((n) => n.type === 'INSTANCE' && n.name === 'Icon 2'), '🎛️ Icon', p.icon2Name)
     if (p.footerBorder === false) setProp(node, '👁️ Footer border', false)
     await fillSlot(node, 'Content slot', spec.children ?? [], ctx)
     if (footer === 'Split') {

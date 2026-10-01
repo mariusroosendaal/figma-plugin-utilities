@@ -60,7 +60,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `Tree` | `nodes`, `mode`, `expanded`, `selected`, `checked` (three levels of indent) | |
 | `ColorInput` | `value` (hex), `opacity`, `variable`, `disabled` | |
 | `Chit` | `color` (hex, `#RRGGBBAA` for alpha), `opacity`, `shape` | |
-| `Dropdown` | `value` (`{ label }`), `placeholder`, `disabled`, `iconName`, `size`, `stroke` | |
+| `Dropdown` | `value` (`{ label, chit?, iconName? }`), `label`, `placeholder`, `disabled`, `iconName`, `size`, `stroke`, `chit` (hex), `badge` (text, `{ text, variant?, strong? }` or a list), `badgeVariant`. A badge or a chit draws the Kit additions Dropdown badge, which shows the first badge only and has no `disabled`, `size` or `stroke` | |
 | `Checkbox`, `Switch` | `checked`, `mixed`, `disabled`, `description`; label as `children` | |
 | `Radio` | `group`, `value` (or `checked`), `disabled`, `variant` (`button`); label as `children` | |
 | `Tabs` | `tabs: [{ label, badge?, unread? }]` (max 5; `unread` takes the count blue), `selectedTab` | |
@@ -73,7 +73,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `Chip` | `label`, `variant`, `iconName`, `closable`, `focused`, `disabled` | |
 | `Tooltip` | Renders its `children` (the trigger) only; pass `show: true` to draw the bubble | |
 | `Menu` | `menuItems: [{ label, group?, section?, showHeading?, type?, checked?, selected?, iconName?, detail?, badge?, disabled?, subMenu? }]`, `itemVariant`, `showGroupLabels`, `searchable`, `searchPlaceholder`, `footerLabel`, `footerVariant`; items also take `avatar` | |
-| `Modal` | `title`, `width` (`small`/`medium`/`large` or pixels), `height` (pixels), `contentPadding`, `icon2`, `footerBorder`. The Kit additions Modal has one header, so `headerVariant` draws as a title | `children`, `footer-left`, `footer-right`, `footer-full` |
+| `Modal` | `title`, `width` (`small`/`medium`/`large` or pixels), `height` (pixels), `contentPadding`, `icon2`, `icon2Name` (its icon), `footerBorder`. The Kit additions Modal has one header, so `headerVariant` draws as a title | `children`, `footer-left`, `footer-right`, `footer-full` |
 | `Header` | `title`, `noBorder` | `left`, `center`, `right` |
 | `Footer` | `variant` (`right`/`split`/`full`) | `children` (right/full), `left`, `right` (split) |
 | `PluginLayout` | | `children` |
