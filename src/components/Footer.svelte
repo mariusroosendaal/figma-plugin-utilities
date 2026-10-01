@@ -98,6 +98,16 @@
     justify-content: end;
   }
 
+  /* A kit Text at the footer's edge sits 16px in: a button's own padding
+     insets its label, so buttons sit 8px in. */
+  .footer--split .footer__left > :global(.text:first-child) {
+    margin-left: var(--size-xxsmall);
+  }
+
+  .footer__right > :global(.text:last-child) {
+    margin-right: var(--size-xxsmall);
+  }
+
   .footer--full {
     display: flex;
     width: 100%;

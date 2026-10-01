@@ -873,6 +873,11 @@ const BUILDERS = {
       const slot = await fillSlot(node, 'Actions slot', spec.children ?? [], ctx)
       if (variant === 'Full') for (const c of slot.children) c.layoutSizingHorizontal = 'FILL'
     }
+    // Text at an edge sits 16px in, as Footer.svelte insets a kit Text there.
+    const isText = (c) => typeof c === 'string' || (!!c && (c.c === 'Text' || (c.text !== undefined && !c.c)))
+    const rights = [].concat((variant === 'Split' ? s.right : variant === 'Right' ? spec.children : null) ?? [])
+    setProp(node, '👁️ Text left', variant === 'Split' && isText([].concat(s.left ?? [])[0]))
+    setProp(node, '👁️ Text right', isText(rights[rights.length - 1]))
     return node
   },
   async PluginLayout(p, spec, parent, ctx) {

@@ -13,6 +13,10 @@
 - **Section** — a titled group of fields as in Figma's panels, from Spacing Sets: a fieldset headed by `Header`, the title strong on its left and icon buttons at its right in the `actions` slot. It pads its own content, so its container doesn't, and it shrinks with its container, so a long dropdown label truncates rather than widening it
 - **DataTable** — named rows with a cell per column, such as a set's size at each breakpoint or a style's size before and after an update, from Type Tools' and Spacing Sets' sets tables and review modals. Columns take their own width, and cells align left unless a column sets `align: "end"`. Selectable rows are buttons that open the `editor` slot under them, with a trailing button in the `action` slot; with `selectable={false}` the table is read-only, with table roles. Each row takes notes as badges after its name, each with a tooltip of its own if given, the first two shown and the rest counted as `+N` with them in its tooltip. Cells are badges, variable chips where they alias a variable, or plain text, colored as new, changed or danger; removed rows are colored and can't be selected, one column can be marked, and headers can be buttons that pick it
 
+### Changed
+- **Footer** — a kit `Text` first in the split footer's left slot, or last in the right slot, sits 16px from the edge, where buttons sit 8px in. The Figma Plugin footer has `👁️ Text left` and `👁️ Text right` for it, and its Split variant keeps 8px between the slots, as the code does
+- **Header** — the Figma Plugin header pads 8px on the left when its left slot has content and 16px before a title alone, as the code already did
+
 ## [0.4.0] - 2026-09-21
 
 ### Added
