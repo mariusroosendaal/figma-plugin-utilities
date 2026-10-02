@@ -1,8 +1,8 @@
-// Spacing Sets — Scale tab, default state. Append after build-mockup.js in a
-// use_figma call. Values come from `Spacing Sets/src/scale.ts` with the UI's
-// defaults (max 512); regenerate them with:
-//   node -e 'import("./src/scale.ts").then(({ generate, DEFAULT_PARAMS, DEFAULT_BREAKPOINTS }) =>
-//     console.log(JSON.stringify(generate({ ...DEFAULT_PARAMS, max: 512, breakpoints: DEFAULT_BREAKPOINTS, primitives: [] }))))'
+// The Scale tab of Spacing Sets, a plugin since rolled into Vitrine Tools'
+// Spacing tab, in its default state. Append after build-mockup.js in a
+// use_figma call. It no longer matches a live screen: keep it as an example of
+// a full spec, with its values written in, as a mockup of a real plugin takes
+// them from the plugin's own code.
 
 const bp = ['sm', 'md', 'lg', 'xl', '2xl']
 const ladder = [4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96, 128, 160, 192, 256, 320, 384, 512]
