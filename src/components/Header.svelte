@@ -9,6 +9,9 @@
 
   /** Remove bottom border */
   export let noBorder = false;
+
+  /** Heading level of the title: 1 for the plugin's own header, 2 or 3 for a bar inside a panel or modal */
+  export let level = 1;
 </script>
 
 <header
@@ -19,7 +22,9 @@
   <div class="header__left">
     <slot name="left" />
     {#if title}
-      <h1 class="header__title">{title}</h1>
+      <svelte:element this={`h${level}`} class="header__title"
+        >{title}</svelte:element
+      >
     {/if}
   </div>
   <div class="header__center">

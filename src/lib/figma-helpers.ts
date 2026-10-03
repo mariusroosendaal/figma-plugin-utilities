@@ -90,6 +90,57 @@ export async function loadFont(family: string, style: string): Promise<void> {
 }
 
 /**
+ * Every font a text node uses: its own when uniform, each run's when mixed.
+ */
+export function fontsOf(node: TextNode): FontName[] {
+  if (node.fontName !== figma.mixed) return [node.fontName];
+  return node.characters.length > 0
+    ? node.getRangeAllFontNames(0, node.characters.length)
+    : [];
+}
+
+const fontLoads = new Map<string, Promise<void>>();
+
+/**
+ * Load a font once per plugin run: later calls for it share the first load,
+ * so hundreds of text layers wait once per font rather than a round trip
+ * each. A load that fails is forgotten, so the next call tries again.
+ */
+export function loadFontOnce(font: FontName): Promise<void> {
+  const key = `${font.family}\u0000${font.style}`;
+  let load = fontLoads.get(key);
+  if (!load) {
+    load = figma.loadFontAsync(font).catch((error: unknown) => {
+      fontLoads.delete(key);
+      throw error;
+    });
+    fontLoads.set(key, load);
+  }
+  return load;
+}
+
+/**
+ * Load every font a text node uses, each once per run — Figma refuses to
+ * write to text whose fonts aren't loaded. Rejects when one won't load, as a
+ * missing font doesn't.
+ */
+export async function loadNodeFonts(node: TextNode): Promise<void> {
+  await Promise.all(fontsOf(node).map(loadFontOnce));
+}
+
+/**
+ * Set a text node's characters in its own fonts, loading them first. Rejects,
+ * leaving the text as it was, when one of its fonts won't load.
+ */
+export async function setText(
+  node: TextNode,
+  characters: string,
+): Promise<void> {
+  await loadNodeFonts(node);
+  node.characters = characters;
+}
+
+/**
  * Save data to client storage (persists across sessions)
  * @param key - Storage key
  * @param value - Value to store (must be JSON-serializable)
@@ -114,6 +165,39 @@ export async function loadFromStorage<T>(
   } catch {
     return defaultValue;
   }
+}
+
+/**
+ * Settings kept in clientStorage under `key`, cleaned by one `sanitize` on
+ * the way in and on the way out, so what's saved is always what a load would
+ * accept. `sanitize` takes anything — a value an older version stored, a
+ * message from the UI, undefined on first run — and returns complete
+ * settings. `save` resolves to the settings it stored. Storage errors are
+ * logged, not thrown: a load falls back to `sanitize(undefined)`.
+ */
+export function createSettingsStore<T>(
+  key: string,
+  sanitize: (raw: unknown) => T,
+): { load(): Promise<T>; save(raw: unknown): Promise<T> } {
+  return {
+    async load() {
+      try {
+        return sanitize(await figma.clientStorage.getAsync(key));
+      } catch (error) {
+        console.error(`Couldn't read "${key}" from clientStorage:`, error);
+        return sanitize(undefined);
+      }
+    },
+    async save(raw) {
+      const settings = sanitize(raw);
+      try {
+        await figma.clientStorage.setAsync(key, settings);
+      } catch (error) {
+        console.error(`Couldn't save "${key}" to clientStorage:`, error);
+      }
+      return settings;
+    },
+  };
 }
 
 /**

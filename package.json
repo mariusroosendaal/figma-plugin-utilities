@@ -34,6 +34,16 @@
       "import": "./src/lib/figma-frame-builders.ts",
       "default": "./src/lib/figma-frame-builders.ts"
     },
+    "./lib/figma-variables": {
+      "types": "./src/lib/figma-variables.ts",
+      "import": "./src/lib/figma-variables.ts",
+      "default": "./src/lib/figma-variables.ts"
+    },
+    "./lib/colors": {
+      "types": "./src/lib/colors.ts",
+      "import": "./src/lib/colors.ts",
+      "default": "./src/lib/colors.ts"
+    },
     "./lib/scale": {
       "types": "./src/lib/scale.ts",
       "import": "./src/lib/scale.ts",

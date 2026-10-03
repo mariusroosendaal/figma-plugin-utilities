@@ -5,10 +5,11 @@ export { sendToPlugin, createMessageHandler } from "./messages.js";
 export {
   rgbToHex,
   hexToRgb,
+  isValidHex,
   getLuminance,
   getContrastRatio,
   meetsContrastLevel,
-} from "./colors.js";
+} from "./colors.ts";
 
 // Validation utilities
 export {

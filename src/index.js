@@ -27,6 +27,7 @@ export {
   // Colors
   rgbToHex,
   hexToRgb,
+  isValidHex,
   getLuminance,
   getContrastRatio,
   meetsContrastLevel,
