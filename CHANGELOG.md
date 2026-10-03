@@ -20,8 +20,14 @@
 - **Header** — `level` sets the title's heading level, 1 by default, for a bar inside a panel or modal. Data Mapper's `Topbar`, an older copy, is replaced by it at level 2, as its `ListItem` and `Footer` are by the package's
 - `rgbToHex` takes options: `lowercase`, `hash` (true by default) and `alpha`, which appends the alpha byte when `a` is below 1. Channels are clamped to 0–1, so a channel just over 1 no longer gives a three-digit byte
 - The color utilities are TypeScript, and `figma-plugin-utilities/lib/colors` is their own export entry, for code.ts
+- `loadFont` loads each font once per run, as `loadFontOnce`
 - **Footer** — a kit `Text` first in the split footer's left slot, or last in the right slot, sits 16px from the edge, where buttons sit 8px in. The Figma Plugin footer has `👁️ Text left` and `👁️ Text right` for it, and its Split variant keeps 8px between the slots, as the code does
 - **Header** — the Figma Plugin header pads 8px on the left when its left slot has content and 16px before a title alone, as the code already did
+
+### Removed
+- `getCollections`, `getVariables` and `getSelection` from figma-helpers — one-line wrappers no plugin used; call `figma.variables.getLocalVariableCollectionsAsync()`, `figma.variables.getLocalVariablesAsync(type)` and `figma.currentPage.selection` directly
+- `saveToStorage` and `loadFromStorage` — no plugin used them; `createSettingsStore` replaces them
+- `notifyError`, `notifySuccess` and `notifyWarning` — exported to the UI, where `figma.notify` doesn't exist, so they did nothing there, and no plugin used them; in code.ts use `showError` and `showSuccess` from figma-helpers
 
 ## [0.4.0] - 2026-09-21
 

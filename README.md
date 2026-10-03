@@ -52,9 +52,6 @@ import {
   // Error handling
   safeAsync,
   parseJsonSafe,
-  notifyError,
-  notifySuccess,
-  notifyWarning,
   // Resize
   setDefaultWidth,
   getContentHeight,
@@ -373,11 +370,6 @@ if (result.ok) {
 // Parse JSON safely
 const parsed = parseJsonSafe(jsonString);
 // { ok: true, value: {...} } or { ok: false, error: "..." }
-
-// Figma notifications
-notifySuccess("Done!");
-notifyError("Something went wrong");
-notifyWarning("Check your input");
 ```
 
 ### Resize (`lib/resize.js`)
@@ -442,13 +434,10 @@ import {
   sendToUI,
   showError,
   showSuccess,
-  getCollections,
-  getVariables,
-  getSelection,
   focusNodes,
   loadFont,
-  saveToStorage,
-  loadFromStorage,
+  setText,
+  createSettingsStore,
   handleResize,
 } from "figma-plugin-utilities/lib/figma-helpers";
 
@@ -459,23 +448,21 @@ sendToUI("success", { message: "Done!" });
 showError("Something went wrong");
 showSuccess("Created!");
 
-// Variables
-const collections = await getCollections();
-const colorVars = await getVariables("COLOR");
-
-// Selection
-const selected = getSelection(); // all selected nodes
-const frames = getSelection("FRAME"); // filtered by type
-
 // Focus viewport on nodes
 focusNodes(figma.currentPage.selection);
 
-// Load font before using
+// Load a font before using it (once per run)
 await loadFont("Inter", "Regular");
 
-// Client storage
-await saveToStorage("settings", { theme: "dark" });
-const settings = await loadFromStorage("settings", { theme: "light" });
+// Set a text layer's characters in its own fonts
+await setText(textNode, "Hello");
+
+// Settings in client storage, cleaned on load and on save
+const store = createSettingsStore("settings", (raw) => ({
+  theme: (raw as { theme?: string })?.theme === "dark" ? "dark" : "light",
+}));
+const settings = await store.load();
+await store.save({ ...settings, theme: "dark" });
 
 // Handle resize message from UI (call in your message handler)
 if (msg.type === "resize") handleResize(msg);

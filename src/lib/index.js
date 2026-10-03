@@ -31,9 +31,6 @@ export {
   withErrorHandling,
   safeAsync,
   parseJsonSafe,
-  notifyError,
-  notifySuccess,
-  notifyWarning,
 } from "./errorHandling.js";
 
 // Resize utilities

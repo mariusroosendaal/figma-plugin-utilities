@@ -47,9 +47,6 @@ export {
   withErrorHandling,
   safeAsync,
   parseJsonSafe,
-  notifyError,
-  notifySuccess,
-  notifyWarning,
   // Resize
   setDefaultWidth,
   getContentHeight,
