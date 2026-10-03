@@ -208,12 +208,15 @@ function setProp(node, prefix, value) {
   const k = propKey(node, prefix)
   if (k !== undefined && value !== undefined) node.setProperties({ [k]: value })
 }
+// Replaces a text layer's characters once its current fonts are loaded.
+async function retext(t, value) {
+  for (const f of t.getStyledTextSegments(['fontName']).map((s) => s.fontName)) await figma.loadFontAsync(f)
+  t.characters = String(value)
+}
 async function setText(node, layerName, value) {
   if (value === undefined || value === null) return
   const t = node.findOne((n) => n.type === 'TEXT' && (!layerName || n.name === layerName))
-  if (!t) return
-  for (const f of t.getStyledTextSegments(['fontName']).map((s) => s.fontName)) await figma.loadFontAsync(f)
-  t.characters = String(value)
+  if (t) await retext(t, value)
 }
 // Checkbox and Switch: show the description line and set its text (a "Value"
 // layer too, inside the "Description" frame).
@@ -221,9 +224,7 @@ async function setDescription(node, prefix, text) {
   if (!text) return
   setProp(node, prefix, true)
   const t = node.findOne((n) => n.type === 'TEXT' && n.parent && n.parent.name === 'Description')
-  if (!t) return
-  for (const f of t.getStyledTextSegments(['fontName']).map((s) => s.fontName)) await figma.loadFontAsync(f)
-  t.characters = String(text)
+  if (t) await retext(t, text)
 }
 async function swapIcon(node, prefix, iconName) {
   const c = await icon(iconName)
@@ -499,8 +500,7 @@ const BUILDERS = {
       else if (/^\d{1,3}$/.test(t.characters)) next = String(Math.round(opacity))
       else if (p.variable && t.characters !== '%') next = p.variable
       if (next === undefined) continue
-      for (const f of t.getStyledTextSegments(['fontName']).map((s) => s.fontName)) await figma.loadFontAsync(f)
-      t.characters = next
+      await retext(t, next)
     }
     paintChit(node.findOne((n) => n.type === 'INSTANCE' && n.name.includes('Chit')), color, opacity / 100)
     return node
@@ -580,8 +580,7 @@ const BUILDERS = {
     const cells = node.findAll((n) => n.type === 'TEXT' && /^-?\d/.test(n.characters) && !inIcon(n))
     for (let i = 0; i < cells.length && i < values.length; i++) {
       if (values[i] === null || values[i] === undefined) continue
-      for (const f of cells[i].getStyledTextSegments(['fontName']).map((x) => x.fontName)) await figma.loadFontAsync(f)
-      cells[i].characters = String(values[i])
+      await retext(cells[i], values[i])
     }
     if (p.iconName) await swapIcon(node, '🎛️  Icon Lead', p.iconName)
     return node
@@ -1262,7 +1261,7 @@ async function build(spec, parent, ctx) {
   return node
 }
 
-// spec: { window: 'Name', width?: 320, height?: number, children: [...] }
+// spec: { window: 'Name', width?: 320, height?: number, icon?: '<svg…>', children: [...] }
 //   or a single component spec (e.g. a Modal) placed on its own.
 // options: { page?: pageId, x?, y?, icons?: { 'icon.24.plus': { id, key } } }
 // The entry point: use_figma calls it after pasting this file in.
@@ -1300,6 +1299,21 @@ async function buildMockup(spec, options = {}) {
       root.appendChild(bar)
       stretch(bar)
       chrome = bar.height
+      // `icon`: the plugin's own icon as SVG markup (its assets/icon.svg). An
+      // instance takes no new layers, so it sits over the bar's placeholder.
+      const box = spec.icon && bar.findOne((n) => n.name === 'Plugin icon')
+      if (box) {
+        box.children[0].visible = false
+        const art = figma.createNodeFromSvg(spec.icon)
+        root.appendChild(art)
+        art.rescale(box.width / art.width)
+        art.name = box.name
+        art.cornerRadius = box.cornerRadius
+        art.clipsContent = true
+        art.layoutPositioning = 'ABSOLUTE'
+        art.x = box.x
+        art.y = box.y
+      }
     }
     if (spec.height) {
       root.primaryAxisSizingMode = 'FIXED'
