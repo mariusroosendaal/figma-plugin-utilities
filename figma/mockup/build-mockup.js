@@ -1299,20 +1299,15 @@ async function buildMockup(spec, options = {}) {
       root.appendChild(bar)
       stretch(bar)
       chrome = bar.height
-      // `icon`: the plugin's own icon as SVG markup (its assets/icon.svg). An
-      // instance takes no new layers, so it sits over the bar's placeholder.
-      const box = spec.icon && bar.findOne((n) => n.name === 'Plugin icon')
-      if (box) {
-        box.children[0].visible = false
+      // `icon`: the plugin's own icon as SVG markup (its assets/icon.svg), in
+      // place of the placeholder in the bar's Icon slot.
+      const slot = spec.icon && bar.findOne((n) => n.type === 'SLOT')
+      if (slot) {
+        for (const c of [...slot.children]) c.remove()
         const art = figma.createNodeFromSvg(spec.icon)
-        root.appendChild(art)
-        art.rescale(box.width / art.width)
-        art.name = box.name
-        art.cornerRadius = box.cornerRadius
-        art.clipsContent = true
-        art.layoutPositioning = 'ABSOLUTE'
-        art.x = box.x
-        art.y = box.y
+        art.name = 'Plugin icon'
+        art.rescale(slot.width / art.width)
+        slot.appendChild(art)
       }
     }
     if (spec.height) {
