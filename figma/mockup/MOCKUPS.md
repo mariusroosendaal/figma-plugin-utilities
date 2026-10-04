@@ -71,6 +71,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `VariablePill` | `label`, `selected`, `onSelected`, `muted`, `disabled` | |
 | `Banner` | `variant`, `message` | |
 | `Chip` | `label`, `variant`, `iconName`, `closable`, `focused`, `disabled` | |
+| `Dropzone` | `buttonLabel`, `hint`, `iconName` (`null` for none), `compact`, `disabled`, `invalid` with `errorMessage`, `dragging` (the drag-over look). Takes `fillHeight` | |
 | `Tooltip` | Renders its `children` (the trigger) only; pass `show: true` to draw the bubble | |
 | `Menu` | `menuItems: [{ label, group?, section?, showHeading?, type?, checked?, selected?, iconName?, detail?, badge?, disabled?, subMenu? }]`, `itemVariant`, `showGroupLabels`, `searchable`, `searchPlaceholder`, `footerLabel`, `footerVariant`; items also take `avatar` | |
 | `Modal` | `title`, `width` (`small`/`medium`/`large` or pixels), `height` (pixels), `contentPadding`, `icon2`, `icon2Name` (its icon), `footerBorder`. The Kit additions Modal has one header, so `headerVariant` draws as a title | `children`, `footer-left`, `footer-right`, `footer-full` |
@@ -98,7 +99,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `Disclosure` | | `children` (DisclosureItems) |
 | `DisclosureItem` | `title`, `open`, `section` | `children` (shown when `open`) |
 
-`Input`, `Dropdown`, `FieldGroup`, `Banner` and the other block-level components fill the width of a vertical parent automatically. Anything else can take `fill: true`; in a horizontal parent, `grow: true` makes a component or stack take the remaining width (CSS `flex: 1` / `1fr`). `fillHeight: true` does the same vertically (e.g. an EmptyState centred in the panel), and stacks take a fixed `width`. `fill` and `stroke` on stacks take color variable names: `bg`, `bg-secondary`, `bg-brand`, `border`, `text`, `text-secondary`, `text-tertiary`, `icon-tertiary`.
+`Input`, `Dropdown`, `FieldGroup`, `Banner`, `Dropzone` and the other block-level components fill the width of a vertical parent automatically. Anything else can take `fill: true`; in a horizontal parent, `grow: true` makes a component or stack take the remaining width (CSS `flex: 1` / `1fr`). `fillHeight: true` does the same vertically (e.g. an EmptyState centred in the panel), and stacks take a fixed `width`. `fill` and `stroke` on stacks take color variable names: `bg`, `bg-secondary`, `bg-brand`, `border`, `text`, `text-secondary`, `text-tertiary`, `icon-tertiary`.
 
 ## Icons
 

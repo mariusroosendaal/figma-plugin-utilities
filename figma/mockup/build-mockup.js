@@ -4,75 +4,77 @@
 //
 // Components resolve by local node ID in the UI3 file and fall back to library
 // import by key elsewhere (the UI3 library must be enabled in that file).
+// Each entry is a component set unless it says `set: false`.
 // The spec format is documented in MOCKUPS.md next to this file.
 
 const UI3 = {
-  Button: { id: '2012:48557', key: '071c9562a22c96fb3e886f3075e3995b17fe0a03', set: true },
-  IconButton: { id: '2324:46757', key: '303e1c5fbb7a88c6b2e4fe7aac7f111195d371ef', set: true },
-  Badge: { id: '2012:35027', key: '0d207dd31bf7e42cb2c936fed80fc62c0cb09147', set: true },
-  Checkbox: { id: '2012:55461', key: 'f62e6ded8a44b7a476c01b90fc16bbae1fe32ebc', set: true },
-  Switch: { id: '2015:24697', key: '4aec511c37f1df05ec1c9e329710e7b30b123ecc', set: true },
-  Radio: { id: '2015:20365', key: '76164e6ee770820fd92e54c599e52a93fd4048d8', set: true },
-  Input: { id: '2028:79255', key: '62a920f029d5f8bde4984db2e5be53a55454690a', set: true },
-  Dropdown: { id: '2028:36589', key: 'fa10d177e81113d0444767849ed87092e3d3fb70', set: true },
-  DropdownBadge: { id: '1027231:25918', key: '18018ce67e36f22a525888874ece3445393faa16', set: true },
-  Tabs: { id: '2015:27780', key: 'bfd94b8634aa735c9be6158d1208ca9a768d6773', set: true },
-  SegmentedControl: { id: '2015:20960', key: 'bca770b30596f62d0674bc3b4b7ae2f6775f5b1e', set: true },
-  Slider: { id: '2015:23280', key: 'd810bedfd3a19e1d131f6b97d050f941dad848b6', set: true },
-  Tooltip: { id: '2015:39095', key: 'c52bc47cc2b561125634c1700e39afd38ec4ad12', set: true },
-  MenuRowSimple: { id: '2327:96028', key: '690e9a0577253ce6c6cc9fec3da79dea66fb31ab', set: true },
-  MenuRowCheckmark: { id: '2327:96252', key: '6bcc3df12ba6da07596547b98ea1b9bc463141c2', set: true },
-  MenuRowHeading: { id: '2327:96347', key: 'a0225291226db5768bd80f0e2ae2507d1f8d50df', set: true },
+  Button: { id: '2012:48557', key: '071c9562a22c96fb3e886f3075e3995b17fe0a03' },
+  IconButton: { id: '2324:46757', key: '303e1c5fbb7a88c6b2e4fe7aac7f111195d371ef' },
+  Badge: { id: '2012:35027', key: '0d207dd31bf7e42cb2c936fed80fc62c0cb09147' },
+  Checkbox: { id: '2012:55461', key: 'f62e6ded8a44b7a476c01b90fc16bbae1fe32ebc' },
+  Switch: { id: '2015:24697', key: '4aec511c37f1df05ec1c9e329710e7b30b123ecc' },
+  Radio: { id: '2015:20365', key: '76164e6ee770820fd92e54c599e52a93fd4048d8' },
+  Input: { id: '2028:79255', key: '62a920f029d5f8bde4984db2e5be53a55454690a' },
+  Dropdown: { id: '2028:36589', key: 'fa10d177e81113d0444767849ed87092e3d3fb70' },
+  DropdownBadge: { id: '1027231:25918', key: '18018ce67e36f22a525888874ece3445393faa16' },
+  Tabs: { id: '2015:27780', key: 'bfd94b8634aa735c9be6158d1208ca9a768d6773' },
+  SegmentedControl: { id: '2015:20960', key: 'bca770b30596f62d0674bc3b4b7ae2f6775f5b1e' },
+  Slider: { id: '2015:23280', key: 'd810bedfd3a19e1d131f6b97d050f941dad848b6' },
+  Tooltip: { id: '2015:39095', key: 'c52bc47cc2b561125634c1700e39afd38ec4ad12' },
+  MenuRowSimple: { id: '2327:96028', key: '690e9a0577253ce6c6cc9fec3da79dea66fb31ab' },
+  MenuRowCheckmark: { id: '2327:96252', key: '6bcc3df12ba6da07596547b98ea1b9bc463141c2' },
+  MenuRowHeading: { id: '2327:96347', key: 'a0225291226db5768bd80f0e2ae2507d1f8d50df' },
   MenuDivider: { id: '2327:96331', key: '0da775e2a59b61cfdf6b2421c562ab16882d07be', set: false },
-  MenuRowComplex: { id: '2327:96049', key: 'b122a716963d6a75190e9c9ff022ea7d19003782', set: true },
-  MenuRowToggle: { id: '2327:96288', key: '4041feb4889093ef96305a06289863c2852f9bc3', set: true },
-  NumericInput: { id: '2028:79190', key: '86d9cd69d26ad1054cd384e536a9e41fd3cd98ad', set: true },
-  ColorInput: { id: '2028:79525', key: '1109b1a24986b1756dc11673ef77fa28f7ff185a', set: true },
-  Chit: { id: '2028:79673', key: '1f3deb32138846892266cb57f84562774c680f90', set: true },
-  IconToggle: { id: '2324:46776', key: 'e0744f36051956ba28abdfa9d6129664ba5797c1', set: true },
-  IconToggleDialog: { id: '2324:46817', key: 'adf85113bfab702068b38874c55b5b3ca2a649fe', set: true },
-  SplitButton: { id: '2324:46856', key: '98c2aebe77ed51c1424d1dc0a7bbf91c5035795e', set: true },
-  BadgeSmallAlt: { id: '2012:35077', key: 'da463a31f8889ae48450808c882a246dd156a502', set: true },
-  BadgeLarge: { id: '2012:35016', key: '01dbc71b5a9f2c9636bbba4382a53580f4948b36', set: true },
+  MenuRowComplex: { id: '2327:96049', key: 'b122a716963d6a75190e9c9ff022ea7d19003782' },
+  MenuRowToggle: { id: '2327:96288', key: '4041feb4889093ef96305a06289863c2852f9bc3' },
+  NumericInput: { id: '2028:79190', key: '86d9cd69d26ad1054cd384e536a9e41fd3cd98ad' },
+  ColorInput: { id: '2028:79525', key: '1109b1a24986b1756dc11673ef77fa28f7ff185a' },
+  Chit: { id: '2028:79673', key: '1f3deb32138846892266cb57f84562774c680f90' },
+  IconToggle: { id: '2324:46776', key: 'e0744f36051956ba28abdfa9d6129664ba5797c1' },
+  IconToggleDialog: { id: '2324:46817', key: 'adf85113bfab702068b38874c55b5b3ca2a649fe' },
+  SplitButton: { id: '2324:46856', key: '98c2aebe77ed51c1424d1dc0a7bbf91c5035795e' },
+  BadgeSmallAlt: { id: '2012:35077', key: 'da463a31f8889ae48450808c882a246dd156a502' },
+  BadgeLarge: { id: '2012:35016', key: '01dbc71b5a9f2c9636bbba4382a53580f4948b36' },
   BadgeDot: { id: '2012:35086', key: '1fc112401ad63d805e2dff2b04e1040218d6458d', set: false },
-  Avatar: { id: '2012:32015', key: '4b1ab7074c15da005ced9ef2c6aadd421e8abe46', set: true },
-  VariablePill: { id: '2028:79753', key: '8dd74e72f23f9fd824faad58c0edeb8d6485192a', set: true },
-  NumericInputMulti: { id: '2028:79619', key: '351a06649c2afe850c4f4a1f8fb3bb6fa282cf10', set: true },
-  MenuRowFooter: { id: '2327:96342', key: '09a61308ca8b3e0d57a047cdd66a255d031a99d4', set: true },
-  TreeRow: { id: '1027222:26144', key: 'f3e55611980a1d9735b3adc94d3fca1a8e557ce4', set: true },
+  Avatar: { id: '2012:32015', key: '4b1ab7074c15da005ced9ef2c6aadd421e8abe46' },
+  VariablePill: { id: '2028:79753', key: '8dd74e72f23f9fd824faad58c0edeb8d6485192a' },
+  NumericInputMulti: { id: '2028:79619', key: '351a06649c2afe850c4f4a1f8fb3bb6fa282cf10' },
+  MenuRowFooter: { id: '2327:96342', key: '09a61308ca8b3e0d57a047cdd66a255d031a99d4' },
+  TreeRow: { id: '1027222:26144', key: 'f3e55611980a1d9735b3adc94d3fca1a8e557ce4' },
   Tree: { id: '1027222:26241', key: '80d6b8310d34fa1635ca35e76efa2c4dfbe7c984', set: false },
-  ToggleButton: { id: '1027239:26209', key: '47d374e9c751986a166b9718203c302c757a33a4', set: true },
-  Banner: { id: '1027204:342', key: '133eade4a3d7f24189bf919ea1b7472182ef2e20', set: true },
-  Chip: { id: '1027205:88', key: '415f290a1158771314dd11b9fc83b97bc62e9b04', set: true },
-  Modal: { id: '1027206:365', key: '248a9a4ecea1cc16056ec1bc28b56acbf5cc8627', set: true },
+  ToggleButton: { id: '1027239:26209', key: '47d374e9c751986a166b9718203c302c757a33a4' },
+  Banner: { id: '1027204:342', key: '133eade4a3d7f24189bf919ea1b7472182ef2e20' },
+  Chip: { id: '1027205:88', key: '415f290a1158771314dd11b9fc83b97bc62e9b04' },
+  Dropzone: { id: '1028012:479', key: 'a4a63412a55d4797f53bf1856fdc5704536dae5e' },
+  Modal: { id: '1027206:365', key: '248a9a4ecea1cc16056ec1bc28b56acbf5cc8627' },
   Menu: { id: '1027206:366', key: '460fe8753d38a6fa072564cfc475b7546803f486', set: false },
   Header: { id: '1027197:23734', key: '92dea3280c6742ad57bbd682c483cac3e5062980', set: false },
   // Figma's own title bar above a plugin UI — not kit code, added to every window.
   WindowHeader: { id: '1027551:31', key: '135771e54148bad7bdcb0825057ac6785ba48f27', set: false },
-  Footer: { id: '1027197:23800', key: '78de9140a69b8fb9bb9f797c34636f2b787fbf7e', set: true },
+  Footer: { id: '1027197:23800', key: '78de9140a69b8fb9bb9f797c34636f2b787fbf7e' },
   PluginLayout: { id: '1027197:23801', key: '41f0db58e59fc01415c151d1cf7c2f1e25f9faea', set: false },
-  FieldGroup: { id: '1027197:23913', key: '0b2eb3a95c0e4a960f7a8ee0e8b46a2136fd5dee', set: true },
-  EmptyState: { id: '1027197:23851', key: '3c765bde25410d1a8a7e6a28874fc6cca62982f6', set: true },
+  FieldGroup: { id: '1027197:23913', key: '0b2eb3a95c0e4a960f7a8ee0e8b46a2136fd5dee' },
+  EmptyState: { id: '1027197:23851', key: '3c765bde25410d1a8a7e6a28874fc6cca62982f6' },
   LoadingState: { id: '1027197:23852', key: '5d3b23c91ddea62dfeee2212abdf8c7f1b0cc763', set: false },
-  StatusBar: { id: '1027197:23902', key: 'b0196b1dd4a43d1ff9a39e6bbee225726960e448', set: true },
-  ListItem: { id: '1027197:23952', key: '0958cc0be61c4fa697f0ca5a0581422bccf71899', set: true },
-  CheckboxCard: { id: '1027197:24237', key: 'b8229a139f45ac8e9ff94638d652d909a450d23a', set: true },
+  StatusBar: { id: '1027197:23902', key: 'b0196b1dd4a43d1ff9a39e6bbee225726960e448' },
+  ListItem: { id: '1027197:23952', key: '0958cc0be61c4fa697f0ca5a0581422bccf71899' },
+  CheckboxCard: { id: '1027197:24237', key: 'b8229a139f45ac8e9ff94638d652d909a450d23a' },
   Section: { id: '1027600:38', key: '100785ab13837f8ffa57ed518ab69f77f6bab6ab', set: false },
   CodeExportModal: { id: '1027600:85', key: '28fdf9be6729bd7c1f65bde45141abe8a76cf184', set: false },
-  FieldGrid: { id: '1027602:534', key: '51663b518974c0c701de68a5b6e9edce70d9df8b', set: true },
+  FieldGrid: { id: '1027602:534', key: '51663b518974c0c701de68a5b6e9edce70d9df8b' },
   SteppedField: { id: '1027596:474', key: '7a9bbe79f93a8b7659c5243e7ca02491ffb22dea', set: false },
   LadderBadges: { id: '1027596:502', key: 'e3d3b7ac533804899f86bb6b41f198172dddd05d', set: false },
-  MappingChip: { id: '1027594:377', key: '0fe7789c674326d04b8657821eb51d0bf3233f7b', set: true },
+  MappingChip: { id: '1027594:377', key: '0fe7789c674326d04b8657821eb51d0bf3233f7b' },
   DataTable: { id: '1027596:301', key: 'f1d2ead952fa218c84a7d59ab68e557d43f8de94', set: false },
-  DataTableRow: { id: '1027596:300', key: 'ca96ebfb66f9871836f6a8f80d00c712fe599cf0', set: true },
-  DataTableCell: { id: '1027596:211', key: 'ce512cf1e7f1954a52bd28b88a3e523dbf5c0aec', set: true },
-  RampCurve: { id: '1027599:473', key: 'd86ee6d14cf7ab42c7b8f8c7c5b42b524016dc71', set: true },
-  Text: { id: '1027216:156', key: 'c695a971ac9052c6ebcbf432b60ce7a0d5281781', set: true },
-  Label: { id: '1027216:161', key: '964899776bca3a6d406cd9e78c9041e2319b958d', set: true },
+  DataTableRow: { id: '1027596:300', key: 'ca96ebfb66f9871836f6a8f80d00c712fe599cf0' },
+  DataTableCell: { id: '1027596:211', key: 'ce512cf1e7f1954a52bd28b88a3e523dbf5c0aec' },
+  RampCurve: { id: '1027599:473', key: 'd86ee6d14cf7ab42c7b8f8c7c5b42b524016dc71' },
+  Text: { id: '1027216:156', key: 'c695a971ac9052c6ebcbf432b60ce7a0d5281781' },
+  Label: { id: '1027216:161', key: '964899776bca3a6d406cd9e78c9041e2319b958d' },
   RadioGroup: { id: '1027216:162', key: '9ec3520dfc75786126a616f7a5331ad428792809', set: false },
-  DisclosureItem: { id: '1027216:25160', key: '81e90351aad15cc9d9b83a8de648c39671327b1a', set: true },
+  DisclosureItem: { id: '1027216:25160', key: '81e90351aad15cc9d9b83a8de648c39671327b1a' },
   Disclosure: { id: '1027216:25161', key: '320745f42bae91a9a03b2367e8cc8badb24762ed', set: false },
-  SidebarRow: { id: '2012:63744', key: '292c5ff546da18e6ecc2ec81b5d3b5b1a5cbf936', set: true },
+  SidebarRow: { id: '2012:63744', key: '292c5ff546da18e6ecc2ec81b5d3b5b1a5cbf936' },
 }
 const STYLES = {
   'body-small': { id: 'S:704c8fb9b4484d295a7511c93134effcabfcc058,', key: '704c8fb9b4484d295a7511c93134effcabfcc058' },
@@ -131,7 +133,7 @@ const component = (name) =>
     if (!e) throw new Error(`Unknown component "${name}"`)
     return (
       (await local(e.id, e.key)) ||
-      (e.set ? figma.importComponentSetByKeyAsync(e.key) : figma.importComponentByKeyAsync(e.key))
+      (e.set === false ? figma.importComponentByKeyAsync(e.key) : figma.importComponentSetByKeyAsync(e.key))
     )
   })
 const variable = (name) =>
@@ -231,6 +233,8 @@ async function swapIcon(node, prefix, iconName) {
   if (c) setProp(node, prefix, c.id)
 }
 const tf = (b) => (b ? 'True' : 'False')
+// A component's 🎛️ Disabled variant, spread where it falls in the variant order
+const dis = (p) => ({ '🎛️ Disabled': tf(p.disabled) })
 // Short for what most builders repeat, to keep the minified builder small.
 const stretch = (node) => (node.layoutSizingHorizontal = 'FILL')
 const stateOf = (p) => (p.disabled ? 'Disabled' : 'Default')
@@ -292,7 +296,7 @@ function textOf(spec) {
 // Each returns the created node. `block` components fill the width of a
 // vertical parent.
 
-const BLOCK = new Set(['Input', 'Textarea', 'NumericInput', 'NumericInputMulti', 'ColorInput', 'Tree', 'Dropdown', 'FieldGroup', 'Banner', 'CheckboxCard', 'ListItem', 'SidebarRow', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem', 'Text', 'Section', 'FieldGrid', 'SteppedField', 'LadderBadges', 'DataTable', 'RampCurve'])
+const BLOCK = new Set(['Input', 'Textarea', 'NumericInput', 'NumericInputMulti', 'ColorInput', 'Tree', 'Dropdown', 'FieldGroup', 'Banner', 'Dropzone', 'CheckboxCard', 'ListItem', 'SidebarRow', 'EmptyState', 'LoadingState', 'StatusBar', 'Header', 'Footer', 'PluginLayout', 'Tabs', 'SegmentedControl', 'Slider', 'RadioGroup', 'Disclosure', 'DisclosureItem', 'Text', 'Section', 'FieldGrid', 'SteppedField', 'LadderBadges', 'DataTable', 'RampCurve'])
 
 const BUILDERS = {
   // Prefer this over a { text } primitive wherever the code uses <Text>: it is a
@@ -352,7 +356,7 @@ const BUILDERS = {
     return node
   },
   async IconButton(p) {
-    const node = await instance('IconButton', { '👥 Variant': p.variant === 'secondary' ? 'Secondary' : 'Default', '🎛️ Disabled': tf(p.disabled), '🐣 State': 'Default' })
+    const node = await instance('IconButton', { '👥 Variant': p.variant === 'secondary' ? 'Secondary' : 'Default', ...dis(p), '🐣 State': 'Default' })
     await swapIcon(node, '🎛️ Icon', p.iconName)
     return node
   },
@@ -385,7 +389,7 @@ const BUILDERS = {
     const label = textOf(spec)
     const node = await instance('Checkbox', {
       '🐣 Type': p.mixed ? 'Mixed' : p.checked ? 'Checked' : 'Unchecked',
-      '🎛️ Disabled': tf(p.disabled),
+      ...dis(p),
       '🎛️ Ghost': tf(p.ghost),
       '🎛️ Muted': tf(p.muted || !(p.checked || p.mixed)),
       '🐣 State': 'Default',
@@ -397,7 +401,7 @@ const BUILDERS = {
   },
   async Switch(p, spec) {
     const label = textOf(spec)
-    const node = await instance('Switch', { '🐣 Type': p.mixed ? 'Mixed' : p.checked ? 'On' : 'Off', '🎛️ Disabled': tf(p.disabled), '🐣 State': 'Default' })
+    const node = await instance('Switch', { '🐣 Type': p.mixed ? 'Mixed' : p.checked ? 'On' : 'Off', ...dis(p), '🐣 State': 'Default' })
     setProp(node, '👁️ Label', label !== undefined && label !== '')
     await setText(node, 'Value', label)
     await setDescription(node, '👁️  Description', p.description)
@@ -459,7 +463,7 @@ const BUILDERS = {
         await setText(badge, null, badges[0].text)
       }
     } else {
-      node = await instance('Dropdown', { '🎛️ Disabled': tf(p.disabled), '🎛️ Icon Lead': tf(iconName), '🐣 State': 'Default', '👥 Size': p.size === 'large' ? 'Large' : 'Default', '🎛️ Stroke': tf(p.stroke !== false) })
+      node = await instance('Dropdown', { ...dis(p), '🎛️ Icon Lead': tf(iconName), '🐣 State': 'Default', '👥 Size': p.size === 'large' ? 'Large' : 'Default', '🎛️ Stroke': tf(p.stroke !== false) })
     }
     await setText(node, 'Value', text || p.placeholder || 'Select an option')
     if (iconName) await swapIcon(node, '↪ Icon', iconName)
@@ -523,7 +527,7 @@ const BUILDERS = {
       const node = await instance('IconToggle', {
         '👥 Variant': p.highlighted ? 'Highlighted' : 'Default',
         '🎛️ On': tf(p.pressed),
-        '🎛️ Disabled': tf(p.disabled),
+        ...dis(p),
         '🐣 State': 'Default',
       })
       const suffix = p.highlighted ? ' (Highlighted)' : ''
@@ -534,7 +538,7 @@ const BUILDERS = {
     const node = await instance('IconToggleDialog', {
       '👥 Variant': p.variant === 'secondary' ? 'Secondary' : 'Default',
       '🎛️ On': tf(p.pressed),
-      '🎛️ Disabled': tf(p.disabled),
+      ...dis(p),
       '🐣 State': 'Default',
     })
     await swapIcon(node, '🎛️ Icon', p.iconName)
@@ -711,6 +715,18 @@ const BUILDERS = {
     setProp(node, '👁️ Close', !!p.closable)
     setProp(node, '👁️ Icon', !!p.iconName)
     if (p.iconName) await swapIcon(node, '↪ Icon', p.iconName)
+    return node
+  },
+  // The drag-over look is runtime state; props.dragging draws it. The button
+  // is an exposed UI3 Button, so its label is set on it.
+  async Dropzone(p) {
+    const node = await instance('Dropzone', { '👥 Size': p.compact ? 'Compact' : 'Default', '🐣 State': p.disabled ? 'Disabled' : p.invalid ? 'Invalid' : p.dragging ? 'Dragging' : 'Default' })
+    setProp(node, '👁️ Hint', !!p.hint)
+    setProp(node, '🎛️ Hint', p.hint)
+    setProp(node, '🎛️ Error', p.errorMessage)
+    setProp(node, '👁️ Icon', p.iconName !== null)
+    await swapIcon(node, '↪ Icon', p.iconName)
+    setProp(named(node, 'Button'), '🎛️ Label', p.buttonLabel ?? 'Choose files')
     return node
   },
   // Tooltips only appear on hover, so a mockup shows the trigger. Pass
@@ -980,7 +996,7 @@ const BUILDERS = {
     return node
   },
   async CheckboxCard(p, spec) {
-    const node = await instance('CheckboxCard', { '🎛️ Disabled': tf(p.disabled) })
+    const node = await instance('CheckboxCard', { ...dis(p) })
     setProp(node, '👁️ Secondary', !!p.secondary)
     if (p.secondary) setProp(node, '🎛️ Secondary', p.secondary)
     const cb = named(node, 'Checkbox')
