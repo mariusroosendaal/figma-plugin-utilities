@@ -31,6 +31,9 @@ export {
   getLuminance,
   getContrastRatio,
   meetsContrastLevel,
+  // Copy
+  plural,
+  joinList,
   // Validation
   validateUrl,
   validateJsonString,

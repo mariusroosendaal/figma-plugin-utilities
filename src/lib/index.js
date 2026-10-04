@@ -11,6 +11,9 @@ export {
   meetsContrastLevel,
 } from "./colors.ts";
 
+// Copy helpers
+export { plural, joinList } from "./format.ts";
+
 // Validation utilities
 export {
   validateUrl,

@@ -15,6 +15,7 @@
 - `lib/figma-variables` — `isVariableAlias`, `isColorValue`, `toRgba`, `getVariableLookup`, and `resolveVariableValue` and `resolveVariableValueAsync`, which follow aliases at a mode; the async one follows library variables too
 - **figma-helpers** — `fontsOf`, `loadFontOnce`, `loadNodeFonts` and `setText` write text in the layer's own fonts, loading each font once per run; `createSettingsStore` keeps settings in clientStorage, cleaned by one `sanitize` on load and on save
 - `isValidHex` — six HEX digits in either case, the "#" required unless `requireHash` is false
+- `plural` and `joinList` — "3 layers", "a, b and c"; from the root, or `lib/format` in code.ts
 
 ### Changed
 - **Header** — `level` sets the title's heading level (1 by default). The left padding is 8px when the left slot has content and 16px before a title alone, in the Figma component too

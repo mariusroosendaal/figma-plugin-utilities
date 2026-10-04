@@ -48,6 +48,11 @@
       "types": "./src/lib/scale.ts",
       "import": "./src/lib/scale.ts",
       "default": "./src/lib/scale.ts"
+    },
+    "./lib/format": {
+      "types": "./src/lib/format.ts",
+      "import": "./src/lib/format.ts",
+      "default": "./src/lib/format.ts"
     }
   },
   "files": [
