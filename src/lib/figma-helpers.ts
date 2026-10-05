@@ -18,22 +18,43 @@ export function sendToUI<T extends Record<string, unknown>>(
   }
 }
 
+// Long enough to read: about 60ms a character, and never under `minimum`.
+const readingTime = (message: string, minimum: number) =>
+  Math.max(minimum, message.length * 60);
+
 /**
- * Show an error notification to the user
- * @param message - Error message to display
- * @param timeout - How long to show the notification (ms)
+ * Show an error notification: something failed, or the file needs fixing
+ * @param message - What went wrong, then what to do
+ * @param timeout - How long to show it (ms); by default long enough to read,
+ *   5s at least
  */
-export function showError(message: string, timeout = 5000): void {
-  figma.notify(message, { error: true, timeout });
+export function showError(message: string, timeout?: number): void {
+  figma.notify(message, {
+    error: true,
+    timeout: timeout ?? readingTime(message, 5000),
+  });
 }
 
 /**
- * Show a success notification to the user
- * @param message - Success message to display
- * @param timeout - How long to show the notification (ms)
+ * Show a success notification: the change is made. End a change to the file
+ * with `UNDO` from `lib/format`.
+ * @param message - What changed, with a count
+ * @param timeout - How long to show it (ms); by default long enough to read,
+ *   3s at least
  */
-export function showSuccess(message: string, timeout = 3000): void {
-  figma.notify(message, { timeout });
+export function showSuccess(message: string, timeout?: number): void {
+  figma.notify(message, { timeout: timeout ?? readingTime(message, 3000) });
+}
+
+/**
+ * Show a regular notification for a run with nothing to do: an empty
+ * selection, nothing to change. Not an error; say what to select or set.
+ * @param message - Why nothing happened, then what to do
+ * @param timeout - How long to show it (ms); by default long enough to read,
+ *   4s at least
+ */
+export function showNotice(message: string, timeout?: number): void {
+  figma.notify(message, { timeout: timeout ?? readingTime(message, 4000) });
 }
 
 /**

@@ -17,6 +17,8 @@
 - **figma-helpers** — `fontsOf`, `loadFontOnce`, `loadNodeFonts` and `setText` write text in the layer's own fonts, loading each font once per run; `createSettingsStore` keeps settings in clientStorage, cleaned by one `sanitize` on load and on save
 - `isValidHex` — six HEX digits in either case, the "#" required unless `requireHash` is false
 - `plural` and `joinList` — "3 layers", "a, b and c"; from the root, or `lib/format` in code.ts
+- **figma-helpers** — `showNotice`, a regular notification for a run with nothing to do, where `showError` is for failures
+- `UNDO` — "Press Ctrl/Cmd+Z to undo.", the last sentence of a success notification for a change to the file
 
 ### Changed
 - **ListItem** — an `actions` slot puts buttons inside the item, after its text and outside its clickable area, in the Figma component too (**Actions slot**)
@@ -25,6 +27,7 @@
 - `rgbToHex` takes `lowercase`, `hash` and `alpha` options and clamps channels to 0–1
 - The color utilities are TypeScript, with their own `lib/colors` entry for code.ts
 - `loadFont` loads each font once per run
+- `showError` and `showSuccess` stay up long enough to read by default, about 60ms a character, and at least 5s and 3s
 
 ### Removed
 - `getCollections`, `getVariables` and `getSelection` — call the Figma API directly

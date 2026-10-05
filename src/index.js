@@ -34,6 +34,7 @@ export {
   meetsContrastLevel,
   // Copy
   plural,
+  UNDO,
   joinList,
   // Validation
   validateUrl,

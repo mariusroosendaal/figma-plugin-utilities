@@ -12,7 +12,7 @@ export {
 } from "./colors.ts";
 
 // Copy helpers
-export { plural, joinList } from "./format.ts";
+export { plural, joinList, UNDO } from "./format.ts";
 
 // Validation utilities
 export {
