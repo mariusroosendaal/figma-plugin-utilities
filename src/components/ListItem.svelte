@@ -19,6 +19,7 @@
    *   on:menuSelect={handleMenuAction}
    * >
    *   <span>Additional info</span>
+   *   <Button slot="actions" variant="secondary" on:click={fill}>Fill</Button>
    * </ListItem>
    */
 
@@ -70,33 +71,41 @@
 </script>
 
 <div class="list-item-wrapper {className}">
-  <div
-    class="list-item"
-    class:active
-    on:click={handleClick}
-    on:keydown={(e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        handleClick();
-      }
-    }}
-    role="button"
-    tabindex="0"
-    aria-pressed={active}
-  >
-    <div class="list-item__content">
-      <div class="list-item__title">{title}</div>
-      {#if $$slots.default}
-        <div class="list-item__meta">
-          <slot />
-        </div>
-      {/if}
-      {#if hasBadge && $$slots.badge}
-        <div class="list-item__badge">
-          <slot name="badge" />
-        </div>
-      {/if}
+  <!-- The actions sit in the card beside the clickable area, not inside it:
+       a button can't be nested in another button -->
+  <div class="list-item" class:active>
+    <div
+      class="list-item__main"
+      on:click={handleClick}
+      on:keydown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+      role="button"
+      tabindex="0"
+      aria-pressed={active}
+    >
+      <div class="list-item__content">
+        <div class="list-item__title">{title}</div>
+        {#if $$slots.default}
+          <div class="list-item__meta">
+            <slot />
+          </div>
+        {/if}
+        {#if hasBadge && $$slots.badge}
+          <div class="list-item__badge">
+            <slot name="badge" />
+          </div>
+        {/if}
+      </div>
     </div>
+    {#if $$slots.actions}
+      <div class="list-item__actions">
+        <slot name="actions" />
+      </div>
+    {/if}
   </div>
 
   {#if menuItems.length > 0}
@@ -128,11 +137,9 @@
     flex: 1;
     display: flex;
     align-items: center;
-    padding: var(--size-xxsmall);
     background: var(--figma-color-bg-secondary);
     border: 1px solid transparent;
     border-radius: var(--border-radius-medium);
-    cursor: pointer;
     transition: border-color 0.15s ease;
     min-width: 0;
   }
@@ -144,6 +151,24 @@
   .list-item.active {
     border-color: var(--figma-color-border-brand-strong);
     background: var(--figma-color-bg-brand-tertiary);
+  }
+
+  .list-item__main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: var(--size-xxsmall);
+    border-radius: inherit;
+    cursor: pointer;
+    min-width: 0;
+  }
+
+  /* The main area's own padding spaces them from the text */
+  .list-item__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--size-xxxsmall);
+    padding-right: var(--size-xxsmall);
   }
 
   .list-item__content {

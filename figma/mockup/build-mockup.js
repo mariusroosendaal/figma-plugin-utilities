@@ -834,9 +834,7 @@ const BUILDERS = {
       add(row)
     } else if (p.footerLabel) {
       add(await instance('MenuDivider'))
-      const button = await instance('Button', { '👥 Variant': 'Secondary', '👥 Size': 'Wide', '🎛️ Disabled': 'False', '🎛️ Icon Lead': 'False', '🐣 State': 'Default' })
-      setProp(button, '🎛️ Label', p.footerLabel)
-      add(button)
+      add(await BUILDERS.Button({ variant: 'secondary', size: 'wide' }, { children: p.footerLabel }))
     }
     return node
   },
@@ -935,14 +933,18 @@ const BUILDERS = {
     setProp(node, '🎛️ Message', p.message ?? '')
     return node
   },
-  async ListItem(p, spec) {
+  async ListItem(p, spec, parent, ctx) {
     const meta = typeof spec.children === 'string' ? spec.children : p.meta
+    const actions = spec.slots?.actions
     const node = await instance('ListItem', { '🐣 Active': tf(p.active) })
     setProp(node, '🎛️ Title', p.title ?? '')
     setProp(node, '👁️ Meta', !!meta)
     if (meta) setProp(node, '🎛️ Meta', meta)
     setProp(node, '👁️ Menu', !!(p.menuItems && p.menuItems.length))
     setProp(node, '👁️ Badge', !!p.hasBadge)
+    setProp(node, '👁️ Actions slot', !!actions)
+    // fillSlot leaves the slot alone when actions is undefined
+    await fillSlot(node, 'Actions slot', actions, ctx)
     return node
   },
   // UI3's Sidebar row comment. Its lead and icons are fixed layers, not

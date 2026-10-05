@@ -18,6 +18,7 @@
 - `plural` and `joinList` — "3 layers", "a, b and c"; from the root, or `lib/format` in code.ts
 
 ### Changed
+- **ListItem** — an `actions` slot puts buttons inside the item, after its text and outside its clickable area, in the Figma component too (**Actions slot**)
 - **Header** — `level` sets the title's heading level (1 by default). The left padding is 8px when the left slot has content and 16px before a title alone, in the Figma component too
 - **Footer** — a kit `Text` at the edge of a split footer sits 16px in, where buttons sit 8px in
 - `rgbToHex` takes `lowercase`, `hash` and `alpha` options and clamps channels to 0–1

@@ -82,7 +82,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `EmptyState` | `message`, `size`, `icon`, `actions: [{ label }]` | |
 | `LoadingState` | `message` | |
 | `StatusBar` | `message`, `type` | |
-| `ListItem` | `title`, `active`, `menuItems`, `hasBadge`; meta text as `children` | |
+| `ListItem` | `title`, `active`, `menuItems`, `hasBadge`; meta text as `children` | `actions` (buttons inside the item, after its text) |
 | `SidebarRow` | `meta`, `title`, `detail`, `message` (or `children`), `link`, `unread`, `selected`, `hover` (the Hover state, which shows the actions); `lines` isn't drawn | `lead` (Avatars by `name` and `color`, `disabled` for UI3's grey read ones, or `{ icon, color }`: two with a `link`, one without), `actions` (IconButtons or `{ icon }`, up to two) |
 | `CheckboxCard` | `checked`, `disabled`, `secondary`; label as `children` | |
 | `Section` | `title` | `children` (the fields), `actions` (icon buttons) |

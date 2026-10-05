@@ -26,13 +26,28 @@ if (instance.getBoolean('👁️ Badge')) {
   if (badge && badge.type === 'INSTANCE') badgeCode = render(badge)
 }
 
+// The Actions slot's buttons. No `path`: it finds nothing once this template
+// runs nested, so the item's own Menu and Badge are left out by name.
+let actionsCode
+if (instance.getBoolean('👁️ Actions slot')) {
+  instance
+    .findConnectedInstances((node) => node.name !== 'Menu' && node.name !== 'Badge')
+    .forEach((child) => {
+      const example = render(child)
+      actionsCode = actionsCode ? figma.code`${actionsCode}\n    ${example}` : example
+    })
+}
+
 const attrs = figma.code` id="${id}" title="${title}"${active ? ' active' : ''}${showMenu ? ' menuItems={menuItems}' : ''}${badgeCode ? ' hasBadge' : ''}`
 const children = figma.code`${meta ? figma.code`
   ${meta}` : ''}${badgeCode ? figma.code`
-  <svelte:fragment slot="badge">${badgeCode}</svelte:fragment>` : ''}`
+  <svelte:fragment slot="badge">${badgeCode}</svelte:fragment>` : ''}${actionsCode ? figma.code`
+  <svelte:fragment slot="actions">
+    ${actionsCode}
+  </svelte:fragment>` : ''}`
 
 export default {
-  example: meta || badgeCode ? figma.code`<ListItem${attrs}>${children}
+  example: meta || badgeCode || actionsCode ? figma.code`<ListItem${attrs}>${children}
 </ListItem>` : figma.code`<ListItem${attrs} />`,
   imports,
   id: 'list-item',
