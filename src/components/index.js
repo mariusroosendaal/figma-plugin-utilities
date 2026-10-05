@@ -16,3 +16,4 @@ export { default as LadderBadges } from "./LadderBadges.svelte";
 export { default as SteppedField } from "./SteppedField.svelte";
 export { default as RampCurve } from "./RampCurve.svelte";
 export { default as MappingChip } from "./MappingChip.svelte";
+export { default as ConfirmModal } from "./ConfirmModal.svelte";

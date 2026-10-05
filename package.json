@@ -53,6 +53,11 @@
       "types": "./src/lib/format.ts",
       "import": "./src/lib/format.ts",
       "default": "./src/lib/format.ts"
+    },
+    "./lib/confirm": {
+      "types": "./src/lib/confirm.ts",
+      "import": "./src/lib/confirm.ts",
+      "default": "./src/lib/confirm.ts"
     }
   },
   "files": [

@@ -17,6 +17,7 @@ export {
   SteppedField,
   RampCurve,
   MappingChip,
+  ConfirmModal,
 } from "./components/index.js";
 
 // Re-export all utilities
@@ -55,4 +56,9 @@ export {
   getContentHeight,
   resizeToFit,
   autoResize,
+  // Confirmation dialogs
+  confirmAction,
+  confirmDiscardChanges,
+  answerConfirm,
+  confirmRequest,
 } from "./lib/index.js";

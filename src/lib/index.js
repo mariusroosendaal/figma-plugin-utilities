@@ -43,3 +43,11 @@ export {
   resizeToFit,
   autoResize,
 } from "./resize.js";
+
+// Confirmation dialogs, shown by ConfirmModal
+export {
+  confirmAction,
+  confirmDiscardChanges,
+  answerConfirm,
+  confirmRequest,
+} from "./confirm.ts";
