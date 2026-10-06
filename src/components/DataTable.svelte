@@ -210,8 +210,8 @@
 
 <style>
   /* Run through the container's padding. Rows keep their own 8px inside,
-     so the name lines up with the container's content; the action ends at
-     its edge. */
+     so the name lines up with the container's content; the action ends 8px
+     from the edge, in line with a Header's icons. */
   .table {
     display: flex;
     flex-direction: column;
@@ -245,8 +245,7 @@
     column-gap: var(--size-xxxsmall);
     align-items: center;
     min-height: var(--size-medium);
-    padding-inline: max(0px, calc(var(--inset, 0px) - var(--size-xxsmall)))
-      var(--inset, 0px);
+    padding-inline: max(0px, calc(var(--inset, 0px) - var(--size-xxsmall)));
     border-bottom: 1px solid var(--figma-color-border);
   }
   .editor {
