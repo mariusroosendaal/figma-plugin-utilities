@@ -47,7 +47,7 @@ function applyPadding(
 
 export const specTokens = {
   accentColors: {
-    green: rgb(0.337, 0.757, 0.396), // #56C165 — AAA
+    green: rgb(0.251, 0.769, 0.349), // #40C459 — AAA
     blue: rgb(0.447, 0.682, 0.988), // #72AEFC — AA
     purple: rgb(0.753, 0.608, 0.965), // #C09BF6 — AA18
     red: rgb(0.98, 0.553, 0.569), // #FA8D91 — DNP
@@ -195,7 +195,7 @@ export function createTokenChip<K extends NodeKind = "frame">(opts: {
   applyAutoLayout(node, {
     name: "label",
     direction: "VERTICAL",
-    padding: { right: 4, left: 4 },
+    padding: { right: 6, left: 6 },
     fill: opts.background,
     cornerRadius: 2,
     height: 24,

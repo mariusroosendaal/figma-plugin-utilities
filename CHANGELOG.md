@@ -28,6 +28,7 @@
 - The color utilities are TypeScript, with their own `lib/colors` entry for code.ts
 - `loadFont` loads each font once per run
 - `showError` and `showSuccess` stay up long enough to read by default, about 60ms a character, and at least 5s and 3s
+- **figma-frame-builders** — `createTokenChip` pads its label 6px on each side, and `specTokens.accentColors.green` is #40C459, as in the Vitrine spec library
 
 ### Removed
 - `getCollections`, `getVariables` and `getSelection` — call the Figma API directly
