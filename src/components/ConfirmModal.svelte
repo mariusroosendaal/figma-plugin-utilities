@@ -34,6 +34,11 @@
 </Modal>
 
 <style>
+  /* The kit's footer is 40px tall; this one grows with stacked buttons. */
+  :global(.modal-footer:has(.confirm-footer)) {
+    height: auto;
+  }
+
   /* The footer's width, which the buttons are laid out by. */
   .confirm-footer {
     container-type: inline-size;
@@ -43,6 +48,7 @@
     display: flex;
     justify-content: flex-end;
     gap: var(--size-xxsmall);
+    width: 100%;
   }
 
   /* In a narrow window, such as a 240px plugin, the buttons don't fit side
@@ -50,6 +56,7 @@
   @container (max-width: 215px) {
     .confirm-actions {
       flex-direction: column-reverse;
+      align-items: stretch;
     }
 
     .confirm-actions > :global(*) {
