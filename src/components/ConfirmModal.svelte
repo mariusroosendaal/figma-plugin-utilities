@@ -16,15 +16,44 @@
 >
   <Text>{$confirmRequest?.message ?? ""}</Text>
 
-  <svelte:fragment slot="footer-right">
-    <Button variant="secondary" on:click={() => answerConfirm(false)}>
-      {$confirmRequest?.cancelLabel || "Cancel"}
-    </Button>
-    <Button
-      variant={$confirmRequest?.destructive ? "destructive" : "primary"}
-      on:click={() => answerConfirm(true)}
-    >
-      {$confirmRequest?.confirmLabel ?? ""}
-    </Button>
+  <svelte:fragment slot="footer-full">
+    <div class="confirm-footer">
+      <div class="confirm-actions">
+        <Button variant="secondary" on:click={() => answerConfirm(false)}>
+          {$confirmRequest?.cancelLabel || "Cancel"}
+        </Button>
+        <Button
+          variant={$confirmRequest?.destructive ? "destructive" : "primary"}
+          on:click={() => answerConfirm(true)}
+        >
+          {$confirmRequest?.confirmLabel ?? ""}
+        </Button>
+      </div>
+    </div>
   </svelte:fragment>
 </Modal>
+
+<style>
+  /* The footer's width, which the buttons are laid out by. */
+  .confirm-footer {
+    container-type: inline-size;
+  }
+
+  .confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--size-xxsmall);
+  }
+
+  /* In a narrow window, such as a 240px plugin, the buttons don't fit side
+     by side: they stack at full width, the confirming one on top. */
+  @container (max-width: 215px) {
+    .confirm-actions {
+      flex-direction: column-reverse;
+    }
+
+    .confirm-actions > :global(*) {
+      width: 100%;
+    }
+  }
+</style>

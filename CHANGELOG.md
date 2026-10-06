@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Added
-- **ConfirmModal** with `confirmAction`, from Data Mapper — a confirmation in a small modal in place of the browser's `confirm()`, resolving true or false — and `confirmDiscardChanges`, the "Discard changes?" prompt before unsaved edits go, for Modal's `beforeClose`
+- **ConfirmModal** with `confirmAction`, from Data Mapper — a confirmation in a small modal in place of the browser's `confirm()`, resolving true or false, its buttons stacked at full width in a window too narrow for them side by side — and `confirmDiscardChanges`, the "Discard changes?" prompt before unsaved edits go, for Modal's `beforeClose`
 - **MappingChip** — one side of a source → target row as a filled 24px chip: a button with a lead icon or chit, a truncating `label`, an optional `preview` and `count`. `tone` is `default`, `secondary` or `component`; `selected` draws the selection border
 - **FieldGrid** — fields side by side in `columns` equal columns (2 by default) that shrink below their content
 - **SteppedField** — a field with − and + icon buttons after it, named by `downLabel` and `upLabel`, firing `step` with -1 or 1
