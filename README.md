@@ -5,8 +5,10 @@ Shared Svelte components and utilities for Figma plugins.
 ## Installation
 
 ```bash
-npm install figma-plugin-utilities
+npm install figma-plugin-utilities figma-ui3-kit-svelte
 ```
+
+The components are built from `figma-ui3-kit-svelte`, a peer dependency: install it beside the utilities.
 
 ## Usage
 

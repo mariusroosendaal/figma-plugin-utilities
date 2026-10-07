@@ -84,6 +84,9 @@
   ],
   "author": "Marius Roosendaal",
   "license": "MIT",
+  "peerDependencies": {
+    "figma-ui3-kit-svelte": "^0.7.0"
+  },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@figma/code-connect": "^2.0.1",
