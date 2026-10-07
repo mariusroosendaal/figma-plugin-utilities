@@ -1065,7 +1065,10 @@ const BUILDERS = {
     return node
   },
   // Rows from `columns` and `rows` as DataTable takes them. slots.action fills
-  // every row's action; slots.editor opens under the selected row.
+  // every row's action; slots.editor opens under the selected row. `inset` is
+  // the code's inset in px: each row and the editor take inset - 8 a side, so
+  // the names line up with the container's content and the action ends 8px
+  // from its edge. Place the table at the container's edge.
   async DataTable(p, spec, parent, ctx) {
     const s = spec.slots || {}
     const node = await instance('DataTable')
@@ -1073,11 +1076,13 @@ const BUILDERS = {
     const cols = (p.columns || []).map((c) => (typeof c === 'string' ? { label: c } : c))
     const selectable = p.selectable !== false
     const max = p.maxBadges ?? 2
+    const side = p.inset > 8 ? p.inset - 8 : 0
     const addRow = async (type, name, cells, r = {}) => {
       const selected = selectable && !r.removed && r.key !== undefined && r.key === p.selectedKey
       const row = await instance('DataTableRow', { '👥 Type': type, '🐣 Selected': tf(selected) })
       slot.appendChild(row)
       stretch(row)
+      row.paddingLeft = row.paddingRight = side
       await setText(row, 'Name', name)
       setProp(row, '👁️ Action', selectable)
       const cellSlot = await fillSlot(row, 'Cells slot', [], ctx)
@@ -1087,7 +1092,7 @@ const BUILDERS = {
         const cell = await instance('DataTableCell', { '👥 Type': kind, '🐣 Active': tf(i === p.active) })
         cellSlot.appendChild(cell)
         // Tracks are rem, 2.75rem by default.
-        cell.resize(parseFloat((cols[i] && cols[i].width) || '2.75') * 16, cell.height)
+        cell.resize(parseFloat(cols[i]?.width || '2.75') * 16, cell.height)
         if (kind === 'Header' || kind === 'Text') setProp(cell, '🎛️ Value', String(c.text))
         else {
           const inner = cell.findOne((n) => n.type === 'INSTANCE')
@@ -1100,7 +1105,7 @@ const BUILDERS = {
       if (badges.length > max) shown.push({ c: 'Badge', props: { text: `+${badges.length - max}` } })
       await fillSlot(row, 'Badges slot', shown, ctx)
       if (type !== 'Header') await fillSlot(row, 'Action slot', s.action ?? [], ctx)
-      if (selected && s.editor) await build({ stack: 'v', padding: [8, 0, 8, 0], stroke: 'border', strokeSides: ['bottom'], name: 'Editor', children: s.editor }, slot, ctx)
+      if (selected && s.editor) await build({ stack: 'v', padding: [8, side, 8, side], stroke: 'border', strokeSides: ['bottom'], name: 'Editor', children: s.editor }, slot, ctx)
     }
     await addRow('Header', p.nameLabel ?? 'Name', cols.map((c) => c.label))
     for (const r of p.rows || []) await addRow(r.removed ? 'Removed' : 'Row', r.name, r.cells || [], r)

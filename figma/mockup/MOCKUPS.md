@@ -90,7 +90,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `SteppedField` | | `children` (the field) |
 | `LadderBadges` | `badges: [{ value, used }]` | |
 | `MappingChip` | `label`, `preview`, `count`, `iconName` or `chit`, `tone`, `selected`, `disabled` | |
-| `DataTable` | `columns` (labels, or `{ label, width }` in rem), `rows: [{ key, name, cells, removed?, badges? }]` (cells as DataTable takes them, or bare values), `nameLabel`, `selectable`, `selectedKey`, `active`, `maxBadges` | `action` (every row), `editor` (under the `selectedKey` row) |
+| `DataTable` | `columns` (labels, or `{ label, width }` in rem), `rows: [{ key, name, cells, removed?, badges? }]` (cells as DataTable takes them, or bare values), `nameLabel`, `selectable`, `selectedKey`, `active`, `maxBadges`, `inset` (px, as the code's `inset`; the table then sits at the container's edge) | `action` (every row), `editor` (under the `selectedKey` row) |
 | `RampCurve` | `breakpoints`, `selected`. The chart is the component's sample drawing; the ramp data isn't drawn | |
 | `CodeExportModal` | `title`, `value`, `copyLabel` | `controls` (above the code) |
 | `Text` | `variant` (`heading-*`, `body-*`, `-strong`), `color` (`--figma-color-text-secondary` / `-tertiary`); text as `children` | |
