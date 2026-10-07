@@ -18,6 +18,9 @@
   /** Optional icon (string name or component) */
   export let icon = null;
 
+  /** Icon size in px, for an icon given by name; the svg is scaled to it */
+  export let iconSize = 24;
+
   /** Single action for backward compatibility { label, handler } */
   export let action = null;
 
@@ -49,7 +52,7 @@
   {#if icon}
     <div class="empty-state__icon" aria-hidden="true">
       {#if typeof icon === "string"}
-        <Icon iconName={icon} />
+        <Icon iconName={icon} size={iconSize} />
       {:else}
         <svelte:component this={icon} />
       {/if}
@@ -109,6 +112,12 @@
     font-weight: var(--body-large-font-weight);
     letter-spacing: var(--body-large-letter-spacing);
     line-height: var(--body-large-line-height);
+  }
+
+  /* Icon sizes its box, but the svg keeps the 24px it's drawn at. */
+  .empty-state__icon :global(.icon-component svg) {
+    width: 100%;
+    height: 100%;
   }
 
   .empty-state__actions {

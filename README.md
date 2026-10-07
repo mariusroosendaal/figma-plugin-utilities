@@ -80,7 +80,7 @@ import { sendToPlugin, createMessageHandler } from "figma-plugin-utilities/lib";
 | `Header` | Header bar with `left`, `center`, `right` slots and optional title |
 | `Footer` | Footer with `right`, `split`, and `full` layout variants |
 | `StatusBar` | Toast notifications with auto-dismiss (info/success/error/warning) |
-| `EmptyState` | Empty/error states with optional icon and action buttons; `size`, `centered`, and `role="alert"` for failures |
+| `EmptyState` | Empty/error states with optional icon and action buttons; `size`, `iconSize`, `centered`, and `role="alert"` for failures |
 | `ListItem` | Selectable list items with metadata and `badge` slots, an action menu (`menuOpen`, `menuToggle`, `menuClose`) |
 | `LoadingState` | Centred message as `role="status"` (text only, no spinner) |
 | `FieldGroup` | Label + input wrapper; `labelFor` binds the label to a text control |

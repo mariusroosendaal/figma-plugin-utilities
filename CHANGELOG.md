@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- **EmptyState** — `iconSize`, the icon's size in px (24 by default), for an icon given by name
+
 ## [0.5.1] - 2026-10-07
 
 ### Changed
