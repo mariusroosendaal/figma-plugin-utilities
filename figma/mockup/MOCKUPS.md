@@ -8,7 +8,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 - **Where to build**
   - **UI3 file** (`6dJFbL7SDC7kkS1fu3AHH6`), page **Mockups** (`1027190:25`). This is the default and needs no setup.
   - **Any other design file**, with access to the UI3 library. Components, styles and variables are imported by key. Icons need `options.icons` (see below).
-- The builder is the `build-mockup.js` source at the end of this skill, minified. It is about 41 KB, and `use_figma` accepts 50,000 characters in all, so keep the spec under about 6 KB: build repeated parts with small helper functions rather than writing them out, and split a large screen into several windows.
+- The builder is the `build-mockup.js` source at the end of this skill, minified. It is about 44 KB, and `use_figma` accepts 50,000 characters in all, so keep the spec under about 6 KB: build repeated parts with small helper functions rather than writing them out, and split a large screen into several windows.
 
 ## Workflow
 
@@ -20,7 +20,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
    | `<Button variant="secondary">Cancel</Button>` | `{ c: 'Button', props: { variant: 'secondary' }, children: 'Cancel' }` |
    | `<svelte:fragment slot="left">…` | `slots: { left: [ … ] }` |
    | Default slot content | `children: [ … ]` |
-   | `<div>` with flex/column layout | `{ stack: 'v' \| 'h', gap, padding, align, justify, wrap, fill, stroke, strokeSides, radius, width, height, grow, fillHeight, children }` |
+   | `<div>` with flex/column layout | `{ stack: 'v' \| 'h', gap, padding, align, justify, wrap, fill, stroke, strokeSides (`['top']` or `['bottom']`), radius, width, height, grow, fillHeight, children }` |
    | CSS grid with N columns | `{ grid: N, gap, children }` |
    | `<Text>` | `{ c: 'Text', props: { variant, color }, children: '…' }`. This is a connected component, so it round-trips. |
    | Plain text in custom markup | `{ text, variant: 'body-medium' \| 'body-small' \| 'body-large' (+ '-strong'), color: 'text' \| 'text-secondary' \| 'text-tertiary', width?, grow?, align?, truncate? }` |

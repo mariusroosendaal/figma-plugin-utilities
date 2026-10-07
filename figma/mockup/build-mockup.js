@@ -1177,14 +1177,10 @@ async function buildStack(spec, parent, ctx) {
   if (spec.justify) f.primaryAxisAlignItems = { start: 'MIN', center: 'CENTER', end: 'MAX', between: 'SPACE_BETWEEN' }[spec.justify] || 'MIN'
   if (spec.wrap) f.layoutWrap = 'WRAP'
   if (spec.radius) f.cornerRadius = spec.radius
-  if (spec.stroke) {
+  if (spec.stroke && !spec.strokeSides) {
     f.strokes = [await paint(spec.stroke)]
     f.strokeWeight = 1
     f.strokeAlign = 'INSIDE'
-    // e.g. strokeSides: ['bottom'] for a border-bottom
-    if (spec.strokeSides) {
-      for (const side of ['Top', 'Right', 'Bottom', 'Left']) f[`stroke${side}Weight`] = spec.strokeSides.includes(side.toLowerCase()) ? 1 : 0
-    }
   }
   parent.appendChild(f)
   if (spec.width) {
@@ -1197,6 +1193,18 @@ async function buildStack(spec, parent, ctx) {
     f.resize(f.width, spec.height)
   }
   for (const child of [].concat(spec.children || [])) await build(child, f, ctx)
+  // strokeSides: ['bottom'] or ['top'] for a one-sided border. SVG export drops
+  // strokes whose sides differ, so it's a 1px rectangle, as in the kit.
+  for (const side of spec.strokeSides || []) {
+    const top = side === 'top'
+    const r = await buildDivider(spec, f)
+    r.name = 'Border'
+    r.layoutPositioning = 'ABSOLUTE'
+    r.resize(f.width, 1)
+    r.x = 0
+    r.y = top ? 0 : f.height - 1
+    r.constraints = { horizontal: 'STRETCH', vertical: top ? 'MIN' : 'MAX' }
+  }
   return f
 }
 // CSS grids become rows of equal-width cells.
@@ -1225,7 +1233,7 @@ async function buildGrid(spec, parent, ctx) {
 async function buildDivider(spec, parent) {
   const r = figma.createRectangle()
   r.name = 'Divider'
-  r.fills = [await paint('border')]
+  r.fills = [await paint(spec.stroke || 'border')]
   parent.appendChild(r)
   r.resize(parent.width || 100, 1)
   if (isVertical(parent)) stretch(r)
