@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-07
+
+### Changed
+- Built against **figma-ui3-kit-svelte** 0.7.0, which `confirmDiscardChanges` needs for Modal's `beforeClose`, and **ConfirmModal** over another modal for Escape to close only the top one
+
 ## [0.5.0] - 2026-10-07
 
 ### Added
