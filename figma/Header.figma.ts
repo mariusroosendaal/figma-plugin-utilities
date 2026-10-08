@@ -27,8 +27,15 @@ const indented = (sections, indent) =>
 // React helper functions, so it's only the fallback for unconnected content.
 // `path` lists every frame between the instance and the slot; empty slots are
 // omitted since every Header slot is optional in code.
+// `path` finds nothing once this template runs nested in another (a Header in a
+// Modal); then each connected child's own slot says where it goes.
+const slotOf = (node) => (node.__containingSlotName__ || '').split('#')[0]
 function slot(path, indent) {
-  const children = instance.findConnectedInstances(() => true, { path })
+  let children = instance.findConnectedInstances(() => true, { path })
+  if (!children.length) {
+    const name = path[path.length - 1]
+    children = instance.findConnectedInstances((node) => slotOf(node) === name)
+  }
   if (!children.length) return ''
   let code
   children.forEach((child) => {

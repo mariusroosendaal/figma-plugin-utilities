@@ -25,8 +25,12 @@ const indented = (sections, indent) =>
 
 // Render a slot's connected children inline. getSlot() alone makes Dev Mode emit
 // React helper functions, so it's only the fallback for unconnected content.
+// `path` finds nothing once this template runs nested in another (a Footer in a
+// Modal); then each connected child's own slot says where it goes.
+const slotOf = (node) => (node.__containingSlotName__ || '').split('#')[0]
 function slot(name, indent) {
-  const children = instance.findConnectedInstances(() => true, { path: [name] })
+  let children = instance.findConnectedInstances(() => true, { path: [name] })
+  if (!children.length) children = instance.findConnectedInstances((node) => slotOf(node) === name)
   if (!children.length) return instance.getSlot(name)
   let code
   children.forEach((child) => {
