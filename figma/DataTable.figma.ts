@@ -13,6 +13,15 @@ const render = (handle) => {
   if (nested) nested.forEach((i) => imports.includes(i) || imports.push(i))
   return result.example
 }
+// A nested child's code can span lines; indent each, not only the first.
+const indented = (sections, indent) =>
+  sections.map((s) =>
+    s.type === 'CODE'
+      ? { ...s, code: s.code.replace(/\n/g, `\n${indent}`) }
+      : s.type === 'INSTANCE' && s.resultSections
+        ? { ...s, resultSections: indented(s.resultSections, indent) }
+        : s,
+  )
 
 // DataTable is data-driven: the header row gives the columns, each other row
 // one entry in rows. Anything else in the Rows slot is the open row's editor.
@@ -35,7 +44,7 @@ const activeIndex = header ? header.activeIndex : -1
 
 let editor
 others.forEach((item) => {
-  const example = render(item)
+  const example = indented(render(item), '    ')
   editor = editor ? figma.code`${editor}\n    ${example}` : example
 })
 

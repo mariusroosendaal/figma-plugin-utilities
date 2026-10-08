@@ -13,6 +13,15 @@ const render = (handle) => {
   if (nested) nested.forEach((i) => imports.includes(i) || imports.push(i))
   return result.example
 }
+// A nested child's code can span lines; indent each, not only the first.
+const indented = (sections, indent) =>
+  sections.map((s) =>
+    s.type === 'CODE'
+      ? { ...s, code: s.code.replace(/\n/g, `\n${indent}`) }
+      : s.type === 'INSTANCE' && s.resultSections
+        ? { ...s, resultSections: indented(s.resultSections, indent) }
+        : s,
+  )
 
 const title = instance.getString('🎛️ Title')
 const active = instance.getEnum('🐣 Active', { 'False': false, 'True': true })
@@ -33,7 +42,7 @@ if (instance.getBoolean('👁️ Actions slot')) {
   instance
     .findConnectedInstances((node) => node.name !== 'Menu' && node.name !== 'Badge')
     .forEach((child) => {
-      const example = render(child)
+      const example = indented(render(child), '    ')
       actionsCode = actionsCode ? figma.code`${actionsCode}\n    ${example}` : example
     })
 }

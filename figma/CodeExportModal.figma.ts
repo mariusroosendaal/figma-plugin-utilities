@@ -13,6 +13,15 @@ const render = (handle) => {
   if (nested) nested.forEach((i) => imports.includes(i) || imports.push(i))
   return result.example
 }
+// A nested child's code can span lines; indent each, not only the first.
+const indented = (sections, indent) =>
+  sections.map((s) =>
+    s.type === 'CODE'
+      ? { ...s, code: s.code.replace(/\n/g, `\n${indent}`) }
+      : s.type === 'INSTANCE' && s.resultSections
+        ? { ...s, resultSections: indented(s.resultSections, indent) }
+        : s,
+  )
 
 // Everything is read off the exposed kit Modal: its title and width, the code
 // in its Textarea, the copy button's label, and any controls above the code.
@@ -30,7 +39,7 @@ if (modal && modal.type === 'INSTANCE') {
   modal
     .findConnectedInstances((node) => !['Textarea', 'Button', 'Close', 'Icon 2'].includes(node.name))
     .forEach((child) => {
-      const example = render(child)
+      const example = indented(render(child), '    ')
       controls = controls ? figma.code`${controls}\n    ${example}` : example
     })
 }
