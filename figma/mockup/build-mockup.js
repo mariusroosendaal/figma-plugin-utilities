@@ -910,6 +910,8 @@ const BUILDERS = {
     const node = await instance('FieldGroup', { '👥 Size': p.size === 'small' ? 'Small' : 'Default' })
     setProp(node, '🎛️ Label', p.label ?? '')
     setProp(node, '👁️ Label', !!p.label)
+    setProp(node, '🎛️ Hint', p.hint ?? '')
+    setProp(node, '👁️ Hint', !!p.hint)
     await fillSlot(node, 'Control slot', spec.children ?? [], ctx)
     return node
   },

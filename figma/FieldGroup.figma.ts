@@ -29,10 +29,11 @@ function slot(name, indent) {
 
 const size = instance.getEnum('👥 Size', { 'Default': 'default', 'Small': 'small' })
 const label = instance.getBoolean('👁️ Label') ? instance.getString('🎛️ Label') : ''
+const hint = instance.getBoolean('👁️ Hint') ? instance.getString('🎛️ Hint') : ''
 const control = slot('Control slot', '  ')
 
 export default {
-  example: figma.code`<FieldGroup${label ? figma.code` label="${label}"` : ''}${size === 'small' ? ' size="small"' : ''}>
+  example: figma.code`<FieldGroup${label ? figma.code` label="${label}"` : ''}${size === 'small' ? ' size="small"' : ''}${hint ? figma.code` hint="${hint}"` : ''}>
   ${control}
 </FieldGroup>`,
   imports,
