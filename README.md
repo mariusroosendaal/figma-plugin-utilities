@@ -83,7 +83,7 @@ import { sendToPlugin, createMessageHandler } from "figma-plugin-utilities/lib";
 | `EmptyState` | Empty/error states with optional icon and action buttons; `size`, `iconSize`, `centered`, and `role="alert"` for failures |
 | `ListItem` | Selectable list items with metadata and `badge` slots, an action menu (`menuOpen`, `menuToggle`, `menuClose`) |
 | `LoadingState` | Centred message as `role="status"` (text only, no spinner) |
-| `FieldGroup` | Label + input wrapper; `labelFor` binds the label to a text control |
+| `FieldGroup` | Label + input wrapper; `labelFor` binds the label to a text control, `hint` adds a line under it |
 | `CheckboxCard` | Large checkbox with card styling and better touch targets; `change` event |
 | `Section` | Titled group of fields as in Figma's panels: a `Header` with the title and an `actions` slot, content padded by the section itself |
 | `DataTable` | Named rows with a cell per column (a set at each breakpoint, a style before and after): columns with their own width and alignment, a read-only mode with table roles, row selection with an `editor` slot, notes as badges, with tooltips, and a `+N` count past two, an `action` slot, values as badges or variable chips, removed rows and a marked column |
