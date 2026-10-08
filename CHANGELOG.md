@@ -4,7 +4,7 @@
 
 ### Added
 - **EmptyState** — `iconSize`, the icon's size in px (24 by default), for an icon given by name
-- **FieldGroup** — `hint`, a line of small secondary text under the control: what to enter, or what the choice does. Empty shows none, so a conditional hint is a string; the `hint` slot takes markup and always shows
+- **FieldGroup** — `hint`, a line of small secondary text under the control: what to enter, or what the choice does. Empty shows none, so a conditional hint is a string; the `hint` slot takes markup and always shows. Like the label, it can't be selected
 
 ### Fixed
 - **FieldGroup** — `labelFor` ties the label to its control, so clicking the label focuses an `Input` or `Textarea`. It was passed to Label as `for`, which Label doesn't take, so no label was tied to anything

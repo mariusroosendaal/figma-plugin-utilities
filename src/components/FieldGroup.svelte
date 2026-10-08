@@ -24,7 +24,12 @@
   {/if}
   <slot />
   {#if $$slots.hint || hint}
-    <Text variant="body-small" color="--figma-color-text-secondary" block>
+    <Text
+      class="field-group__hint"
+      variant="body-small"
+      color="--figma-color-text-secondary"
+      block
+    >
       <slot name="hint">{hint}</slot>
     </Text>
   {/if}
@@ -39,5 +44,11 @@
 
   .field-group.small {
     gap: var(--size-xxxsmall);
+  }
+
+  /* Like the label, the hint is interface text, not content to copy */
+  .field-group :global(.field-group__hint) {
+    cursor: default;
+    user-select: none;
   }
 </style>
