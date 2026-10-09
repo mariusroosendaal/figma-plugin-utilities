@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Added
+- `figma-plugin-utilities/vite` — `figmaPluginConfig(import.meta.url)`, a plugin's whole Vite config: each thread built on its own (`vite build && vite build --mode code`), so both may import the same module, the UI's CSS and JS inlined into `dist/index.html`, `src/manifest.json` copied, at `es2017`. `moduleScript` inlines the UI as a module script. `ui3InlineSvg` and `inlineFigmaHtml` are exported too. `vite` and `@sveltejs/vite-plugin-svelte` are optional peer dependencies
 - **EmptyState** — `iconSize`, the icon's size in px (24 by default), for an icon given as SVG markup
 - **FieldGroup** — `hint`, a line of secondary text under the control: what to enter, or what the choice does. Empty shows none, so a conditional hint is a string; the `hint` slot takes markup and always shows. Like the label, it can't be selected. The hint and the control's error take the label's size: body-medium, or body-small in a small group. The Figma component has the hint too, which Code Connect and the mockup builder read
 

@@ -58,6 +58,11 @@
       "types": "./src/lib/confirm.ts",
       "import": "./src/lib/confirm.ts",
       "default": "./src/lib/confirm.ts"
+    },
+    "./vite": {
+      "types": "./src/vite.d.ts",
+      "import": "./src/vite.js",
+      "default": "./src/vite.js"
     }
   },
   "files": [
@@ -85,7 +90,17 @@
   "author": "Marius Roosendaal",
   "license": "MIT",
   "peerDependencies": {
-    "figma-ui3-kit-svelte": "^0.7.0"
+    "figma-ui3-kit-svelte": "^0.7.0",
+    "@sveltejs/vite-plugin-svelte": "^3.0.2",
+    "vite": "^5.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@sveltejs/vite-plugin-svelte": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
