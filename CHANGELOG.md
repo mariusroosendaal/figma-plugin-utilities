@@ -14,6 +14,8 @@
 - `sendToUI`, `sendToPlugin` — a `type` field in the data no longer replaces the message's type
 - `formatErrorMessage` — the network, CORS and JSON messages follow the copy guidelines: no "Please" or "Network error:" prefix
 - **FieldGroup** — `labelFor` ties the label to its control, so clicking the label focuses an `Input` or `Textarea`. It was passed to Label as `for`, which Label doesn't take, so no label was tied to anything
+- **EmptyState** — `icon`, `action` and `actions` have types, so a plugin's `svelte-check` with `checkJs` passes
+- `autoResize` — the options default to `{ container: null }`, which matches their type; without a container it still warns and does nothing
 
 ## [0.5.1] - 2026-10-07
 

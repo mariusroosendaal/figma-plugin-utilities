@@ -15,16 +15,31 @@
   /** Message to display */
   export let message = "";
 
-  /** Optional icon: SVG markup, such as an icon from figma-ui3-kit-svelte/icons, or a component */
+  /**
+   * Optional icon: SVG markup, such as an icon from figma-ui3-kit-svelte/icons, or a component
+   * @type {string | import("svelte").ComponentType | null}
+   */
   export let icon = null;
 
   /** Icon size in px, for an icon given as SVG markup; the svg is scaled to it */
   export let iconSize = 24;
 
-  /** Single action for backward compatibility { label, handler } */
+  /**
+   * @typedef {object} EmptyStateAction
+   * @property {string} label
+   * @property {() => void} handler
+   */
+
+  /**
+   * Single action for backward compatibility { label, handler }
+   * @type {EmptyStateAction | null}
+   */
   export let action = null;
 
-  /** Multiple actions [{ label, handler }] */
+  /**
+   * Multiple actions [{ label, handler }]
+   * @type {EmptyStateAction[] | null}
+   */
   export let actions = null;
 
   /** Size variant: 'small', 'medium', 'large' */

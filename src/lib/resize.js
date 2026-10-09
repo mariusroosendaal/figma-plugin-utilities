@@ -85,7 +85,7 @@ export function resizeToFit(options = {}) {
  * Use bind:this on a wrapper element that flows naturally with content.
  *
  * @param {object} options - Auto-resize options
- * @param {HTMLElement} options.container - Container element to observe (required, must not have fixed height)
+ * @param {HTMLElement | null} options.container - Container element to observe (required, must not have fixed height)
  * @param {number} [options.width] - Width in pixels (uses default if not specified)
  * @param {number} [options.minHeight=100] - Minimum height in pixels
  * @param {number} [options.maxHeight=800] - Maximum height in pixels
@@ -94,7 +94,7 @@ export function resizeToFit(options = {}) {
  * @param {number} [options.threshold=20] - Minimum height change to trigger resize (prevents position reset)
  * @returns {function} Cleanup function to stop observing
  */
-export function autoResize(options = {}) {
+export function autoResize(options = { container: null }) {
   const {
     container,
     width = defaultWidth,
