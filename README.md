@@ -82,7 +82,7 @@ import { sendToPlugin, createMessageHandler } from "figma-plugin-utilities/lib";
 | `StatusBar` | Toast notifications with auto-dismiss (info/success/error/warning) |
 | `EmptyState` | Empty/error states with optional icon and action buttons; `size`, `iconSize`, `centered`, and `role="alert"` for failures |
 | `ListItem` | Selectable list items with metadata and `badge` slots, an action menu (`menuOpen`, `menuToggle`, `menuClose`) |
-| `LoadingState` | Centred message as `role="status"` (text only, no spinner) |
+| `LoadingState` | Centered message as `role="status"` (text only, no spinner) |
 | `FieldGroup` | Label + input wrapper; `labelFor` binds the label to a text control, `hint` adds a line under it |
 | `CheckboxCard` | Large checkbox with card styling and better touch targets; `change` event |
 | `Section` | Titled group of fields as in Figma's panels: a `Header` with the title and an `actions` slot, content padded by the section itself |
@@ -379,8 +379,8 @@ const parsed = parseJsonSafe(jsonString);
 Utilities for dynamically resizing the plugin window to fit its content.
 
 ```javascript
-// One-time resize to fit content
-resizeToFit({ width: 300, minHeight: 100, maxHeight: 600 });
+// One-time resize to fit content: measure a naturally-flowing wrapper, not document.body
+resizeToFit({ container: myContainerEl, width: 300, minHeight: 100, maxHeight: 600 });
 
 // Watch for content changes and auto-resize
 const cleanup = autoResize({

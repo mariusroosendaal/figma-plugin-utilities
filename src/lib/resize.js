@@ -3,8 +3,8 @@
  *
  * Usage in UI:
  *   import { resizeToFit, autoResize } from "figma-plugin-utilities";
- *   resizeToFit(); // One-time resize
- *   autoResize();  // Watch for changes and auto-resize
+ *   resizeToFit({ container }); // One-time resize to a content wrapper
+ *   autoResize({ container });  // Watch for changes and auto-resize
  *
  * Usage in code.ts:
  *   import { handleResize } from "figma-plugin-utilities/lib/figma-helpers";
@@ -46,7 +46,10 @@ export function getContentHeight(container) {
  * @param {number} [options.minHeight=100] - Minimum height in pixels
  * @param {number} [options.maxHeight=800] - Maximum height in pixels
  * @param {number} [options.padding=0] - Extra padding to add to calculated height
- * @param {HTMLElement} [options.container] - Container element to measure
+ * @param {HTMLElement} [options.container] - Container element to measure,
+ *   required without `height`. Not `document.body`: the kit sets
+ *   `html, body, #app { height: 100% }`, so the body measures the window,
+ *   which then can grow but never shrink.
  */
 export function resizeToFit(options = {}) {
   const {
@@ -55,12 +58,16 @@ export function resizeToFit(options = {}) {
     minHeight = 100,
     maxHeight = 800,
     padding = 0,
-    container = document.body,
+    container,
   } = options;
 
   let finalHeight = height;
 
   if (finalHeight === undefined) {
+    if (!container) {
+      console.warn("resizeToFit: pass a height, or a container to measure");
+      return;
+    }
     finalHeight = getContentHeight(container) + padding;
   }
 

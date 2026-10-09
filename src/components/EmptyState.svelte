@@ -7,7 +7,7 @@
    * @example
    * <EmptyState
    *   message="No items found"
-   *   icon="search"
+   *   icon={IconSearch}
    *   actions={[{ label: "Add Item", handler: handleAdd }]}
    * />
    */
@@ -15,10 +15,10 @@
   /** Message to display */
   export let message = "";
 
-  /** Optional icon (string name or component) */
+  /** Optional icon: SVG markup, such as an icon from figma-ui3-kit-svelte/icons, or a component */
   export let icon = null;
 
-  /** Icon size in px, for an icon given by name; the svg is scaled to it */
+  /** Icon size in px, for an icon given as SVG markup; the svg is scaled to it */
   export let iconSize = 24;
 
   /** Single action for backward compatibility { label, handler } */

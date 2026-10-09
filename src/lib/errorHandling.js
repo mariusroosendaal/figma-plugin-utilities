@@ -44,12 +44,13 @@ export function formatErrorMessage(error, context) {
   // Common error patterns to make more user-friendly
   if (message.includes("Failed to fetch") || message.includes("NetworkError")) {
     userMessage =
-      "Network error: Could not connect to the server. Please check your internet connection and try again.";
+      "Couldn't connect to the server. Check your internet connection and try again.";
   } else if (message.includes("CORS")) {
     userMessage =
-      "CORS error: The resource host does not allow plugin access. Try resources from allowed domains.";
+      "The resource host doesn't allow plugin access. Try resources from allowed domains.";
   } else if (message.includes("JSON")) {
-    userMessage = "Invalid JSON format. Please check your data and try again.";
+    userMessage =
+      "Couldn't read the data as JSON. Check its format and try again.";
   } else if (message.includes("not found")) {
     userMessage = message
       .replace(/not found/gi, "not found")

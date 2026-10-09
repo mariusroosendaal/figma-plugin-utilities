@@ -550,7 +550,7 @@ const BUILDERS = {
     return node
   },
   // A Kit addition: UI3 toggles only icons, so the labelled one is our own set.
-  // Its badge is a Badge small alt, filled grey at rest and on the on-selected
+  // Its badge is a Badge small alt, filled gray at rest and on the on-selected
   // fill while on — the On variants carry that override already.
   async ToggleButton(p, spec) {
     const node = await instance('ToggleButton', {
@@ -665,7 +665,7 @@ const BUILDERS = {
     })
     // Badge counts are set once the badges show. _Tab reaches for Count New on
     // the selected tab; the kit reserves it for `unread` and gives the selected
-    // tab the filled grey Default instead.
+    // tab the filled gray Default instead.
     for (let i = 0; i < items.length; i++) {
       const badge = tabs[i] && tabs[i].badge
       if (badge === undefined || badge === null || badge === '') continue
@@ -982,7 +982,7 @@ const BUILDERS = {
       if (!slot) {
         // Without a link the row has one avatar.
       } else if (item?.c === 'Avatar') {
-        // UI3 greys out a read comment's avatars: `disabled`.
+        // UI3 grays out a read comment's avatars: `disabled`.
         const a = item.props || {}
         slot.setProperties({ '👥 Variant': a.disabled ? 'Grey' : pick(AVATAR_COLORS, a.color, 'Purple'), '🐣 State': stateOf(a) })
         await setText(slot, null, (a.name || '').charAt(0).toUpperCase())

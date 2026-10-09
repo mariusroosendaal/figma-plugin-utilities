@@ -12,7 +12,7 @@ export function sendToUI<T extends Record<string, unknown>>(
   data?: T,
 ): void {
   if (data) {
-    figma.ui.postMessage({ type, ...data });
+    figma.ui.postMessage({ ...data, type });
   } else {
     figma.ui.postMessage({ type });
   }

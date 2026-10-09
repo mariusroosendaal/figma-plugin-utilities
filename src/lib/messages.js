@@ -8,7 +8,7 @@
  * @param {object} data - Additional data to send
  */
 export function sendToPlugin(type, data = {}) {
-  parent.postMessage({ pluginMessage: { type, ...data } }, "*");
+  parent.postMessage({ pluginMessage: { ...data, type } }, "*");
 }
 
 /**

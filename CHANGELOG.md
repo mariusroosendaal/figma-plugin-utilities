@@ -3,10 +3,15 @@
 ## [Unreleased]
 
 ### Added
-- **EmptyState** — `iconSize`, the icon's size in px (24 by default), for an icon given by name
+- **EmptyState** — `iconSize`, the icon's size in px (24 by default), for an icon given as SVG markup
 - **FieldGroup** — `hint`, a line of secondary text under the control: what to enter, or what the choice does. Empty shows none, so a conditional hint is a string; the `hint` slot takes markup and always shows. Like the label, it can't be selected. The hint and the control's error take the label's size: body-medium, or body-small in a small group. The Figma component has the hint too, which Code Connect and the mockup builder read
 
+### Changed
+- `resizeToFit` — measures only the `container` you pass, and without one or a `height` warns and leaves the window as it is. It measured `document.body` by default, which fills the window, so the window could grow but never shrink
+
 ### Fixed
+- `sendToUI`, `sendToPlugin` — a `type` field in the data no longer replaces the message's type
+- `formatErrorMessage` — the network, CORS and JSON messages follow the copy guidelines: no "Please" or "Network error:" prefix
 - **FieldGroup** — `labelFor` ties the label to its control, so clicking the label focuses an `Input` or `Textarea`. It was passed to Label as `for`, which Label doesn't take, so no label was tied to anything
 
 ## [0.5.1] - 2026-10-07
@@ -68,7 +73,7 @@
 - The dev-mode `console.warn` **FieldGroup** logged when `label` was set without `labelFor` — a `Dropdown` is a button and cannot be a `<label for>` target, so it fired on correct code. Dropped in the a11y pass, recorded late
 
 ### Fixed
-- **StatusBar** — the default `info` type sets `color: var(--figma-color-text)`. The `error`, `success` and `warning` types each set a foreground; the default one relied on inheritance, and nothing up the tree sets `color`, so the message rendered in the UA's black on the dark theme's grey bar
+- **StatusBar** — the default `info` type sets `color: var(--figma-color-text)`. The `error`, `success` and `warning` types each set a foreground; the default one relied on inheritance, and nothing up the tree sets `color`, so the message rendered in the UA's black on the dark theme's gray bar
 - **EmptyState** — the actions are a keyed `{#each}`, so swapping one action for another reuses the right button rather than repainting the row
 - **docs** — `figma-frame-builders` is documented, `sanitizeInput` no longer claims to escape HTML (it stringifies, truncates, strips control characters and trims), and `formatErrorMessage`, `handleAsyncError`, `withErrorHandling` and `logError` are documented with their real signatures. `withErrorHandling(fn, operation)` calls `fn()` with no arguments and returns its result; it was documented as returning a wrapped function
 
