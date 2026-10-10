@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed
+- Needs Svelte 5: `svelte` is a peer dependency, `^5.0.0`, and the optional `@sveltejs/vite-plugin-svelte` peer is `^4.0.0`
+
 ## [0.6.0] - 2026-10-10
 
 ### Added
