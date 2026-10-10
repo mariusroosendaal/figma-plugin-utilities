@@ -63,9 +63,9 @@ export default {
     ? figma.code`<DataTable${attrs}
   ${rowsCode}
 >
-  <svelte:fragment slot="editor" let:row>
+  {#snippet editor(row)}
     ${editor}
-  </svelte:fragment>
+  {/snippet}
 </DataTable>`
     : figma.code`<DataTable${attrs}
   ${rowsCode}

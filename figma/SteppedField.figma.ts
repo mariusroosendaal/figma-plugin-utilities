@@ -51,7 +51,7 @@ if (group && group.type === 'INSTANCE') {
 const subject = label ? ` ${label}` : ''
 
 export default {
-  example: figma.code`<SteppedField downLabel="Step${subject} down" upLabel="Step${subject} up" on:step={(e) => step(e.detail)}>
+  example: figma.code`<SteppedField downLabel="Step${subject} down" upLabel="Step${subject} up" onstep={step}>
   ${field}
 </SteppedField>`,
   imports,

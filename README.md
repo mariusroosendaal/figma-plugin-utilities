@@ -77,22 +77,22 @@ import { sendToPlugin, createMessageHandler } from "figma-plugin-utilities/lib";
 | Component | Description |
 |-----------|-------------|
 | `PluginLayout` | Main content wrapper with scrollable area |
-| `Header` | Header bar with `left`, `center`, `right` slots and optional title |
+| `Header` | Header bar with `left`, `center`, `right` snippets and optional title |
 | `Footer` | Footer with `right`, `split`, and `full` layout variants |
 | `StatusBar` | Toast notifications with auto-dismiss (info/success/error/warning) |
 | `EmptyState` | Empty/error states with optional icon and action buttons; `size`, `iconSize`, `centered`, and `role="alert"` for failures |
-| `ListItem` | Selectable list items with metadata and `badge` slots, an action menu (`menuOpen`, `menuToggle`, `menuClose`) |
+| `ListItem` | Selectable list items with metadata and a `badge` snippet, an action menu (`menuOpen`, `onmenutoggle`, `onmenuclose`) |
 | `LoadingState` | Centered message as `role="status"` (text only, no spinner) |
 | `FieldGroup` | Label + input wrapper; `labelFor` binds the label to a text control, `hint` adds a line under it |
 | `CheckboxCard` | Large checkbox with card styling and better touch targets; `change` event |
-| `Section` | Titled group of fields as in Figma's panels: a `Header` with the title and an `actions` slot, content padded by the section itself |
-| `DataTable` | Named rows with a cell per column (a set at each breakpoint, a style before and after): columns with their own width and alignment, a read-only mode with table roles, row selection with an `editor` slot, notes as badges, with tooltips, and a `+N` count past two, an `action` slot, values as badges or variable chips, removed rows and a marked column |
+| `Section` | Titled group of fields as in Figma's panels: a `Header` with the title and an `actions` snippet, content padded by the section itself |
+| `DataTable` | Named rows with a cell per column (a set at each breakpoint, a style before and after): columns with their own width and alignment, a read-only mode with table roles, row selection with an `editor` snippet, notes as badges, with tooltips, and a `+N` count past two, an `action` snippet, values as badges or variable chips, removed rows and a marked column |
 | `FieldGrid` | Fields side by side in equal columns (`columns`, default 2) that shrink below their content |
 | `SteppedField` | A field with − and + icon buttons after it, as one grid cell; `step` event with -1 or 1 |
 | `LadderBadges` | A scale's sizes as badges, outlined where used and archived where not, each with the caller's tooltip |
 | `RampCurve` | A ramp's Bézier at the breakpoint shown, in the caller's units: handles for the ends and the bend at the smallest and largest breakpoint, blends between; `change` and `select` events |
 | `MappingChip` | One side of a source → target row: a filled 24px chip with a lead icon or chit, a truncating label, a `preview` after a dot and a trailing `count`; `click` event |
-| `CodeExportModal` | Read-only code in a modal with a copy button that reads "Copied" for 2s; a `controls` slot above the code |
+| `CodeExportModal` | Read-only code in a modal with a copy button that reads "Copied" for 2s; a `controls` snippet above the code |
 
 Every component also takes a `class` (or `className`) prop.
 
@@ -100,12 +100,12 @@ Every component also takes a `class` (or `className`) prop.
 
 ```svelte
 <Header title="My Plugin">
-  <svelte:fragment slot="left">
-    <IconButton iconName={IconBack} on:click={goBack} />
-  </svelte:fragment>
-  <svelte:fragment slot="right">
+  {#snippet left()}
+    <IconButton iconName={IconBack} onclick={goBack} />
+  {/snippet}
+  {#snippet right()}
     <IconButton iconName={IconSettings} />
-  </svelte:fragment>
+  {/snippet}
 </Header>
 
 <!-- Without border -->
@@ -122,12 +122,12 @@ Every component also takes a `class` (or `className`) prop.
 
 <!-- Split layout -->
 <Footer variant="split">
-  <svelte:fragment slot="left">
+  {#snippet left()}
     <Button variant="secondary">Cancel</Button>
-  </svelte:fragment>
-  <svelte:fragment slot="right">
+  {/snippet}
+  {#snippet right()}
     <Button variant="primary">Save</Button>
-  </svelte:fragment>
+  {/snippet}
 </Footer>
 
 <!-- Full-width buttons -->
@@ -142,7 +142,7 @@ Every component also takes a `class` (or `className`) prop.
 <StatusBar 
   message={status.message} 
   type={status.type} 
-  on:close={() => status = { message: '', type: 'info' }} 
+  onclose={() => status = { message: '', type: 'info' }} 
 />
 ```
 
@@ -172,8 +172,8 @@ Types: `info`, `success`, `error`, `warning`. Auto-dismisses after 4s for `info`
     { label: 'Edit', value: 'edit' },
     { label: 'Delete', value: 'delete' }
   ]}
-  on:click={handleSelect}
-  on:menuSelect={handleMenuAction}
+  onclick={handleSelect}
+  onmenuselect={handleMenuAction}
 >
   <span>Additional metadata</span>
 </ListItem>
@@ -187,7 +187,7 @@ Large checkbox with card-style background and better touch targets.
 <!-- Basic usage -->
 <CheckboxCard
   checked={isSelected}
-  on:change={handleToggle}
+  onchange={handleToggle}
 >
   Small
 </CheckboxCard>
@@ -195,10 +195,10 @@ Large checkbox with card-style background and better touch targets.
 <!-- With secondary text -->
 <CheckboxCard
   checked={isSelected}
-  on:change={handleToggle}
+  onchange={handleToggle}
 >
   Small
-  <svelte:fragment slot="secondary">400px</svelte:fragment>
+  {#snippet secondary()}400px{/snippet}
 </CheckboxCard>
 
 <!-- Disabled state -->
@@ -226,7 +226,7 @@ Large checkbox with card-style background and better touch targets.
 <SteppedField
   downLabel="Step {set.name} down"
   upLabel="Step {set.name} up"
-  on:step={(e) => setOffset(set.offset + e.detail)}
+  onstep={(step) => setOffset(set.offset + step)}
 >
   <FieldGroup label="Steps off the curve" labelFor="offset" size="small">
     <NumericInput id="offset" value={set.offset} precision={0} />
@@ -257,11 +257,11 @@ Each badge's accessible name is `"{value}px, used"` or `"{value}px, unused"`.
   count={row.uses}
   tone="secondary"
   title="Select these icons"
-  on:click={() => reveal(row)}
+  onclick={() => reveal(row)}
 />
 ```
 
-`iconName` or `chit` (which wins) adds a lead that hangs into the padding; `preview` follows the label as "label · preview"; `tone` is `default`, `secondary` or `component`; `selected` draws the selection border. The `lead` slot takes a marker ahead of the lead, and `element` binds the button.
+`iconName` or `chit` (which wins) adds a lead that hangs into the padding; `preview` follows the label as "label · preview"; `tone` is `default`, `secondary` or `component`; `selected` draws the selection border. The `lead` snippet takes a marker ahead of the lead, and `element` binds the button.
 
 ### RampCurve
 
@@ -281,8 +281,8 @@ Each badge's accessible name is `"{value}px, used"` or `"{value}px, unused"`.
   bottomLabel="Smallest level"
   topLabel="Largest level"
   along="levels"
-  on:change={(e) => (ramp = { ...ramp, ...e.detail })}
-  on:select={(e) => (selected = e.detail)}
+  onchange={(patch) => (ramp = { ...ramp, ...patch })}
+  onselect={(index) => (selected = index)}
 />
 ```
 
@@ -297,11 +297,11 @@ Each badge's accessible name is `"{value}px, used"` or `"{value}px, unused"`.
   value={css}
   ariaLabel="Exported CSS"
   copyLabel="Copy CSS"
-  onClose={() => (exportOpen = false)}
+  onclose={() => (exportOpen = false)}
 >
-  <svelte:fragment slot="controls">
+  {#snippet controls()}
     <SegmentedControl …/>
-  </svelte:fragment>
+  {/snippet}
 </CodeExportModal>
 ```
 

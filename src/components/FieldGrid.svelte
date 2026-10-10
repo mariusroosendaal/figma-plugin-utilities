@@ -1,10 +1,13 @@
 <!-- Fields side by side in equal columns. -->
-<script>
-  export let columns = 2;
+<script lang="ts">
+  import type { Snippet } from "svelte";
+
+  let { columns = 2, children }: { columns?: number; children?: Snippet } =
+    $props();
 </script>
 
 <div class="grid" style:--columns={columns}>
-  <slot />
+  {@render children?.()}
 </div>
 
 <style>

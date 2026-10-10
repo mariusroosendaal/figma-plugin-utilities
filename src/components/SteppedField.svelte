@@ -1,34 +1,40 @@
 <!--
-  A field with − and + buttons after it, as one grid cell. The buttons fire
-  `step` with -1 or 1; what a step means is the caller's.
+  A field with − and + buttons after it, as one grid cell. The buttons call
+  `onstep` with -1 or 1; what a step means is the caller's.
 -->
-<script>
-  import { createEventDispatcher } from "svelte";
+<script lang="ts">
+  import type { Snippet } from "svelte";
   import { IconButton } from "figma-ui3-kit-svelte";
   import { IconMinus, IconPlus } from "figma-ui3-kit-svelte/icons";
 
-  /** The − button's label, e.g. "Step body down". */
-  export let downLabel;
-  /** The + button's label, e.g. "Step body up". */
-  export let upLabel;
+  interface Props {
+    /** The − button's label, e.g. "Step body down". */
+    downLabel: string;
+    /** The + button's label, e.g. "Step body up". */
+    upLabel: string;
+    /** The field */
+    children?: Snippet;
+    /** -1 for the − button, 1 for the + button */
+    onstep?: (step: -1 | 1) => void;
+  }
 
-  const dispatch = createEventDispatcher();
+  let { downLabel, upLabel, children, onstep }: Props = $props();
 </script>
 
 <div class="stepped">
   <div class="grow">
-    <slot />
+    {@render children?.()}
   </div>
   <div class="steppers">
     <IconButton
       iconName={IconMinus}
       ariaLabel={downLabel}
-      on:click={() => dispatch("step", -1)}
+      onclick={() => onstep?.(-1)}
     />
     <IconButton
       iconName={IconPlus}
       ariaLabel={upLabel}
-      on:click={() => dispatch("step", 1)}
+      onclick={() => onstep?.(1)}
     />
   </div>
 </div>

@@ -3,13 +3,16 @@
   disabled (the archived badge) where it isn't. Each badge's title is the
   caller's, so each plugin words its own.
 -->
-<script>
+<script lang="ts">
   import { Badge, Tooltip } from "figma-ui3-kit-svelte";
 
-  /** @type {{ value: number, used: boolean, title: string }[]} */
-  export let badges = [];
-  /** Names the group, e.g. "Ladder sizes". */
-  export let ariaLabel;
+  interface Props {
+    badges?: { value: number; used: boolean; title: string }[];
+    /** Names the group, e.g. "Ladder sizes". */
+    ariaLabel: string;
+  }
+
+  let { badges = [], ariaLabel }: Props = $props();
 </script>
 
 <div class="ladder" role="group" aria-label={ariaLabel}>

@@ -2,8 +2,27 @@
 
 ## [Unreleased]
 
-### Changed
-- Needs Svelte 5: `svelte` is a peer dependency, `^5.0.0`, and the optional `@sveltejs/vite-plugin-svelte` peer is `^4.0.0`
+### Breaking
+- Needs Svelte 5: `svelte` is a peer dependency, `^5.0.0`, and the optional `@sveltejs/vite-plugin-svelte` peer is `^4.0.0`. The components are Svelte 5 runes components with typed props, as the kit's are, so their events are callback props that get what was `event.detail`, and their named slots are snippets. See figma-ui3-kit-svelte's changelog for how a call changes
+- Renamed, component by component:
+
+  | Component | Svelte 4 | Svelte 5 |
+  | --- | --- | --- |
+  | CheckboxCard | `on:change`; slot `secondary` | `onchange({ checked })`; snippet `secondary` |
+  | CodeExportModal | `onClose`; slot `controls` | `onclose`; snippet `controls` |
+  | DataTable | `on:select`, `on:column`; slots `action` and `editor` with `let:row`, `note` | `onselect(row)`, `oncolumn(index)`; snippets `action(row)`, `editor(row)`, `note` |
+  | FieldGroup | slot `hint` | `hint` takes a snippet as well as a string |
+  | Footer | slots `left`, `right` | snippets `left`, `right` |
+  | Header | slots `left`, `center`, `right` | snippets `left`, `center`, `right` |
+  | ListItem | `on:click`, `on:menuToggle`, `on:menuSelect`, `on:menuClose`; slots `badge`, `actions` | `onclick({ id })`, `onmenutoggle({ id, open })`, `onmenuselect({ id, action })`, `onmenuclose({ id })`; snippets `badge`, `actions` |
+  | MappingChip | `on:click`; slot `lead` | `onclick(event)`, not while disabled; snippet `lead` |
+  | RampCurve | `on:change`, `on:select` | `onchange(patch)`, `onselect(index)` |
+  | Section | slot `actions` | snippet `actions` |
+  | StatusBar | `on:close` | `onclose()` |
+  | SteppedField | `on:step` | `onstep(step)`, -1 or 1 |
+
+### Added
+- Types for plugins written in TypeScript: `import type { DataTableRow, DataTableColumn, DataTableCell } from "figma-plugin-utilities"`. ListItem takes the type of its `menuItems`, so `onmenuselect` hands back the row's own `value` type
 
 ## [0.6.0] - 2026-10-10
 

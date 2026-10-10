@@ -45,12 +45,12 @@ const variant = instance.getEnum('👥 Variant', { 'Right': 'right', 'Split': 's
 let example
 if (variant === 'split') {
   example = figma.code`<Footer variant="split">
-  <svelte:fragment slot="left">
+  {#snippet left()}
     ${slot('Left slot', '    ')}
-  </svelte:fragment>
-  <svelte:fragment slot="right">
+  {/snippet}
+  {#snippet right()}
     ${slot('Right slot', '    ')}
-  </svelte:fragment>
+  {/snippet}
 </Footer>`
 } else {
   example = figma.code`<Footer${variant === 'full' ? ' variant="full"' : ''}>

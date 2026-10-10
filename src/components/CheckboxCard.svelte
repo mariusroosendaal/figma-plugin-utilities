@@ -1,5 +1,5 @@
-<script>
-  import { createEventDispatcher } from "svelte";
+<script lang="ts">
+  import type { Snippet } from "svelte";
   import { Checkbox } from "figma-ui3-kit-svelte";
 
   /**
@@ -7,62 +7,67 @@
    * Wraps the standard checkbox in a card-like layout
    *
    * @example
-   * <CheckboxCard
-   *   checked={isSelected}
-   *   on:change={handleToggle}
-   * >
+   * <CheckboxCard bind:checked={isSelected} onchange={handleToggle}>
    *   Small
    * </CheckboxCard>
    *
    * @example with secondary text
-   * <CheckboxCard
-   *   checked={isSelected}
-   *   on:change={handleToggle}
-   * >
+   * <CheckboxCard bind:checked={isSelected} onchange={handleToggle}>
    *   Small
-   *   <svelte:fragment slot="secondary">400px</svelte:fragment>
+   *   {#snippet secondary()}400px{/snippet}
    * </CheckboxCard>
    */
 
-  const dispatch = createEventDispatcher();
-
-  /** Whether checkbox is checked */
-  export let checked = false;
-
-  /** Whether checkbox is disabled */
-  export let disabled = false;
-
-  let cardEl;
-
-  function handleChange(e) {
-    if (disabled) return;
-    checked = e.target.checked;
-    dispatch("change", { checked });
+  interface Props {
+    checked?: boolean;
+    disabled?: boolean;
+    /** The label */
+    children?: Snippet;
+    /** A line under the label, such as a size */
+    secondary?: Snippet;
+    /** After `checked` updates */
+    onchange?: (detail: { checked: boolean }) => void;
   }
 
-  function handleCardClick(e) {
+  let {
+    checked = $bindable(),
+    disabled = false,
+    children,
+    secondary,
+    onchange,
+  }: Props = $props();
+
+  let cardEl: HTMLDivElement | undefined = $state();
+
+  function handleChange(e: Event & { currentTarget: HTMLInputElement }) {
+    if (disabled) return;
+    checked = e.currentTarget.checked;
+    onchange?.({ checked });
+  }
+
+  function handleCardClick(e: MouseEvent) {
     if (disabled) return;
     // Clicks inside the Checkbox component (label/input) are handled natively
-    if (e.target.closest(".checkbox-container")) return;
-    cardEl?.querySelector('input[type="checkbox"]')?.click();
+    if ((e.target as Element).closest(".checkbox-container")) return;
+    cardEl?.querySelector<HTMLInputElement>('input[type="checkbox"]')?.click();
   }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <!-- Keyboard users interact with the native checkbox input inside; this div is a mouse-only larger click target -->
 <div
   class="checkbox-card"
   class:disabled
   aria-disabled={disabled || undefined}
   bind:this={cardEl}
-  on:click={handleCardClick}
+  onclick={handleCardClick}
 >
-  <Checkbox {checked} {disabled} on:change={handleChange}>
-    <slot />
+  <Checkbox {checked} {disabled} onchange={handleChange}>
+    {@render children?.()}
   </Checkbox>
-  {#if $$slots.secondary}
+  {#if secondary}
     <div class="checkbox-card__secondary">
-      <slot name="secondary" />
+      {@render secondary()}
     </div>
   {/if}
 </div>

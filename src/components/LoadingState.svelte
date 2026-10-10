@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { Text } from "figma-ui3-kit-svelte";
 
   /**
@@ -13,11 +13,13 @@
    * {/if}
    */
 
-  /** Message to display */
-  export let message = "Loading...";
+  interface Props {
+    /** Message to display */
+    message?: string;
+    class?: string;
+  }
 
-  let className = "";
-  export { className as class };
+  let { message = "Loading...", class: className = "" }: Props = $props();
 </script>
 
 <div class="loading-state {className}" role="status">

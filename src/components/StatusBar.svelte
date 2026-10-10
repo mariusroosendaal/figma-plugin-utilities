@@ -1,10 +1,5 @@
-<script>
-  /* The auto-dismiss below trips svelte/infinite-reactive-loop: the reactive
-     statement writes `visible`, and the timeout it schedules writes it again
-     through handleClose(). Neither reads `visible`, so the statement cannot
-     re-trigger itself — the rule only sees the shared assignment target. */
-  /* eslint-disable svelte/infinite-reactive-loop */
-  import { onDestroy, createEventDispatcher } from "svelte";
+<script lang="ts">
+  import { onDestroy } from "svelte";
   import { IconButton } from "figma-ui3-kit-svelte";
   import { IconClose } from "figma-ui3-kit-svelte/icons";
 
@@ -12,46 +7,56 @@
   // Supports types: 'info', 'success', 'error', 'warning'
   // Auto-dismisses after 4s for 'info' and 'success' types
 
-  const dispatch = createEventDispatcher();
+  interface Props {
+    /** Message to display */
+    message?: string;
+    /** Status type */
+    type?: "info" | "success" | "error" | "warning";
+    class?: string;
+    /** Dismissed, by its button or after 4s */
+    onclose?: () => void;
+  }
 
-  /** Message to display */
-  export let message = "";
+  let {
+    message = "",
+    type = "info",
+    class: className = "",
+    onclose,
+  }: Props = $props();
 
-  /** Status type: 'info', 'success', 'error', 'warning' */
-  export let type = "info";
+  let visible = $state(false);
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
-  let className = "";
-  export { className as class };
-
-  let visible = false;
-  let timeoutId;
-
-  $: shouldAutoDismiss = type === "success" || type === "info";
+  let shouldAutoDismiss = $derived(type === "success" || type === "info");
 
   // Compute icon color based on type
-  $: computedIconColor =
+  let computedIconColor = $derived(
     type === "error"
       ? "--figma-color-icon-ondanger"
       : type === "success"
         ? "--figma-color-icon-onsuccess"
         : type === "warning"
           ? "--figma-color-icon-onwarning"
-          : "--figma-color-icon";
+          : "--figma-color-icon",
+  );
 
   // Show status when message changes
-  $: if (message) {
-    visible = true;
-    if (shouldAutoDismiss) {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => handleClose(), 4000);
+  $effect.pre(() => {
+    if (message) {
+      visible = true;
+      if (shouldAutoDismiss) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => handleClose(), 4000);
+      }
+    } else {
+      visible = false;
     }
-  } else {
-    visible = false;
-  }
+  });
+
   function handleClose() {
     visible = false;
     clearTimeout(timeoutId);
-    dispatch("close");
+    onclose?.();
   }
 
   onDestroy(() => {
@@ -71,7 +76,7 @@
     <IconButton
       iconName={IconClose}
       ariaLabel="Dismiss"
-      on:click={handleClose}
+      onclick={handleClose}
       iconColor={computedIconColor}
     />
   </div>

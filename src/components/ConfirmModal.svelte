@@ -2,7 +2,7 @@
   The dialog confirmAction() opens: mount one in the plugin's UI, after
   everything else, so it shows above any modal that asks.
 -->
-<script>
+<script lang="ts">
   import { Modal, Button, Text } from "figma-ui3-kit-svelte";
   import { confirmRequest, answerConfirm } from "../lib/confirm";
 </script>
@@ -12,25 +12,25 @@
   title={$confirmRequest?.title ?? ""}
   width="small"
   position="center"
-  on:close={() => answerConfirm(false)}
+  onclose={() => answerConfirm(false)}
 >
   <Text>{$confirmRequest?.message ?? ""}</Text>
 
-  <svelte:fragment slot="footer-full">
+  {#snippet footerFull()}
     <div class="confirm-footer">
       <div class="confirm-actions">
-        <Button variant="secondary" on:click={() => answerConfirm(false)}>
+        <Button variant="secondary" onclick={() => answerConfirm(false)}>
           {$confirmRequest?.cancelLabel || "Cancel"}
         </Button>
         <Button
           variant={$confirmRequest?.destructive ? "destructive" : "primary"}
-          on:click={() => answerConfirm(true)}
+          onclick={() => answerConfirm(true)}
         >
           {$confirmRequest?.confirmLabel ?? ""}
         </Button>
       </div>
     </div>
-  </svelte:fragment>
+  {/snippet}
 </Modal>
 
 <style>

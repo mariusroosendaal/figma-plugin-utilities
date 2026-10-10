@@ -1,23 +1,28 @@
 <!--
   Section: a titled group of fields, as in Figma's panels — a fieldset headed
   by Header, the title on its left and icon buttons at its right (the
-  `actions` slot). It pads its own content, so its parent must not: the
+  `actions` snippet). It pads its own content, so its parent must not: the
   Header runs edge to edge. Rule sections apart with an <hr>.
 -->
-<script>
+<script lang="ts">
+  import type { Snippet } from "svelte";
   import Header from "./Header.svelte";
 
-  export let title;
+  interface Props {
+    title: string;
+    /** Icon buttons at the header's right */
+    actions?: Snippet;
+    /** The fields */
+    children?: Snippet;
+  }
+
+  let { title, actions, children }: Props = $props();
 </script>
 
 <fieldset class="section" aria-label={title}>
-  <Header {title} noBorder>
-    <svelte:fragment slot="right">
-      <slot name="actions" />
-    </svelte:fragment>
-  </Header>
+  <Header {title} noBorder right={actions} />
   <div class="body">
-    <slot />
+    {@render children?.()}
   </div>
 </fieldset>
 

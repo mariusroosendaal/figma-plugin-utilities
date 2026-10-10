@@ -53,9 +53,9 @@ export default {
   copyLabel="${copyLabel}"${width !== 'medium' ? figma.code`
   width="${width}"` : ''}
 >${controls ? figma.code`
-  <svelte:fragment slot="controls">
+  {#snippet controls()}
     ${controls}
-  </svelte:fragment>
+  {/snippet}
 ` : ''}</CodeExportModal>`,
   imports,
   id: 'code-export-modal',

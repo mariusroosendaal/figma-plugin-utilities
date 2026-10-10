@@ -2,28 +2,48 @@
   Read-only code in a modal, with a button that copies it. Each modal keeps
   its own "Copied" state, so copying one never marks the other.
 -->
-<script>
-  import { onDestroy } from "svelte";
+<script lang="ts">
+  import { onDestroy, type Snippet } from "svelte";
   import { Button, Modal, Textarea } from "figma-ui3-kit-svelte";
 
-  export let isOpen = false;
-  export let title;
-  export let value = "";
-  /** Names the code for assistive tech, e.g. "Exported token JSON". */
-  export let ariaLabel;
-  /** The copy button's label, e.g. "Copy JSON". */
-  export let copyLabel;
-  export let position = "bottom";
-  export let width = "medium";
-  export let height = "auto";
-  export let onClose = null;
+  interface Props {
+    isOpen?: boolean;
+    title: string;
+    value?: string;
+    /** Names the code for assistive tech, e.g. "Exported token JSON". */
+    ariaLabel: string;
+    /** The copy button's label, e.g. "Copy JSON". */
+    copyLabel: string;
+    position?: "center" | "left" | "right" | "bottom";
+    width?: string | number;
+    height?: string | number;
+    /** Options for what's exported, above the code */
+    controls?: Snippet;
+    /** X, Escape or a click outside */
+    onclose?: () => void;
+  }
 
-  let copied = false;
-  let copyTimer = null;
+  let {
+    isOpen = $bindable(),
+    title,
+    value = "",
+    ariaLabel,
+    copyLabel,
+    position = "bottom",
+    width = "medium",
+    height = "auto",
+    controls,
+    onclose,
+  }: Props = $props();
+
+  let copied = $state(false);
+  let copyTimer: ReturnType<typeof setTimeout> | undefined;
   onDestroy(() => clearTimeout(copyTimer));
 
   // Reopened, the button reads as it would before a copy.
-  $: if (isOpen) copied = false;
+  $effect.pre(() => {
+    if (isOpen) copied = false;
+  });
 
   // execCommand, not the Clipboard API: the plugin iframe isn't granted
   // clipboard-write.
@@ -53,24 +73,24 @@
 </script>
 
 <Modal
-  {isOpen}
+  bind:isOpen
   {title}
   {position}
   {width}
   {height}
   overlayPadding="0px"
-  {onClose}
+  {onclose}
 >
   <div class="export-content">
     <!-- Options for what's exported, above the code. -->
-    <slot name="controls" />
+    {@render controls?.()}
     <Textarea {value} readonly {ariaLabel} variant="code" />
   </div>
-  <svelte:fragment slot="footer-right">
-    <Button variant="primary" on:click={handleCopy}>
+  {#snippet footerRight()}
+    <Button variant="primary" onclick={handleCopy}>
       {copied ? "Copied" : copyLabel}
     </Button>
-  </svelte:fragment>
+  {/snippet}
 </Modal>
 
 <style>

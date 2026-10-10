@@ -1,3 +1,8 @@
+// Types, for `import type { DataTableRow } from "figma-plugin-utilities"`
+/** @typedef {import("./components/DataTable.svelte").Column} DataTableColumn */
+/** @typedef {import("./components/DataTable.svelte").Cell} DataTableCell */
+/** @typedef {import("./components/DataTable.svelte").Row} DataTableRow */
+
 // Re-export all components
 export {
   CheckboxCard,

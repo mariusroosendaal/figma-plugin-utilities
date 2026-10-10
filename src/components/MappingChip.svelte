@@ -9,52 +9,64 @@
   rather than a lead plus the padding. The label truncates; `preview` follows
   it after a dot, and `count` sits at the chip's end.
 -->
-<script>
-  import { createEventDispatcher } from "svelte";
+<script lang="ts">
+  import type { Snippet } from "svelte";
   import { Chit, Icon } from "figma-ui3-kit-svelte";
 
-  /** The chip's text */
-  export let label = "";
-  /** Secondary text after the label, as "label · preview" */
-  export let preview = "";
-  /** @type {number | string | null} a trailing count, such as how many layers the chip stands for */
-  export let count = null;
-  /** @type {any} a lead icon, from `figma-ui3-kit-svelte/icons` */
-  export let iconName = null;
-  /** @type {string | string[] | null} a lead chit, the kit Chit's `color`; wins over `iconName` */
-  export let chit = null;
-  /** @type {"default" | "secondary" | "component"} text and icon color: `component` for instances, `secondary` for a quieter side */
-  export let tone = "default";
-  /** Marks the chip as the chosen one, with the selection border */
-  export let selected = false;
-  export let disabled = false;
-  /** @type {string | undefined} */
-  export let title = undefined;
-  /** @type {string | undefined} */
-  export let ariaLabel = undefined;
-  /** @type {HTMLButtonElement | null} the button, for anchoring a menu or popover to it */
-  export let element = null;
+  interface Props {
+    /** The chip's text */
+    label?: string;
+    /** Secondary text after the label, as "label · preview" */
+    preview?: string;
+    /** A trailing count, such as how many layers the chip stands for */
+    count?: number | string | null;
+    /** A lead icon, from `figma-ui3-kit-svelte/icons` */
+    iconName?: string | null;
+    /** A lead chit, the kit Chit's `color`; wins over `iconName` */
+    chit?: string | string[] | null;
+    /** Text and icon color: `component` for instances, `secondary` for a quieter side */
+    tone?: "default" | "secondary" | "component";
+    /** Marks the chip as the chosen one, with the selection border */
+    selected?: boolean;
+    disabled?: boolean;
+    title?: string;
+    ariaLabel?: string;
+    /** The button, for anchoring a menu or popover to it */
+    element?: HTMLButtonElement | null;
+    class?: string;
+    /** Ahead of the lead, for a marker such as a refused write's "!" */
+    lead?: Snippet;
+    /** Not while disabled */
+    onclick?: (event: MouseEvent) => void;
+  }
 
-  let className = "";
-  export { className as class };
+  let {
+    label = "",
+    preview = "",
+    count = null,
+    iconName = null,
+    chit = null,
+    tone = "default",
+    selected = false,
+    disabled = false,
+    title = undefined,
+    ariaLabel = undefined,
+    element = $bindable(),
+    class: className = "",
+    lead,
+    onclick,
+  }: Props = $props();
 
-  const dispatch = createEventDispatcher();
-
-  /**
-   * @param {string} tone
-   * @param {boolean} disabled
-   */
-  function iconColorFor(tone, disabled) {
+  function iconColorFor(tone: string, disabled: boolean) {
     if (disabled) return "--figma-color-icon-disabled";
     if (tone === "component") return "--figma-color-icon-component";
     if (tone === "secondary") return "--figma-color-icon-secondary";
     return "--figma-color-icon";
   }
-  $: iconColor = iconColorFor(tone, disabled);
+  let iconColor = $derived(iconColorFor(tone, disabled));
 
-  /** @param {MouseEvent} event */
-  function handleClick(event) {
-    if (!disabled) dispatch("click", event);
+  function handleClick(event: MouseEvent) {
+    if (!disabled) onclick?.(event);
   }
 </script>
 
@@ -65,10 +77,10 @@
   {disabled}
   {title}
   aria-label={ariaLabel}
-  on:click={handleClick}
+  onclick={handleClick}
 >
   <!-- Ahead of the lead, for a marker such as a refused write's "!". -->
-  <slot name="lead" />
+  {@render lead?.()}
   {#if chit}
     <span class="lead"><Chit color={chit} /></span>
   {:else if iconName}

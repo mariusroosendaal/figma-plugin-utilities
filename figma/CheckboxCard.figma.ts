@@ -24,7 +24,7 @@ if (checkbox && checkbox.type === 'INSTANCE') {
 export default {
   example: figma.code`<CheckboxCard${checked ? ' checked' : ''}${disabled ? ' disabled' : ''}>
   ${label}${secondary ? figma.code`
-  <svelte:fragment slot="secondary">${secondary}</svelte:fragment>` : ''}
+  {#snippet secondary()}${secondary}{/snippet}` : ''}
 </CheckboxCard>`,
   imports,
   id: 'checkbox-card',

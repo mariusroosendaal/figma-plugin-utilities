@@ -7,85 +7,120 @@
   plain text; badges and text are colored as new, changed or danger.
 
   Selectable (the default), rows are buttons, named by their `label`, that
-  open the `editor` slot under them, with a trailing button in `action`.
+  open the `editor` snippet under them, with a trailing button in `action`.
   Not selectable, the table is read-only, with table roles. Removed rows are
   colored and can't be selected either way.
 -->
-<script>
-  import { createEventDispatcher } from "svelte";
+<script lang="ts" module>
+  /** `width` is a grid track, 2.75rem by default; `align` "start" by default, "end" to right-align numbers. */
+  export interface Column {
+    label: string;
+    title?: string;
+    width?: string;
+    align?: "start" | "end";
+  }
+
+  /** `alias` names the variable the value aliases, shown as a chip; `plain`
+   * shows the text as it is, not as a badge (muted cells are). */
+  export interface Cell {
+    text: string | number;
+    tone?: "new" | "changed" | "danger" | "muted" | null;
+    title?: string | null;
+    alias?: string | null;
+    plain?: boolean;
+  }
+
+  export interface Row {
+    key: string;
+    name: string;
+    label?: string;
+    cells: Cell[];
+    tone?: "new" | null;
+    removed?: boolean;
+    badges?: { text: string; variant?: string; title?: string }[];
+    /** Whatever else the caller keeps on a row, for its snippets and `onselect` */
+    [extra: string]: any;
+  }
+</script>
+
+<script lang="ts">
+  import type { Snippet } from "svelte";
   import { Badge, Tooltip, VariablePill } from "figma-ui3-kit-svelte";
 
-  /**
-   * @typedef {{
-   *   label: string,
-   *   title?: string,
-   *   width?: string,
-   *   align?: "start" | "end",
-   * }} Column  `width` is a grid track, 2.75rem by default; `align` "start"
-   *   by default, "end" to right-align numbers.
-   * @typedef {{
-   *   text: string | number,
-   *   tone?: "new" | "changed" | "danger" | "muted" | null,
-   *   title?: string | null,
-   *   alias?: string | null,
-   *   plain?: boolean,
-   * }} Cell  `alias` names the variable the value aliases, shown as a chip;
-   *   `plain` shows the text as it is, not as a badge (muted cells are).
-   * @typedef {{
-   *   key: string,
-   *   name: string,
-   *   label?: string,
-   *   cells: Cell[],
-   *   tone?: "new" | null,
-   *   removed?: boolean,
-   *   badges?: { text: string, variant?: string, title?: string }[],
-   *   [extra: string]: any,
-   * }} Row
-   */
+  interface Props {
+    /** The columns after the name. */
+    columns?: (Column | string)[];
+    rows?: Row[];
+    /** The name column's header. */
+    nameLabel?: string;
+    /** Rows are buttons that open an editor; false makes the table read-only. */
+    selectable?: boolean;
+    /** The row whose editor is open. */
+    selectedKey?: string | null;
+    /** A column to mark, header and cells. */
+    active?: number | null;
+    /** Makes the column headers buttons that call `oncolumn`. */
+    selectableColumns?: boolean;
+    /**
+     * The container's side padding, such as "var(--size-xsmall)": the rows
+     * run through it to the container's edges, their contents still in line
+     * with the rest of it.
+     */
+    inset?: string | null;
+    /** How many of a row's badges show before the rest become a count. */
+    maxBadges?: number;
+    /** Names a read-only table. */
+    ariaLabel?: string | null;
+    class?: string;
+    /** A trailing button on each row */
+    action?: Snippet<[Row]>;
+    /** Under the selected row */
+    editor?: Snippet<[Row]>;
+    /** Under the table */
+    note?: Snippet;
+    /** A row, when selectable */
+    onselect?: (row: Row) => void;
+    /** A column header, when `selectableColumns`: its index */
+    oncolumn?: (index: number) => void;
+  }
 
-  /** @type {(Column | string)[]} The columns after the name. */
-  export let columns = [];
-  /** @type {Row[]} */
-  export let rows = [];
-  /** The name column's header. */
-  export let nameLabel = "Name";
-  /** Rows are buttons that open an editor; false makes the table read-only. */
-  export let selectable = true;
-  /** @type {string | null} The row whose editor is open. */
-  export let selectedKey = null;
-  /** @type {number | null} A column to mark, header and cells. */
-  export let active = null;
-  /** Makes the column headers buttons that dispatch `column`. */
-  export let selectableColumns = false;
-  /**
-   * @type {string | null} The container's side padding, such as
-   * "var(--size-xsmall)": the rows run through it to the container's edges,
-   * their contents still in line with the rest of it.
-   */
-  export let inset = null;
-  /** How many of a row's badges show before the rest become a count. */
-  export let maxBadges = 2;
-  /** @type {string | null} Names a read-only table. */
-  export let ariaLabel = null;
-
-  let className = "";
-  export { className as class };
-
-  const dispatch = createEventDispatcher();
+  let {
+    columns = [],
+    rows = [],
+    nameLabel = "Name",
+    selectable = true,
+    selectedKey = null,
+    active = null,
+    selectableColumns = false,
+    inset = null,
+    maxBadges = 2,
+    ariaLabel = null,
+    class: className = "",
+    action,
+    editor,
+    note,
+    onselect,
+    oncolumn,
+  }: Props = $props();
 
   // The badge a value gets for its tone.
-  const TONES = { new: "success", changed: "warning", danger: "danger" };
+  const TONES: Record<string, string> = {
+    new: "success",
+    changed: "warning",
+    danger: "danger",
+  };
 
-  // The limit is passed in, so the markup re-runs when it changes.
-  const shown = (row, max) => (row.badges ?? []).slice(0, max);
-  const hidden = (row, max) => (row.badges ?? []).slice(max);
+  const shown = (row: Row, max: number) => (row.badges ?? []).slice(0, max);
+  const hidden = (row: Row, max: number) => (row.badges ?? []).slice(max);
 
-  $: cols = columns.map((c) => (typeof c === "string" ? { label: c } : c));
-  $: tracks = cols.map((c) => c.width ?? "2.75rem").join(" ");
+  let cols = $derived(
+    columns.map((c) => (typeof c === "string" ? { label: c } : c)) as Column[],
+  );
+  let tracks = $derived(cols.map((c) => c.width ?? "2.75rem").join(" "));
   // Read-only, the table has table roles; selectable, its rows are buttons
   // named by their label, and the header is for sight only unless it picks.
-  $: roles = !selectable;
-  $: headerHidden = !roles && !selectableColumns;
+  let roles = $derived(!selectable);
+  let headerHidden = $derived(!roles && !selectableColumns);
 </script>
 
 <div
@@ -112,7 +147,7 @@
             aria-label="Show {col.label}"
             aria-pressed={c === active}
             title={col.title ?? null}
-            on:click={() => dispatch("column", c)}>{col.label}</button
+            onclick={() => oncolumn?.(c)}>{col.label}</button
           >
         {:else}
           <span
@@ -140,7 +175,7 @@
         role={roles ? "row" : undefined}
         aria-label={roles ? undefined : row.label}
         aria-expanded={interactive ? selected : undefined}
-        on:click={() => interactive && dispatch("select", row)}
+        onclick={() => interactive && onselect?.(row)}
       >
         <span class="token" role={roles ? "cell" : undefined}>
           <span class="name" class:is-new={row.tone === "new"}>{row.name}</span>
@@ -192,21 +227,21 @@
               <Badge
                 variant={row.removed
                   ? "danger"
-                  : (TONES[cell.tone] ?? "default")}
+                  : (TONES[cell.tone ?? ""] ?? "default")}
                 text={String(cell.text)}
               />
             {/if}
           </span>
         {/each}
       </svelte:element>
-      <span class="action"><slot name="action" {row} /></span>
+      <span class="action">{@render action?.(row)}</span>
     </div>
     {#if selected}
-      <div class="editor"><slot name="editor" {row} /></div>
+      <div class="editor">{@render editor?.(row)}</div>
     {/if}
   {/each}
 </div>
-<slot name="note" />
+{@render note?.()}
 
 <style>
   /* Run through the container's padding. Rows keep their own 8px inside,

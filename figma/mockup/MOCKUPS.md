@@ -18,8 +18,8 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
    | Svelte | Spec |
    |---|---|
    | `<Button variant="secondary">Cancel</Button>` | `{ c: 'Button', props: { variant: 'secondary' }, children: 'Cancel' }` |
-   | `<svelte:fragment slot="left">…` | `slots: { left: [ … ] }` |
-   | Default slot content | `children: [ … ]` |
+   | `{#snippet left()}…{/snippet}` | `slots: { left: [ … ] }` |
+   | Children (content not in a snippet) | `children: [ … ]` |
    | `<div>` with flex/column layout | `{ stack: 'v' \| 'h', gap, padding, align, justify, wrap, fill, stroke, strokeSides (`['top']` or `['bottom']`), radius, width, height, grow, fillHeight, children }` |
    | CSS grid with N columns | `{ grid: N, gap, children }` |
    | `<Text>` | `{ c: 'Text', props: { variant, color }, children: '…' }`. This is a connected component, so it round-trips. |
@@ -74,7 +74,7 @@ Build a Figma mockup of a plugin UI from real UI3 components, starting from a `P
 | `Dropzone` | `buttonLabel`, `hint`, `iconName` (`null` for none), `compact`, `disabled`, `invalid` with `errorMessage`, `dragging` (the drag-over look). Takes `fillHeight` | |
 | `Tooltip` | Renders its `children` (the trigger) only; pass `show: true` to draw the bubble | |
 | `Menu` | `menuItems: [{ label, group?, section?, showHeading?, type?, checked?, selected?, iconName?, detail?, badge?, disabled?, subMenu? }]`, `itemVariant`, `showGroupLabels`, `searchable`, `searchPlaceholder`, `footerLabel`, `footerVariant`; items also take `avatar` | |
-| `Modal` | `title`, `width` (`small`/`medium`/`large` or pixels), `height` (pixels), `contentPadding`, `icon2`, `icon2Name` (its icon), `footerBorder`. The Kit additions Modal has one header, so `headerVariant` draws as a title | `children`, `footer-left`, `footer-right`, `footer-full` |
+| `Modal` | `title`, `width` (`small`/`medium`/`large` or pixels), `height` (pixels), `contentPadding`, `icon2`, `icon2Name` (its icon), `footerBorder`. The Kit additions Modal has one header, so `headerVariant` draws as a title | `children`, `footerLeft`, `footerRight`, `footerFull` |
 | `Header` | `title`, `noBorder` | `left`, `center`, `right` |
 | `Footer` | `variant` (`right`/`split`/`full`). Text first in `left` or last in `right` sits 16px from the edge, as in code | `children` (right/full), `left`, `right` (split) |
 | `PluginLayout` | | `children` |

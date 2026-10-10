@@ -51,14 +51,14 @@ const left = instance.getBoolean('👁️ Left slot') ? slot(['Left', 'Left slot
 const center = instance.getBoolean('👁️ Center slot') ? slot(['Center slot'], '    ') : undefined
 const right = slot(['Right slot'], '    ')
 
-const fragment = (name, content) =>
+const snippet = (name, content) =>
   content ? figma.code`
-  <svelte:fragment slot="${name}">
+  {#snippet ${name}()}
     ${content}
-  </svelte:fragment>` : ''
+  {/snippet}` : ''
 
 export default {
-  example: figma.code`<Header${title ? figma.code` title="${title}"` : ''}${noBorder ? ' noBorder' : ''}>${fragment('left', left)}${fragment('center', center)}${fragment('right', right)}
+  example: figma.code`<Header${title ? figma.code` title="${title}"` : ''}${noBorder ? ' noBorder' : ''}>${snippet('left', left)}${snippet('center', center)}${snippet('right', right)}
 </Header>`,
   imports,
   id: 'plugin-header',

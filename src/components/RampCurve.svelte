@@ -6,148 +6,211 @@
   the grid lines, the dots and how a point snaps to a rung. At the smallest
   and largest breakpoint the three control points are handles: bottom and
   top move whole rungs, the bend moves anywhere and slides along x, the same
-  at every breakpoint. Those between are blends, only shown. Fires `change`
-  with a patch of the ramp, and `select` with a breakpoint's index.
+  at every breakpoint. Those between are blends, only shown. Calls `onchange`
+  with a patch of the ramp, and `onselect` with a breakpoint's index.
 -->
-<script>
-  import { createEventDispatcher } from "svelte";
+<script lang="ts">
   import { Button, Dropdown, Text } from "figma-ui3-kit-svelte";
   import { clampPosition } from "../lib/scale";
 
   /**
    * The ends in rungs and the bends at the smallest (`Sm`) and largest
    * (`Lg`) breakpoint, and where along x the bend sits.
-   * @type {{ bottomSm: number, topSm: number, bendSm: number, bottomLg: number, topLg: number, bendLg: number, bendPosition?: number }}
    */
-  export let ramp;
-  /** @type {[number, number, number][]} Each breakpoint's P0, P1 and P2. */
-  export let curves = [];
-  /** @type {[number, number]} The y range shown. */
-  export let span = [0, 1];
-  /** @type {{ key: string | number, y: number, label: string | number }[]} */
-  export let grid = [];
-  /** @type {{ key: string | number, x: number, y: number, marked?: boolean }[]} x from 0 to 1. */
-  export let dots = [];
-  /** @type {string[]} Breakpoint names. */
-  export let breakpoints = [];
-  /** Index of the breakpoint shown. */
-  export let selected = 0;
-  /** How many rungs the ends can take. */
-  export let rungCount = 2;
-  /** The rung nearest a y value, for dragging an end. */
-  export let rungAt = (y) => y;
-  /** An end's y value as its slider reads it, e.g. "16px". */
-  export let format = (y) => `${Math.round(y)}`;
-  /** Names the chart, e.g. "Heading ramp"; the breakpoint follows. */
-  export let ariaLabel;
-  export let bottomLabel = "First";
-  export let topLabel = "Last";
-  /** What runs along x, for the bend's value, e.g. "levels". */
-  export let along = "sets";
+  type Ramp = {
+    bottomSm: number;
+    topSm: number;
+    bendSm: number;
+    bottomLg: number;
+    topLg: number;
+    bendLg: number;
+    bendPosition?: number;
+  };
 
-  const dispatch = createEventDispatcher();
+  interface Props {
+    ramp: Ramp;
+    /** Each breakpoint's P0, P1 and P2. */
+    curves?: [number, number, number][];
+    /** The y range shown. */
+    span?: [number, number];
+    grid?: { key: string | number; y: number; label: string | number }[];
+    /** x from 0 to 1. */
+    dots?: { key: string | number; x: number; y: number; marked?: boolean }[];
+    /** Breakpoint names. */
+    breakpoints?: string[];
+    /** Index of the breakpoint shown. */
+    selected?: number;
+    /** How many rungs the ends can take. */
+    rungCount?: number;
+    /** The rung nearest a y value, for dragging an end. */
+    rungAt?: (y: number) => number;
+    /** An end's y value as its slider reads it, e.g. "16px". */
+    format?: (y: number) => string;
+    /** Names the chart, e.g. "Heading ramp"; the breakpoint follows. */
+    ariaLabel: string;
+    bottomLabel?: string;
+    topLabel?: string;
+    /** What runs along x, for the bend's value, e.g. "levels". */
+    along?: string;
+    /** A patch of the ramp */
+    onchange?: (patch: Partial<Ramp>) => void;
+    /** A breakpoint's index */
+    onselect?: (index: number) => void;
+  }
+
+  let {
+    ramp,
+    curves = [],
+    span = [0, 1],
+    grid = [],
+    dots = [],
+    breakpoints = [],
+    selected = 0,
+    rungCount = 2,
+    rungAt = (y) => y,
+    format = (y) => `${Math.round(y)}`,
+    ariaLabel,
+    bottomLabel = "First",
+    topLabel = "Last",
+    along = "sets",
+    onchange,
+    onselect,
+  }: Props = $props();
+
+  type Handle = "bottom" | "bend" | "top";
 
   const W = 240;
   const H = 180;
   const PAD = { left: 28, right: 8, top: 8, bottom: 8 };
   const plotW = W - PAD.left - PAD.right;
   const plotH = H - PAD.top - PAD.bottom;
-  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const clamp = (v: number, lo: number, hi: number) =>
+    Math.min(hi, Math.max(lo, v));
 
-  $: lastIndex = breakpoints.length - 1;
-  $: editable = selected === 0 || selected === lastIndex;
-  $: end = selected === 0 ? "Sm" : "Lg";
-  $: topRung = Math.max(1, rungCount - 1);
-  $: breakpointItems = breakpoints.map((name, b) => ({
-    label: name,
-    value: b,
-  }));
-  $: breakpointItem = breakpointItems.find((i) => i.value === selected) ?? null;
+  let lastIndex = $derived(breakpoints.length - 1);
+  let editable = $derived(selected === 0 || selected === lastIndex);
+  let end = $derived(selected === 0 ? "Sm" : "Lg");
+  let topRung = $derived(Math.max(1, rungCount - 1));
+  let breakpointItems = $derived(
+    breakpoints.map((name, b) => ({ label: name, value: b })),
+  );
+  let breakpointItem = $derived(
+    breakpointItems.find((i) => i.value === selected) ?? null,
+  );
 
   // While dragging, the axis holds still; rescaling under the pointer would
   // make the handle run away from it.
-  let frozen = null;
-  $: [yMin, yMax] = frozen ?? span;
-  const X = (x) => PAD.left + x * plotW;
-  const toY = (v, lo, hi) => PAD.top + plotH - ((v - lo) / (hi - lo)) * plotH;
-  const fromY = (y, lo, hi) => lo + ((PAD.top + plotH - y) / plotH) * (hi - lo);
+  let frozen: [number, number] | null = $state(null);
+  let [yMin, yMax] = $derived(frozen ?? span);
+  const X = (x: number) => PAD.left + x * plotW;
+  const toY = (v: number, lo: number, hi: number) =>
+    PAD.top + plotH - ((v - lo) / (hi - lo)) * plotH;
+  const fromY = (y: number, lo: number, hi: number) =>
+    lo + ((PAD.top + plotH - y) / plotH) * (hi - lo);
 
-  // Coordinates are worked out here, not in the markup: a helper called from
-  // the markup would not re-run when the ramp changes.
   // Lines in view, labelled where there's room.
-  $: lines = grid
-    .map((g) => ({ ...g, cy: toY(g.y, yMin, yMax) }))
-    .filter((g) => g.y >= yMin && g.y <= yMax)
-    .reduce((acc, g) => {
-      const labelled = acc.filter((a) => a.label !== null);
-      const prev = labelled[labelled.length - 1];
-      acc.push({ ...g, label: !prev || prev.cy - g.cy >= 10 ? g.label : null });
-      return acc;
-    }, []);
+  type Line = {
+    key: string | number;
+    y: number;
+    label: string | number | null;
+    cy: number;
+  };
+  let lines = $derived(
+    grid
+      .map((g) => ({ ...g, cy: toY(g.y, yMin, yMax) }))
+      .filter((g) => g.y >= yMin && g.y <= yMax)
+      .reduce((acc: Line[], g) => {
+        const labelled = acc.filter((a) => a.label !== null);
+        const prev = labelled[labelled.length - 1];
+        acc.push({
+          ...g,
+          label: !prev || prev.cy - g.cy >= 10 ? g.label : null,
+        });
+        return acc;
+      }, []),
+  );
 
-  $: position = clampPosition(ramp.bendPosition ?? 0.5);
+  let position = $derived(clampPosition(ramp.bendPosition ?? 0.5));
   // A quadratic with its control point at (position, P1): SVG draws it as is.
-  function pathFor([p0, p1, p2], c, lo, hi) {
+  function pathFor(
+    [p0, p1, p2]: [number, number, number],
+    c: number,
+    lo: number,
+    hi: number,
+  ) {
     return `M${X(0)},${toY(p0, lo, hi)} Q${X(c)},${toY(p1, lo, hi)} ${X(1)},${toY(p2, lo, hi)}`;
   }
-  $: paths = curves.map((p) => pathFor(p, position, yMin, yMax));
-  $: current = curves[selected] ?? [0, 0, 0];
-  $: polygon = [0, position, 1]
-    .map((x, i) => `${i ? "L" : "M"}${X(x)},${toY(current[i], yMin, yMax)}`)
-    .join(" ");
-  $: circles = dots.map((d) => ({
-    ...d,
-    cx: X(d.x),
-    cy: toY(d.y, yMin, yMax),
-  }));
+  let paths = $derived(curves.map((p) => pathFor(p, position, yMin, yMax)));
+  let current = $derived(curves[selected] ?? [0, 0, 0]);
+  let polygon = $derived(
+    [0, position, 1]
+      .map((x, i) => `${i ? "L" : "M"}${X(x)},${toY(current[i], yMin, yMax)}`)
+      .join(" "),
+  );
+  let circles = $derived(
+    dots.map((d) => ({ ...d, cx: X(d.x), cy: toY(d.y, yMin, yMax) })),
+  );
 
-  $: bend = end === "Sm" ? ramp.bendSm : ramp.bendLg;
-  $: handles = [
-    { id: "bottom", x: 0, y: current[0], label: bottomLabel },
-    { id: "bend", x: position, y: current[1], label: "Bend" },
-    { id: "top", x: 1, y: current[2], label: topLabel },
-  ].map((h) => ({
-    ...h,
-    cx: X(h.x),
-    cy: toY(h.y, yMin, yMax),
-    valueNow: h.id === "bend" ? bend : ramp[`${h.id}${end}`],
-    valueMin: h.id === "bend" ? -0.5 : 0,
-    valueMax: h.id === "bend" ? 1.5 : topRung,
-    valueText:
-      h.id === "bend"
-        ? `bend ${bend.toFixed(2)}, at ${position.toFixed(2)} along the ${along}`
-        : format(h.y),
-  }));
+  // A ramp end's rung: `bottomSm`, `topLg`…
+  const endOf = (handle: Handle) =>
+    (ramp as Record<string, number>)[`${handle}${end}`];
 
-  function setBend(value) {
+  let bend = $derived(end === "Sm" ? ramp.bendSm : ramp.bendLg);
+  let handles = $derived(
+    (
+      [
+        { id: "bottom", x: 0, y: current[0], label: bottomLabel },
+        { id: "bend", x: position, y: current[1], label: "Bend" },
+        { id: "top", x: 1, y: current[2], label: topLabel },
+      ] as { id: Handle; x: number; y: number; label: string }[]
+    ).map((h) => ({
+      ...h,
+      cx: X(h.x),
+      cy: toY(h.y, yMin, yMax),
+      valueNow: h.id === "bend" ? bend : endOf(h.id),
+      valueMin: h.id === "bend" ? -0.5 : 0,
+      valueMax: h.id === "bend" ? 1.5 : topRung,
+      valueText:
+        h.id === "bend"
+          ? `bend ${bend.toFixed(2)}, at ${position.toFixed(2)} along the ${along}`
+          : format(h.y),
+    })),
+  );
+
+  function setBend(value: number) {
     const rounded = Math.round(value * 100) / 100;
-    dispatch("change", { [`bend${end}`]: clamp(rounded, -0.5, 1.5) });
+    onchange?.({ [`bend${end}`]: clamp(rounded, -0.5, 1.5) });
   }
-  function setPosition(value) {
-    dispatch("change", {
+  function setPosition(value: number) {
+    onchange?.({
       bendPosition: clampPosition(Math.round(value * 100) / 100),
     });
   }
-  function setEnd(handle, rung) {
-    dispatch("change", {
+  function setEnd(handle: Handle, rung: number) {
+    onchange?.({
       [`${handle}${end}`]: clamp(Math.round(rung), 0, topRung),
     });
   }
 
-  let svg;
-  let dragging = null;
-  function yAt(event) {
+  let svg: SVGSVGElement | undefined = $state();
+  let dragging: Handle | null = $state(null);
+  function yAt(event: PointerEvent) {
+    if (!svg) return 0;
     const box = svg.getBoundingClientRect();
     const y = ((event.clientY - box.top) / box.height) * H;
     return fromY(y, yMin, yMax);
   }
   // Where along x the pointer is, 0…1.
-  function xAt(event) {
+  function xAt(event: PointerEvent) {
+    if (!svg) return 0;
     const box = svg.getBoundingClientRect();
     const x = ((event.clientX - box.left) / box.width) * W;
     return (x - PAD.left) / plotW;
   }
-  function handleDown(event, handle) {
+  function handleDown(
+    event: PointerEvent & { currentTarget: SVGGElement },
+    handle: Handle,
+  ) {
     if (!editable) return;
     dragging = handle;
     frozen = [yMin, yMax];
@@ -159,7 +222,7 @@
   // The drag is followed on the window, not by pointer capture alone, which
   // doesn't always take in a plugin's iframe: the handle keeps moving once
   // the pointer leaves the chart.
-  function handleMove(event) {
+  function handleMove(event: PointerEvent) {
     if (!dragging) return;
     // Let go outside the plugin's window, where the release went unheard.
     if (event.buttons === 0) return handleUp();
@@ -177,7 +240,7 @@
     dragging = null;
     frozen = null;
   }
-  function handleKey(event, handle) {
+  function handleKey(event: KeyboardEvent, handle: Handle) {
     if (
       handle === "bend" &&
       (event.key === "ArrowLeft" || event.key === "ArrowRight")
@@ -190,21 +253,21 @@
     event.preventDefault();
     const up = event.key === "ArrowUp" ? 1 : -1;
     if (handle === "bend") setBend(bend + up * 0.02);
-    else setEnd(handle, ramp[`${handle}${end}`] + up);
+    else setEnd(handle, endOf(handle) + up);
   }
 </script>
 
 <svelte:window
-  on:pointermove={handleMove}
-  on:pointerup={handleUp}
-  on:pointercancel={handleUp}
+  onpointermove={handleMove}
+  onpointerup={handleUp}
+  onpointercancel={handleUp}
 />
 
 <div class="ramp-curve">
   <Dropdown
     menuItems={breakpointItems}
     value={breakpointItem}
-    on:change={(e) => dispatch("select", e.detail.value)}
+    onchange={(item) => onselect?.(item.value)}
     ariaLabel="Breakpoint shown"
   />
 
@@ -213,10 +276,10 @@
       >Calculated from the endpoints.</Text
     >
     <div class="endpoint-actions">
-      <Button variant="link" on:click={() => dispatch("select", 0)}
+      <Button variant="link" onclick={() => onselect?.(0)}
         >Edit {breakpoints[0]}</Button
       >
-      <Button variant="link" on:click={() => dispatch("select", lastIndex)}
+      <Button variant="link" onclick={() => onselect?.(lastIndex)}
         >Edit {breakpoints[lastIndex]}</Button
       >
     </div>
@@ -275,8 +338,8 @@
           aria-valuemin={h.valueMin}
           aria-valuemax={h.valueMax}
           aria-valuetext={h.valueText}
-          on:pointerdown={(e) => handleDown(e, h.id)}
-          on:keydown={(e) => handleKey(e, h.id)}
+          onpointerdown={(e) => handleDown(e, h.id)}
+          onkeydown={(e) => handleKey(e, h.id)}
         >
           <circle class="hit" r="8" />
           <circle class="knob" r={h.id === "bend" ? 3 : 3.5} />

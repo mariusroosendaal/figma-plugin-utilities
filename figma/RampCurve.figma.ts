@@ -31,8 +31,8 @@ export default {
   {breakpoints}
   {selected}
   ariaLabel="Heading ramp"
-  on:change={(e) => updateRamp(e.detail)}
-  on:select={(e) => (selected = e.detail)}
+  onchange={updateRamp}
+  onselect={(index) => (selected = index)}
 />`,
   imports,
   id: 'ramp-curve',

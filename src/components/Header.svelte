@@ -1,26 +1,41 @@
-<script>
-  // Header component with left/center/right slots
+<script lang="ts">
+  import type { Snippet } from "svelte";
 
-  /** Additional CSS class */
-  export let className = "";
+  // Header component with left, center and right snippets
 
-  /** Title text (displayed in left section) */
-  export let title = "";
+  interface Props {
+    /** Additional CSS class */
+    className?: string;
+    /** Title text (displayed in left section) */
+    title?: string;
+    /** Remove bottom border */
+    noBorder?: boolean;
+    /** Heading level of the title: 1 for the plugin's own header, 2 or 3 for a bar inside a panel or modal */
+    level?: 1 | 2 | 3 | 4 | 5 | 6;
+    /** Before the title */
+    left?: Snippet;
+    center?: Snippet;
+    right?: Snippet;
+  }
 
-  /** Remove bottom border */
-  export let noBorder = false;
-
-  /** Heading level of the title: 1 for the plugin's own header, 2 or 3 for a bar inside a panel or modal */
-  export let level = 1;
+  let {
+    className = "",
+    title = "",
+    noBorder = false,
+    level = 1,
+    left,
+    center,
+    right,
+  }: Props = $props();
 </script>
 
 <header
   class="header {className}"
-  class:has-left-content={$$slots.left}
+  class:has-left-content={left}
   class:no-border={noBorder}
 >
   <div class="header__left">
-    <slot name="left" />
+    {@render left?.()}
     {#if title}
       <svelte:element this={`h${level}`} class="header__title"
         >{title}</svelte:element
@@ -28,10 +43,10 @@
     {/if}
   </div>
   <div class="header__center">
-    <slot name="center" />
+    {@render center?.()}
   </div>
   <div class="header__right">
-    <slot name="right" />
+    {@render right?.()}
   </div>
 </header>
 

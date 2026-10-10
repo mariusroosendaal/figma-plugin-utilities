@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+  import type { Component } from "svelte";
   import { Button, Icon } from "figma-ui3-kit-svelte";
 
   /**
@@ -12,49 +13,46 @@
    * />
    */
 
-  /** Message to display */
-  export let message = "";
+  interface EmptyStateAction {
+    label: string;
+    handler: () => void;
+  }
 
-  /**
-   * Optional icon: SVG markup, such as an icon from figma-ui3-kit-svelte/icons, or a component
-   * @type {string | import("svelte").ComponentType | null}
-   */
-  export let icon = null;
+  interface Props {
+    /** Message to display */
+    message?: string;
+    /** Optional icon: SVG markup, such as an icon from figma-ui3-kit-svelte/icons, or a component */
+    icon?: string | Component | null;
+    /** Icon size in px, for an icon given as SVG markup; the svg is scaled to it */
+    iconSize?: number;
+    /** Single action for backward compatibility { label, handler } */
+    action?: EmptyStateAction | null;
+    /** Multiple actions [{ label, handler }] */
+    actions?: EmptyStateAction[] | null;
+    /** Size variant */
+    size?: "small" | "medium" | "large";
+    /** Whether to center vertically */
+    centered?: boolean;
+    /** ARIA role: "status" for info messages, "alert" for errors */
+    role?: "status" | "alert";
+    class?: string;
+  }
 
-  /** Icon size in px, for an icon given as SVG markup; the svg is scaled to it */
-  export let iconSize = 24;
+  let {
+    message = "",
+    icon = null,
+    iconSize = 24,
+    action = null,
+    actions = null,
+    size = "medium",
+    centered = true,
+    role = "status",
+    class: className = "",
+  }: Props = $props();
 
-  /**
-   * @typedef {object} EmptyStateAction
-   * @property {string} label
-   * @property {() => void} handler
-   */
-
-  /**
-   * Single action for backward compatibility { label, handler }
-   * @type {EmptyStateAction | null}
-   */
-  export let action = null;
-
-  /**
-   * Multiple actions [{ label, handler }]
-   * @type {EmptyStateAction[] | null}
-   */
-  export let actions = null;
-
-  /** Size variant: 'small', 'medium', 'large' */
-  export let size = "medium";
-
-  /** Whether to center vertically */
-  export let centered = true;
-
-  /** ARIA role: "status" for info messages, "alert" for errors */
-  export let role = "status";
-
-  let className = "";
-  export { className as class };
-
-  $: normalizedActions = actions ? actions : action ? [action] : null;
+  let normalizedActions = $derived(
+    actions ? actions : action ? [action] : null,
+  );
 </script>
 
 <div
@@ -69,7 +67,8 @@
       {#if typeof icon === "string"}
         <Icon iconName={icon} size={iconSize} />
       {:else}
-        <svelte:component this={icon} />
+        {@const IconComponent = icon}
+        <IconComponent />
       {/if}
     </div>
   {/if}
@@ -81,7 +80,7 @@
   {#if normalizedActions && normalizedActions.length > 0}
     <div class="empty-state__actions">
       {#each normalizedActions as actionItem (actionItem.label)}
-        <Button variant="secondary" on:click={actionItem.handler}>
+        <Button variant="secondary" onclick={() => actionItem.handler()}>
           {actionItem.label}
         </Button>
       {/each}

@@ -840,7 +840,11 @@ const BUILDERS = {
   },
   async Modal(p, spec, parent, ctx) {
     const s = spec.slots || {}
-    const footer = s['footer-full'] ? 'Full' : s['footer-left'] || s['footer-right'] ? 'Split' : 'None'
+    // As the snippets are named; the Svelte 4 slot names still work
+    const footerLeft = s.footerLeft ?? s['footer-left']
+    const footerRight = s.footerRight ?? s['footer-right']
+    const footerFull = s.footerFull ?? s['footer-full']
+    const footer = footerFull ? 'Full' : footerLeft || footerRight ? 'Split' : 'None'
     // width: 'small' | 'medium' | 'large' | a pixel number; height: pixels.
     const width = typeof p.width === 'number' ? 'Large' : pick({ small: 'Small', medium: 'Medium', large: 'Large' }, p.width, 'Medium')
     const node = await instance('Modal', { '👥 Width': width, '👥 Footer': footer })
@@ -858,10 +862,10 @@ const BUILDERS = {
     if (p.footerBorder === false) setProp(node, '👁️ Footer border', false)
     await fillSlot(node, 'Content slot', spec.children ?? [], ctx)
     if (footer === 'Split') {
-      await fillSlot(node, 'Footer left slot', s['footer-left'] ?? [], ctx)
-      await fillSlot(node, 'Footer right slot', s['footer-right'] ?? [], ctx)
+      await fillSlot(node, 'Footer left slot', footerLeft ?? [], ctx)
+      await fillSlot(node, 'Footer right slot', footerRight ?? [], ctx)
     } else if (footer === 'Full') {
-      const slot = await fillSlot(node, 'Footer full slot', s['footer-full'], ctx)
+      const slot = await fillSlot(node, 'Footer full slot', footerFull, ctx)
       for (const c of slot.children) stretch(c)
     }
     if (p.height) {

@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+  import type { Snippet } from "svelte";
+
   /**
    * Standard plugin layout wrapper
    * Provides consistent structure with main content area and optional footer
@@ -10,13 +12,18 @@
    * </PluginLayout>
    */
 
-  /** Additional CSS classes for the wrapper */
-  export let className = "";
+  interface Props {
+    /** Additional CSS classes for the wrapper */
+    className?: string;
+    children?: Snippet;
+  }
+
+  let { className = "", children }: Props = $props();
 </script>
 
 <div class="plugin-wrapper {className}">
   <main class="plugin-main">
-    <slot />
+    {@render children?.()}
   </main>
 </div>
 

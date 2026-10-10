@@ -1,6 +1,6 @@
-<script>
-  import { createEventDispatcher } from "svelte";
-  import { IconButton, Menu } from "figma-ui3-kit-svelte";
+<script lang="ts" generics="T extends MenuOption = MenuOption">
+  import type { Snippet } from "svelte";
+  import { IconButton, Menu, type MenuOption } from "figma-ui3-kit-svelte";
   import { IconMore } from "figma-ui3-kit-svelte/icons";
 
   /**
@@ -15,60 +15,83 @@
    *     { label: 'Edit', value: 'edit' },
    *     { label: 'Delete', value: 'delete' }
    *   ]}
-   *   on:click={handleSelect}
-   *   on:menuSelect={handleMenuAction}
+   *   onclick={handleSelect}
+   *   onmenuselect={handleMenuAction}
    * >
    *   <span>Additional info</span>
-   *   <Button slot="actions" variant="secondary" on:click={fill}>Fill</Button>
+   *   {#snippet actions()}
+   *     <Button variant="secondary" onclick={fill}>Fill</Button>
+   *   {/snippet}
    * </ListItem>
    */
 
-  const dispatch = createEventDispatcher();
+  interface Props {
+    /** Unique identifier */
+    id: string;
+    /** Display title */
+    title: string;
+    /** Whether item is selected/active */
+    active?: boolean;
+    /** Menu items [{ label, value }] */
+    menuItems?: T[];
+    /** Whether menu is open (bindable) */
+    menuOpen?: boolean;
+    /** Reference to menu button element */
+    menuButtonElement?: HTMLButtonElement | null;
+    /** Whether to show the badge snippet */
+    hasBadge?: boolean;
+    class?: string;
+    /** Under the title */
+    children?: Snippet;
+    badge?: Snippet;
+    /** Beside the clickable area */
+    actions?: Snippet;
+    /** The item, by click or Enter */
+    onclick?: (detail: { id: string }) => void;
+    /** The menu button, after `menuOpen` updates */
+    onmenutoggle?: (detail: { id: string; open: boolean }) => void;
+    /** A menu row: its `value` */
+    onmenuselect?: (detail: { id: string; action: T["value"] }) => void;
+    /** The menu closed, after `menuOpen` turns false */
+    onmenuclose?: (detail: { id: string }) => void;
+  }
 
-  /** Unique identifier */
-  export let id;
-
-  /** Display title */
-  export let title;
-
-  /** Whether item is selected/active */
-  export let active = false;
-
-  /** Menu items [{ label, value }] */
-  export let menuItems = [];
-
-  /** Whether menu is open (bindable) */
-  export let menuOpen = false;
-
-  /** Reference to menu button element */
-  export let menuButtonElement = null;
-
-  /** Whether to show badge slot */
-  export let hasBadge = false;
-
-  let className = "";
-  export { className as class };
+  let {
+    id,
+    title,
+    active = false,
+    menuItems = [],
+    menuOpen = $bindable(),
+    menuButtonElement = $bindable(),
+    hasBadge = false,
+    class: className = "",
+    children,
+    badge,
+    actions,
+    onclick,
+    onmenutoggle,
+    onmenuselect,
+    onmenuclose,
+  }: Props = $props();
 
   function handleClick() {
-    dispatch("click", { id });
+    onclick?.({ id });
   }
 
-  function handleMenuToggle(e) {
+  function handleMenuToggle(e: MouseEvent) {
     e.stopPropagation();
     menuOpen = !menuOpen;
-    dispatch("menuToggle", { id, open: menuOpen });
+    onmenutoggle?.({ id, open: menuOpen });
   }
 
-  function handleMenuSelect(e) {
-    // Closed before the parent hears of it: written after, the prop stops
-    // following the parent in Svelte 5.35+ (see Modal's closeModal)
-    menuOpen = false;
-    dispatch("menuSelect", { id, action: e.detail.value });
+  // The menu closes itself after a pick, and calls handleMenuClose
+  function handleMenuSelect(item: T) {
+    onmenuselect?.({ id, action: item.value });
   }
 
   function handleMenuClose() {
     menuOpen = false;
-    dispatch("menuClose", { id });
+    onmenuclose?.({ id });
   }
 </script>
 
@@ -78,8 +101,8 @@
   <div class="list-item" class:active>
     <div
       class="list-item__main"
-      on:click={handleClick}
-      on:keydown={(e) => {
+      onclick={handleClick}
+      onkeydown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           handleClick();
@@ -91,21 +114,21 @@
     >
       <div class="list-item__content">
         <div class="list-item__title">{title}</div>
-        {#if $$slots.default}
+        {#if children}
           <div class="list-item__meta">
-            <slot />
+            {@render children()}
           </div>
         {/if}
-        {#if hasBadge && $$slots.badge}
+        {#if hasBadge && badge}
           <div class="list-item__badge">
-            <slot name="badge" />
+            {@render badge()}
           </div>
         {/if}
       </div>
     </div>
-    {#if $$slots.actions}
+    {#if actions}
       <div class="list-item__actions">
-        <slot name="actions" />
+        {@render actions()}
       </div>
     {/if}
   </div>
@@ -115,14 +138,14 @@
       iconName={IconMore}
       ariaLabel="{title} options"
       bind:element={menuButtonElement}
-      on:click={handleMenuToggle}
+      onclick={handleMenuToggle}
     />
     <Menu
       bind:isOpen={menuOpen}
       {menuItems}
       anchorElement={menuButtonElement}
-      on:select={handleMenuSelect}
-      on:close={handleMenuClose}
+      onselect={handleMenuSelect}
+      onclose={handleMenuClose}
     />
   {/if}
 </div>

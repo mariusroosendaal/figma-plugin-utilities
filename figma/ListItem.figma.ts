@@ -50,10 +50,10 @@ if (instance.getBoolean('👁️ Actions slot')) {
 const attrs = figma.code` id="${id}" title="${title}"${active ? ' active' : ''}${showMenu ? ' menuItems={menuItems}' : ''}${badgeCode ? ' hasBadge' : ''}`
 const children = figma.code`${meta ? figma.code`
   ${meta}` : ''}${badgeCode ? figma.code`
-  <svelte:fragment slot="badge">${badgeCode}</svelte:fragment>` : ''}${actionsCode ? figma.code`
-  <svelte:fragment slot="actions">
+  {#snippet badge()}${badgeCode}{/snippet}` : ''}${actionsCode ? figma.code`
+  {#snippet actions()}
     ${actionsCode}
-  </svelte:fragment>` : ''}`
+  {/snippet}` : ''}`
 
 export default {
   example: meta || badgeCode || actionsCode ? figma.code`<ListItem${attrs}>${children}

@@ -50,9 +50,9 @@ const content = slot(instance, 'Content slot', '  ', false, (node) => node.name 
 
 export default {
   example: figma.code`<Section title="${title}">${actions ? figma.code`
-  <svelte:fragment slot="actions">
+  {#snippet actions()}
     ${actions}
-  </svelte:fragment>` : ''}
+  {/snippet}` : ''}
   ${content}
 </Section>`,
   imports,

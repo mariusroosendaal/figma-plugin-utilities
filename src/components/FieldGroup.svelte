@@ -1,37 +1,48 @@
-<script>
+<script lang="ts">
+  import type { Snippet } from "svelte";
   import { Label, Text } from "figma-ui3-kit-svelte";
 
-  /** Label text (optional) */
-  export let label = "";
+  interface Props {
+    /** Label text (optional) */
+    label?: string;
+    /** id of the associated control (optional) */
+    labelFor?: string;
+    /** Size of the label (optional) */
+    size?: "medium" | "small";
+    /**
+     * A line under the control: what to enter, or what the choice does
+     * (optional). An empty string shows none, so a conditional hint is a
+     * string; a snippet takes markup and always shows. It takes the label's
+     * size, as the control's error does: body-medium, or body-small in a
+     * small group.
+     */
+    hint?: string | Snippet;
+    /** The control */
+    children?: Snippet;
+  }
 
-  /** id of the associated control (optional) */
-  export let labelFor = "";
-
-  /** Size of the label (optional) */
-  export let size = undefined;
-
-  /**
-   * A line under the control: what to enter, or what the choice does
-   * (optional). Empty shows none, so a conditional hint is a string; the
-   * `hint` slot takes markup and always shows. It takes the label's size, as
-   * the control's error does: body-medium, or body-small in a small group.
-   */
-  export let hint = "";
+  let {
+    label = "",
+    labelFor = "",
+    size = undefined,
+    hint = "",
+    children,
+  }: Props = $props();
 </script>
 
 <div class="field-group" class:small={size === "small"}>
   {#if label}
     <Label htmlFor={labelFor} {size}>{label}</Label>
   {/if}
-  <slot />
-  {#if $$slots.hint || hint}
+  {@render children?.()}
+  {#if hint}
     <Text
       class="field-group__hint"
       variant={size === "small" ? "body-small" : "body-medium"}
       color="--figma-color-text-secondary"
       block
     >
-      <slot name="hint">{hint}</slot>
+      {#if typeof hint === "function"}{@render hint()}{:else}{hint}{/if}
     </Text>
   {/if}
 </div>

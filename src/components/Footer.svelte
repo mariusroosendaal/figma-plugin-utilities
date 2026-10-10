@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+  import type { Snippet } from "svelte";
+
   /**
    * Plugin footer with layout variants
    *
@@ -10,12 +12,12 @@
    *
    * <!-- Split layout -->
    * <Footer variant="split">
-   *   <svelte:fragment slot="left">
+   *   {#snippet left()}
    *     <Button variant="secondary">Cancel</Button>
-   *   </svelte:fragment>
-   *   <svelte:fragment slot="right">
+   *   {/snippet}
+   *   {#snippet right()}
    *     <Button variant="primary">Save</Button>
-   *   </svelte:fragment>
+   *   {/snippet}
    * </Footer>
    *
    * <!-- Full width buttons -->
@@ -24,27 +26,42 @@
    * </Footer>
    */
 
-  /** Layout variant: 'right', 'split', 'full' */
-  export let variant = "right";
+  interface Props {
+    /** Layout variant */
+    variant?: "right" | "split" | "full";
+    /** Additional CSS class */
+    className?: string;
+    /** The buttons, for the right and full variants */
+    children?: Snippet;
+    /** Split variant */
+    left?: Snippet;
+    /** Split variant */
+    right?: Snippet;
+  }
 
-  /** Additional CSS class */
-  export let className = "";
+  let {
+    variant = "right",
+    className = "",
+    children,
+    left,
+    right,
+  }: Props = $props();
 </script>
 
 <footer class="footer footer--{variant} {className}">
   {#if variant === "right"}
     <div class="footer__right">
-      <slot />
+      {@render children?.()}
     </div>
   {:else if variant === "split"}
     <div class="footer__left">
-      <slot name="left" />
+      {@render left?.()}
     </div>
     <div class="footer__right">
-      <slot name="right" />
+      {@render right?.()}
     </div>
   {:else if variant === "full"}
-    <slot />
+    {@render children?.()}
   {/if}
 </footer>
 

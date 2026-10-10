@@ -21,7 +21,7 @@ export default defineConfig([
     languageOptions: {
       parser: svelteParser,
       parserOptions: {
-        parser: "espree",
+        parser: tseslint.parser,
         ecmaVersion: "latest",
         sourceType: "module",
         extraFileExtensions: [".svelte"],
@@ -33,7 +33,4 @@ export default defineConfig([
     ...config,
     files: config.files ?? ["**/*.{ts,tsx,mts,cts}"],
   })),
-  // Runes-mode advice: legacy-mode components react to reassignment, not to
-  // SvelteSet or SvelteMap. Drop this once the components move to runes.
-  { rules: { "svelte/prefer-svelte-reactivity": "off" } },
 ]);
