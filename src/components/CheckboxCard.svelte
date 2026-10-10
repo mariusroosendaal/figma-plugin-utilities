@@ -91,8 +91,9 @@
     cursor: not-allowed;
   }
 
-  /* Custom checkbox styling for card variant */
-  .checkbox-card :global(.checkbox-box) {
+  /* Custom checkbox styling for card variant: an empty box takes the window's
+     fill. Checkbox's own rules style the checked, mixed and disabled ones. */
+  .checkbox-card :global(.checkbox-box:not(.checked, .mixed, .disabled)) {
     background-color: var(--figma-color-bg);
   }
 
