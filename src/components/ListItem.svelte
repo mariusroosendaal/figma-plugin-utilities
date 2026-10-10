@@ -60,8 +60,10 @@
   }
 
   function handleMenuSelect(e) {
-    dispatch("menuSelect", { id, action: e.detail.value });
+    // Closed before the parent hears of it: written after, the prop stops
+    // following the parent in Svelte 5.35+ (see Modal's closeModal)
     menuOpen = false;
+    dispatch("menuSelect", { id, action: e.detail.value });
   }
 
   function handleMenuClose() {
