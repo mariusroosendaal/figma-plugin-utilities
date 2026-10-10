@@ -12,26 +12,26 @@
  *   if (msg.type === "resize") handleResize(msg);
  */
 
-import { sendToPlugin } from "./messages.ts";
+import { sendToPlugin } from "./messages";
 
 /** Default width for the plugin window */
 let defaultWidth = 300;
 
 /**
  * Set the default width used for resize operations
- * @param {number} width - The default width in pixels
+ * @param width - The default width in pixels
  */
-export function setDefaultWidth(width) {
+export function setDefaultWidth(width: number): void {
   defaultWidth = width;
 }
 
 /**
  * Get the current content height of the plugin UI
  * Uses scrollHeight which works when container doesn't have fixed height
- * @param {HTMLElement} [container] - Container element to measure (should NOT have height: 100%)
- * @returns {number} The content height in pixels
+ * @param container - Container element to measure (should NOT have height: 100%)
+ * @returns The content height in pixels
  */
-export function getContentHeight(container) {
+export function getContentHeight(container?: HTMLElement | null): number {
   if (!container) {
     return 0;
   }
@@ -40,18 +40,23 @@ export function getContentHeight(container) {
 
 /**
  * Request the plugin to resize to fit content
- * @param {object} [options] - Resize options
- * @param {number} [options.width] - Width in pixels (uses default if not specified)
- * @param {number} [options.height] - Height in pixels (auto-calculated if not specified)
- * @param {number} [options.minHeight=100] - Minimum height in pixels
- * @param {number} [options.maxHeight=800] - Maximum height in pixels
- * @param {number} [options.padding=0] - Extra padding to add to calculated height
- * @param {HTMLElement} [options.container] - Container element to measure,
- *   required without `height`. Not `document.body`: the kit sets
- *   `html, body, #app { height: 100% }`, so the body measures the window,
- *   which then can grow but never shrink.
+ * Options: `width` in pixels (the default width if not specified), `height`
+ * (auto-calculated if not specified), `minHeight` (100), `maxHeight` (800),
+ * `padding` (0) added to the calculated height, and `container`, the element
+ * to measure, required without `height`. Not `document.body`: the kit sets
+ * `html, body, #app { height: 100% }`, so the body measures the window,
+ * which then can grow but never shrink.
  */
-export function resizeToFit(options = {}) {
+export function resizeToFit(
+  options: {
+    width?: number;
+    height?: number;
+    minHeight?: number;
+    maxHeight?: number;
+    padding?: number;
+    container?: HTMLElement | null;
+  } = {},
+): void {
   const {
     width = defaultWidth,
     height,
@@ -84,17 +89,25 @@ export function resizeToFit(options = {}) {
  * IMPORTANT: The container element must NOT have height: 100% or fixed height.
  * Use bind:this on a wrapper element that flows naturally with content.
  *
- * @param {object} options - Auto-resize options
- * @param {HTMLElement | null} options.container - Container element to observe (required, must not have fixed height)
- * @param {number} [options.width] - Width in pixels (uses default if not specified)
- * @param {number} [options.minHeight=100] - Minimum height in pixels
- * @param {number} [options.maxHeight=800] - Maximum height in pixels
- * @param {number} [options.padding=0] - Extra padding to add to calculated height
- * @param {number} [options.debounce=50] - Debounce delay in milliseconds
- * @param {number} [options.threshold=20] - Minimum height change to trigger resize (prevents position reset)
- * @returns {function} Cleanup function to stop observing
+ * Options: `container`, the element to observe (required, must not have fixed
+ * height), `width` in pixels (the default width if not specified), `minHeight`
+ * (100), `maxHeight` (800), `padding` (0) added to the calculated height,
+ * `debounce` delay in milliseconds (50), and `threshold`, the minimum height
+ * change to trigger a resize (20; prevents position reset).
+ *
+ * @returns Cleanup function to stop observing
  */
-export function autoResize(options = { container: null }) {
+export function autoResize(
+  options: {
+    container: HTMLElement | null;
+    width?: number;
+    minHeight?: number;
+    maxHeight?: number;
+    padding?: number;
+    debounce?: number;
+    threshold?: number;
+  } = { container: null },
+): () => void {
   const {
     container,
     width = defaultWidth,
@@ -110,7 +123,7 @@ export function autoResize(options = { container: null }) {
     return () => {};
   }
 
-  let timeoutId = null;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let lastHeight = 0;
 
   const doResize = () => {

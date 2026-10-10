@@ -79,7 +79,7 @@
 
   {#if normalizedActions && normalizedActions.length > 0}
     <div class="empty-state__actions">
-      {#each normalizedActions as actionItem (actionItem.label)}
+      {#each normalizedActions as actionItem, i (i)}
         <Button variant="secondary" onclick={() => actionItem.handler()}>
           {actionItem.label}
         </Button>

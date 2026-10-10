@@ -6,12 +6,13 @@
 
 /**
  * Validate a URL string
- * @param {string} url - The URL to validate
- * @param {Object} [options] - Validation options
- * @param {boolean} [options.required=true] - Whether URL is required
- * @returns {{ valid: boolean, error?: string }}
+ * @param url - The URL to validate
+ * @param options - Validation options; `required` defaults to true
  */
-export function validateUrl(url, options = { required: true }) {
+export function validateUrl(
+  url: string,
+  options: { required?: boolean } = { required: true },
+): { valid: boolean; error?: string } {
   if (!url || typeof url !== "string" || !url.trim()) {
     if (options.required) {
       return { valid: false, error: "URL is required" };
@@ -68,13 +69,14 @@ export function validateUrl(url, options = { required: true }) {
 
 /**
  * Validate a JSON string
- * @param {string} jsonString - The JSON string to validate
- * @param {Object} [options] - Validation options
- * @param {number} [options.maxSizeKB] - Maximum size in KB
- * @param {boolean} [options.requireObject] - Whether root must be an object
- * @returns {{ valid: boolean, error?: string, parsed?: unknown }}
+ * @param jsonString - The JSON string to validate
+ * @param options - Validation options: `maxSizeKB` caps the size,
+ *   `requireObject` requires the root to be an object
  */
-export function validateJsonString(jsonString, options = {}) {
+export function validateJsonString(
+  jsonString: string,
+  options: { maxSizeKB?: number; requireObject?: boolean } = {},
+): { valid: boolean; error?: string; parsed?: unknown } {
   if (!jsonString || typeof jsonString !== "string") {
     return {
       valid: false,
@@ -131,11 +133,10 @@ export function validateJsonString(jsonString, options = {}) {
 
 /**
  * Sanitize user input string
- * @param {unknown} input - The input to sanitize
- * @param {number} [maxLength] - Maximum length
- * @returns {string}
+ * @param input - The input to sanitize
+ * @param maxLength - Maximum length
  */
-export function sanitizeInput(input, maxLength) {
+export function sanitizeInput(input: unknown, maxLength?: number): string {
   if (input === null || input === undefined) {
     return "";
   }
@@ -159,11 +160,10 @@ export function sanitizeInput(input, maxLength) {
 
 /**
  * Sanitize a name/title for storage
- * @param {unknown} name - The name to sanitize
- * @param {number} [maxLength=200] - Maximum length
- * @returns {string}
+ * @param name - The name to sanitize
+ * @param maxLength - Maximum length, 200 by default
  */
-export function sanitizeName(name, maxLength = 200) {
+export function sanitizeName(name: unknown, maxLength = 200): string {
   const sanitized = sanitizeInput(name, maxLength);
 
   // Remove problematic characters but keep basic punctuation
@@ -173,10 +173,12 @@ export function sanitizeName(name, maxLength = 200) {
 
 /**
  * Validate an email address
- * @param {string} email - The email to validate
- * @returns {{ valid: boolean, error?: string }}
+ * @param email - The email to validate
  */
-export function validateEmail(email) {
+export function validateEmail(email: string): {
+  valid: boolean;
+  error?: string;
+} {
   if (!email || typeof email !== "string" || !email.trim()) {
     return { valid: false, error: "Email is required" };
   }
@@ -192,14 +194,14 @@ export function validateEmail(email) {
 
 /**
  * Validate a number within range
- * @param {unknown} value - The value to validate
- * @param {Object} [options] - Validation options
- * @param {number} [options.min] - Minimum value
- * @param {number} [options.max] - Maximum value
- * @param {boolean} [options.integer] - Must be an integer
- * @returns {{ valid: boolean, error?: string, value?: number }}
+ * @param value - The value to validate
+ * @param options - Validation options: `min`, `max`, and `integer` (must be
+ *   an integer)
  */
-export function validateNumber(value, options = {}) {
+export function validateNumber(
+  value: unknown,
+  options: { min?: number; max?: number; integer?: boolean } = {},
+): { valid: boolean; error?: string; value?: number } {
   const num = Number(value);
 
   if (isNaN(num)) {
@@ -223,10 +225,9 @@ export function validateNumber(value, options = {}) {
 
 /**
  * Check if a value is empty (null, undefined, empty string, empty array)
- * @param {unknown} value - The value to check
- * @returns {boolean}
+ * @param value - The value to check
  */
-export function isEmpty(value) {
+export function isEmpty(value: unknown): boolean {
   if (value === null || value === undefined) return true;
   if (typeof value === "string" && value.trim() === "") return true;
   if (Array.isArray(value) && value.length === 0) return true;

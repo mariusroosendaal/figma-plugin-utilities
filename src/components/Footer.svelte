@@ -30,7 +30,7 @@
     /** Layout variant */
     variant?: "right" | "split" | "full";
     /** Additional CSS class */
-    className?: string;
+    class?: string;
     /** The buttons, for the right and full variants */
     children?: Snippet;
     /** Split variant */
@@ -41,7 +41,7 @@
 
   let {
     variant = "right",
-    className = "",
+    class: className = "",
     children,
     left,
     right,

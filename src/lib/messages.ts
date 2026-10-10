@@ -45,7 +45,8 @@ export type Handlers<M extends Msg> = string extends M["type"]
 /**
  * A copy of the arrays and plain objects in `value`, at any depth. Svelte 5
  * state is a Proxy, which postMessage can't clone, as `$state.snapshot` would
- * say; typed arrays, dates and the rest go as they are.
+ * say; typed arrays, dates and the rest go as they are. State inside a Map,
+ * a Set or a class instance isn't reached: snapshot that before sending.
  */
 function plain(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(plain);

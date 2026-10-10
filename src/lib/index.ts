@@ -1,5 +1,5 @@
 // Message utilities
-export { sendToPlugin, createMessageHandler } from "./messages.ts";
+export { sendToPlugin, createMessageHandler } from "./messages";
 
 // Color utilities
 export {
@@ -9,10 +9,10 @@ export {
   getLuminance,
   getContrastRatio,
   meetsContrastLevel,
-} from "./colors.ts";
+} from "./colors";
 
 // Copy helpers
-export { plural, joinList, UNDO } from "./format.ts";
+export { plural, joinList, UNDO } from "./format";
 
 // Validation utilities
 export {
@@ -23,7 +23,7 @@ export {
   validateEmail,
   validateNumber,
   isEmpty,
-} from "./validation.js";
+} from "./validation";
 
 // Error handling utilities
 export {
@@ -34,7 +34,7 @@ export {
   withErrorHandling,
   safeAsync,
   parseJsonSafe,
-} from "./errorHandling.js";
+} from "./errorHandling";
 
 // Resize utilities
 export {
@@ -42,7 +42,7 @@ export {
   getContentHeight,
   resizeToFit,
   autoResize,
-} from "./resize.js";
+} from "./resize";
 
 // Confirmation dialogs, shown by ConfirmModal
 export {
@@ -50,4 +50,4 @@ export {
   confirmDiscardChanges,
   answerConfirm,
   confirmRequest,
-} from "./confirm.ts";
+} from "./confirm";

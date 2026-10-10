@@ -14,11 +14,11 @@
 
   interface Props {
     /** Additional CSS classes for the wrapper */
-    className?: string;
+    class?: string;
     children?: Snippet;
   }
 
-  let { className = "", children }: Props = $props();
+  let { class: className = "", children }: Props = $props();
 </script>
 
 <div class="plugin-wrapper {className}">

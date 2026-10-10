@@ -5,7 +5,7 @@
 
   interface Props {
     /** Additional CSS class */
-    className?: string;
+    class?: string;
     /** Title text (displayed in left section) */
     title?: string;
     /** Remove bottom border */
@@ -19,7 +19,7 @@
   }
 
   let {
-    className = "",
+    class: className = "",
     title = "",
     noBorder = false,
     level = 1,

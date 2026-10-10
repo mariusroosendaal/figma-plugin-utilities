@@ -5,20 +5,24 @@
  * error messages and error handling patterns across the plugin.
  */
 
-/**
- * @typedef {Object} FormattedError
- * @property {string} message - Technical error message
- * @property {string} userMessage - User-friendly error message
- * @property {string} [technical] - Stack trace or detailed info
- */
+export interface FormattedError {
+  /** Technical error message */
+  message: string;
+  /** User-friendly error message */
+  userMessage: string;
+  /** Stack trace or detailed info */
+  technical?: string;
+}
 
 /**
  * Format an error into a user-friendly message
- * @param {unknown} error - The error to format
- * @param {string} [context] - Optional context to add to the message
- * @returns {FormattedError}
+ * @param error - The error to format
+ * @param context - Optional context to add to the message
  */
-export function formatErrorMessage(error, context) {
+export function formatErrorMessage(
+  error: unknown,
+  context?: string,
+): FormattedError {
   let message = "An unexpected error occurred";
   let technical = "";
 
@@ -68,30 +72,34 @@ export function formatErrorMessage(error, context) {
 
 /**
  * Handle async errors with standardized formatting
- * @param {unknown} error - The error to handle
- * @param {string} operation - Description of the operation that failed
- * @returns {FormattedError}
+ * @param error - The error to handle
+ * @param operation - Description of the operation that failed
  */
-export function handleAsyncError(error, operation) {
+export function handleAsyncError(
+  error: unknown,
+  operation: string,
+): FormattedError {
   return formatErrorMessage(error, operation);
 }
 
 /**
  * Create a user-friendly error message for UI display
- * @param {unknown} error - The error to format
- * @param {string} operation - Description of the operation that failed
- * @returns {string}
+ * @param error - The error to format
+ * @param operation - Description of the operation that failed
  */
-export function createUserErrorMessage(error, operation) {
+export function createUserErrorMessage(
+  error: unknown,
+  operation: string,
+): string {
   return handleAsyncError(error, operation).userMessage;
 }
 
 /**
  * Log error with context (for debugging)
- * @param {unknown} error - The error to log
- * @param {string} context - Context description
+ * @param error - The error to log
+ * @param context - Context description
  */
-export function logError(error, context) {
+export function logError(error: unknown, context: string): void {
   const formatted = formatErrorMessage(error, context);
   console.error(`[${context}]`, formatted.message);
   if (formatted.technical && formatted.technical !== formatted.message) {
@@ -101,12 +109,13 @@ export function logError(error, context) {
 
 /**
  * Wrap an async function with error handling
- * @template T
- * @param {() => Promise<T>} fn - The async function to wrap
- * @param {string} operation - Description of the operation
- * @returns {Promise<T>}
+ * @param fn - The async function to wrap
+ * @param operation - Description of the operation
  */
-export async function withErrorHandling(fn, operation) {
+export async function withErrorHandling<T>(
+  fn: () => Promise<T>,
+  operation: string,
+): Promise<T> {
   try {
     return await fn();
   } catch (error) {
@@ -117,12 +126,13 @@ export async function withErrorHandling(fn, operation) {
 
 /**
  * Wrap an async function and return a result object instead of throwing
- * @template T
- * @param {() => Promise<T>} fn - The async function to wrap
- * @param {string} operation - Description of the operation
- * @returns {Promise<{ ok: true, value: T } | { ok: false, error: FormattedError }>}
+ * @param fn - The async function to wrap
+ * @param operation - Description of the operation
  */
-export async function safeAsync(fn, operation) {
+export async function safeAsync<T>(
+  fn: () => Promise<T>,
+  operation: string,
+): Promise<{ ok: true; value: T } | { ok: false; error: FormattedError }> {
   try {
     const value = await fn();
     return { ok: true, value };
@@ -134,10 +144,12 @@ export async function safeAsync(fn, operation) {
 
 /**
  * Parse JSON safely without throwing
- * @param {string} jsonString - The JSON string to parse
- * @returns {{ ok: true, value: any } | { ok: false, error: string }}
+ * @param jsonString - The JSON string to parse
  */
-export function parseJsonSafe(jsonString) {
+export function parseJsonSafe(
+  jsonString: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): { ok: true; value: any } | { ok: false; error: string } {
   try {
     const value = JSON.parse(jsonString);
     return { ok: true, value };

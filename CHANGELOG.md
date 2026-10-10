@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ### Breaking
-- Needs Svelte 5: `svelte` is a peer dependency, `^5.0.0`, and the optional `@sveltejs/vite-plugin-svelte` peer is `^4.0.0`. The components are Svelte 5 runes components with typed props, as the kit's are, so their events are callback props that get what was `event.detail`, and their named slots are snippets. See figma-ui3-kit-svelte's changelog for how a call changes
+- Needs Svelte 5.35 or later: `svelte` is a peer dependency, `^5.35.0`, as the kit's is, and the optional `@sveltejs/vite-plugin-svelte` peer is `^4.0.0`. The components are Svelte 5 runes components with typed props, as the kit's are, so their events are callback props that get what was `event.detail`, and their named slots are snippets. See figma-ui3-kit-svelte's changelog for how a call changes
 - Renamed, component by component:
 
   | Component | Svelte 4 | Svelte 5 |
@@ -12,9 +12,10 @@
   | CodeExportModal | `onClose`; slot `controls` | `onclose`; snippet `controls` |
   | DataTable | `on:select`, `on:column`; slots `action` and `editor` with `let:row`, `note` | `onselect(row)`, `oncolumn(index)`; snippets `action(row)`, `editor(row)`, `note` |
   | FieldGroup | slot `hint` | `hint` takes a snippet as well as a string |
-  | Footer | slots `left`, `right` | snippets `left`, `right` |
-  | Header | slots `left`, `center`, `right` | snippets `left`, `center`, `right` |
+  | Footer | `className`; slots `left`, `right` | `class`, as the kit's components; snippets `left`, `right` |
+  | Header | `className`; slots `left`, `center`, `right` | `class`; snippets `left`, `center`, `right` |
   | ListItem | `on:click`, `on:menuToggle`, `on:menuSelect`, `on:menuClose`; slots `badge`, `actions` | `onclick({ id })`, `onmenutoggle({ id, open })`, `onmenuselect({ id, action })`, `onmenuclose({ id })`; snippets `badge`, `actions` |
+  | PluginLayout | `className` | `class` |
   | MappingChip | `on:click`; slot `lead` | `onclick(event)`, not while disabled; snippet `lead` |
   | RampCurve | `on:change`, `on:select` | `onchange(patch)`, `onselect(index)` |
   | Section | slot `actions` | snippet `actions` |
@@ -22,11 +23,15 @@
   | SteppedField | `on:step` | `onstep(step)`, -1 or 1 |
 
 ### Added
-- Types for plugins written in TypeScript: `import type { DataTableRow, DataTableColumn, DataTableCell } from "figma-plugin-utilities"`. ListItem takes the type of its `menuItems`, so `onmenuselect` hands back the row's own `value` type
+- Types for plugins written in TypeScript: `import type { DataTableRow, DataTableColumn, DataTableCell } from "figma-plugin-utilities"`. The entry points are TypeScript, so the types reach a plugin that installs the package from npm. ListItem takes the type of its `menuItems`, so `onmenuselect` hands back the row's own `value` type
 - Typed messages: with the messages typed as one union per direction, `const send: Send<ToPlugin> = sendToPlugin` (or `sendToUI` in `code.ts`) checks each message's name and data, and `createMessageHandler<ToUI>({ … })` hands each handler its own message. `Send`, `Handlers` and `Msg` come from `figma-plugin-utilities` and `figma-plugin-utilities/lib/messages`. Untyped calls work as before
 
 ### Changed
 - `sendToPlugin` copies the arrays and plain objects in its data before posting them, so a message can hold Svelte 5 `$state`, a Proxy that postMessage can't clone
+
+### Fixed
+- StatusBar: an error or warning that follows an info or success message within 4 seconds stays until it's dismissed, instead of closing on the earlier message's timer
+- DataTable and EmptyState: two columns or actions with the same label no longer break the table or the buttons
 
 ## [0.6.0] - 2026-10-10
 

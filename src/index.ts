@@ -1,16 +1,10 @@
 // Types, for `import type { DataTableRow, Send } from "figma-plugin-utilities"`
-/** @typedef {import("./components/DataTable.svelte").Column} DataTableColumn */
-/** @typedef {import("./components/DataTable.svelte").Cell} DataTableCell */
-/** @typedef {import("./components/DataTable.svelte").Row} DataTableRow */
-/** @typedef {import("./lib/messages").Msg} Msg */
-/**
- * @template {Msg} M
- * @typedef {import("./lib/messages").Send<M>} Send
- */
-/**
- * @template {Msg} M
- * @typedef {import("./lib/messages").Handlers<M>} Handlers
- */
+export type {
+  Column as DataTableColumn,
+  Cell as DataTableCell,
+  Row as DataTableRow,
+} from "./components/data-table";
+export type { Msg, Send, Handlers } from "./lib/messages";
 
 // Re-export all components
 export {
@@ -32,7 +26,7 @@ export {
   RampCurve,
   MappingChip,
   ConfirmModal,
-} from "./components/index.js";
+} from "./components/index";
 
 // Re-export all utilities
 export {
@@ -76,4 +70,4 @@ export {
   confirmDiscardChanges,
   answerConfirm,
   confirmRequest,
-} from "./lib/index.js";
+} from "./lib/index";

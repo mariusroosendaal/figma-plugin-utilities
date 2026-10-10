@@ -41,11 +41,13 @@
   );
 
   // Show status when message changes
+  // The last message's timer goes first: an error that follows an info
+  // message within 4s would otherwise close with it
   $effect.pre(() => {
+    clearTimeout(timeoutId);
     if (message) {
       visible = true;
       if (shouldAutoDismiss) {
-        clearTimeout(timeoutId);
         timeoutId = setTimeout(() => handleClose(), 4000);
       }
     } else {
