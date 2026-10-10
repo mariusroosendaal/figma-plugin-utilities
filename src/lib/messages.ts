@@ -43,12 +43,35 @@ export type Handlers<M extends Msg> = string extends M["type"]
   : { [K in M["type"]]?: (msg: Extract<M, { type: K }>) => void };
 
 /**
- * Send a message to the plugin code
+ * A copy of the arrays and plain objects in `value`, at any depth. Svelte 5
+ * state is a Proxy, which postMessage can't clone, as `$state.snapshot` would
+ * say; typed arrays, dates and the rest go as they are.
+ */
+function plain(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(plain);
+  if (
+    value !== null &&
+    typeof value === "object" &&
+    Object.getPrototypeOf(value) === Object.prototype
+  ) {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, plain(entry)]),
+    );
+  }
+  return value;
+}
+
+/**
+ * Send a message to the plugin code. The data may hold Svelte state: it's
+ * copied first.
  * @param type - Message type identifier
  * @param data - Additional data to send
  */
 export function sendToPlugin(type: string, data: object = {}): void {
-  parent.postMessage({ pluginMessage: { ...data, type } }, "*");
+  parent.postMessage(
+    { pluginMessage: { ...(plain(data) as object), type } },
+    "*",
+  );
 }
 
 /**

@@ -25,6 +25,9 @@
 - Types for plugins written in TypeScript: `import type { DataTableRow, DataTableColumn, DataTableCell } from "figma-plugin-utilities"`. ListItem takes the type of its `menuItems`, so `onmenuselect` hands back the row's own `value` type
 - Typed messages: with the messages typed as one union per direction, `const send: Send<ToPlugin> = sendToPlugin` (or `sendToUI` in `code.ts`) checks each message's name and data, and `createMessageHandler<ToUI>({ … })` hands each handler its own message. `Send`, `Handlers` and `Msg` come from `figma-plugin-utilities` and `figma-plugin-utilities/lib/messages`. Untyped calls work as before
 
+### Changed
+- `sendToPlugin` copies the arrays and plain objects in its data before posting them, so a message can hold Svelte 5 `$state`, a Proxy that postMessage can't clone
+
 ## [0.6.0] - 2026-10-10
 
 ### Added
