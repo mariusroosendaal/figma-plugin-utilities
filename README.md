@@ -342,7 +342,7 @@ const send: Send<ToUI> = sendToUI;
 figma.ui.onmessage = (msg: ToPlugin) => { /* … */ };
 ```
 
-### Colors (`lib/colors.js`)
+### Colors (`lib/colors.ts`)
 
 ```javascript
 // Convert between formats (Figma uses 0-1 range)
@@ -355,7 +355,7 @@ const ratio = getContrastRatio(color1, color2);
 const passes = meetsContrastLevel(ratio, "AA"); // true/false
 ```
 
-### Validation (`lib/validation.js`)
+### Validation (`lib/validation.ts`)
 
 ```javascript
 const urlResult = validateUrl("https://example.com");
@@ -375,7 +375,7 @@ sanitizeInput(input, 50); // stringify, truncate to maxLength, strip control cha
 isEmpty(""); // true — also for [] and {}
 ```
 
-### Error Handling (`lib/errorHandling.js`)
+### Error Handling (`lib/errorHandling.ts`)
 
 ```javascript
 // Safe async operations
@@ -394,7 +394,7 @@ const parsed = parseJsonSafe(jsonString);
 // { ok: true, value: {...} } or { ok: false, error: "..." }
 ```
 
-### Resize (`lib/resize.js`)
+### Resize (`lib/resize.ts`)
 
 Utilities for dynamically resizing the plugin window to fit its content.
 
