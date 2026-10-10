@@ -1,7 +1,16 @@
-// Types, for `import type { DataTableRow } from "figma-plugin-utilities"`
+// Types, for `import type { DataTableRow, Send } from "figma-plugin-utilities"`
 /** @typedef {import("./components/DataTable.svelte").Column} DataTableColumn */
 /** @typedef {import("./components/DataTable.svelte").Cell} DataTableCell */
 /** @typedef {import("./components/DataTable.svelte").Row} DataTableRow */
+/** @typedef {import("./lib/messages").Msg} Msg */
+/**
+ * @template {Msg} M
+ * @typedef {import("./lib/messages").Send<M>} Send
+ */
+/**
+ * @template {Msg} M
+ * @typedef {import("./lib/messages").Handlers<M>} Handlers
+ */
 
 // Re-export all components
 export {

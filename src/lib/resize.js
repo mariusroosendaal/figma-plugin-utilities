@@ -12,7 +12,7 @@
  *   if (msg.type === "resize") handleResize(msg);
  */
 
-import { sendToPlugin } from "./messages.js";
+import { sendToPlugin } from "./messages.ts";
 
 /** Default width for the plugin window */
 let defaultWidth = 300;

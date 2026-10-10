@@ -24,6 +24,11 @@
     "./lib/*": {
       "import": "./src/lib/*.js"
     },
+    "./lib/messages": {
+      "types": "./src/lib/messages.ts",
+      "import": "./src/lib/messages.ts",
+      "default": "./src/lib/messages.ts"
+    },
     "./lib/figma-helpers": {
       "types": "./src/lib/figma-helpers.ts",
       "import": "./src/lib/figma-helpers.ts",

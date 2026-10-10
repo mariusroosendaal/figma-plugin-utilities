@@ -309,7 +309,7 @@ Copies with `execCommand`, since the plugin iframe isn't granted clipboard-write
 
 ## Utilities
 
-### Messages (`lib/messages.js`)
+### Messages (`lib/messages.ts`)
 
 ```javascript
 // Send message to plugin code
@@ -320,6 +320,26 @@ window.onmessage = createMessageHandler({
   success: (msg) => console.log("Success:", msg),
   error: (msg) => console.error("Error:", msg),
 });
+```
+
+In TypeScript, type the messages as one union per direction, and the helpers check each message's name and data:
+
+```ts
+// messages.ts
+export type ToPlugin = { type: "run"; options: Options } | { type: "cancel" };
+export type ToUI = { type: "done"; count: number };
+
+// PluginUI.svelte
+import { sendToPlugin, createMessageHandler, type Send } from "figma-plugin-utilities";
+const send: Send<ToPlugin> = sendToPlugin;
+send("run", { options }); // the data is required, since `run` has it
+window.onmessage = createMessageHandler<ToUI>({ done: (msg) => (count = msg.count) });
+
+// code.ts
+import { sendToUI } from "figma-plugin-utilities/lib/figma-helpers";
+import type { Send } from "figma-plugin-utilities/lib/messages";
+const send: Send<ToUI> = sendToUI;
+figma.ui.onmessage = (msg: ToPlugin) => { /* … */ };
 ```
 
 ### Colors (`lib/colors.js`)
